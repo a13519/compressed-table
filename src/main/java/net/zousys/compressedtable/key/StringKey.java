@@ -43,7 +43,9 @@ public class StringKey implements KeySet {
      */
     public static StringKey create(KeyHeadersList keyHeaderList, List<String> fields, CompressedRow row) {
         StringKey sk = new StringKey(keyHeaderList, row);
-        sk.cast(fields, row.getCompressedTable().getHeaderMapping(), row.getCompressedTable().getContents().size()+"."+row.getCompressedContent().hash());
+        sk.cast(fields,
+                row.getCompressedTable().getHeaderMapping(),
+                System.currentTimeMillis()+"."+row.getCompressedContent().hash());
         return sk;
     }
 
