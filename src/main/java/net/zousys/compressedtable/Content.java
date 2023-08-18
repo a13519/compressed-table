@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.zip.DataFormatException;
 
 public interface Content {
-    public List<String> form() throws DataFormatException, IOException;
-    public byte[] getByteArray();
-    public float getCompressionRatio();
+    List<String> form() throws DataFormatException, IOException;
+
+    byte[] getByteArray();
+
+    float getCompressionRatio();
 }

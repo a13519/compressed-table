@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+
 @NoArgsConstructor
 public class CompressedByteArray {
     private byte[] bytearray;
@@ -17,12 +18,13 @@ public class CompressedByteArray {
     public void loadContent(byte[] bytearray) throws IOException {
         compress(bytearray);
     }
+
     public void loadContent(String string) throws IOException {
         compress(string.getBytes(StandardCharsets.UTF_8));
     }
 
     private void compress(byte[] bytearray) throws IOException {
-        if (bytearray==null){
+        if (bytearray == null) {
             return;
         }
         this.beforesize = bytearray.length;
@@ -31,7 +33,7 @@ public class CompressedByteArray {
     }
 
     public byte[] formBytes() throws DataFormatException, IOException {
-        if (bytearray==null) {
+        if (bytearray == null) {
             return null;
         } else {
             return decompress(this.bytearray, false);
@@ -43,7 +45,7 @@ public class CompressedByteArray {
     }
 
     public float getCompressionRatio() {
-        return (float)aftersize/beforesize;
+        return (float) aftersize / beforesize;
     }
 
 

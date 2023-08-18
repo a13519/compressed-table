@@ -19,6 +19,11 @@ import java.util.Map;
 public class StringKey implements Key {
     private List<String> keys = new ArrayList<>();
 
+    public static StringKey create(String[] keyheaders, Map<String, Integer> map, List<String> fields) {
+        StringKey sk = new StringKey();
+        sk.setKey(keyheaders, map, fields);
+        return sk;
+    }
     @Override
     public String toString() {
         return "{" + keys +
@@ -27,9 +32,9 @@ public class StringKey implements Key {
 
     @Override
     public void setKey(String[] keyheaders, Map<String, Integer> map, List<String> fields) {
-        if (keyheaders!=null&&map!=null&&fields!=null) {
+        if (keyheaders != null && map != null && fields != null) {
             keys = new ArrayList<>();
-            Arrays.stream(keyheaders).forEach(header-> {
+            Arrays.stream(keyheaders).forEach(header -> {
                 try {
                     keys.add(fields.get(map.get(header)));
                 } catch (NullPointerException e) {

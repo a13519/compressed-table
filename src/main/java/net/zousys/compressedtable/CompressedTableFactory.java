@@ -11,17 +11,20 @@ import java.nio.file.Paths;
 public class CompressedTableFactory {
     public static enum Type {
         CSV, EXCEL
-    };
+    }
+
+    ;
     @Getter
     private Type type;
     @Getter
     private String[] keyHeaders;
+
     private CompressedTableFactory(Type type) {
         this.type = type;
     }
 
     public static CompressedTableFactory build(Type type) {
-        if (type.equals(Type.CSV)){
+        if (type.equals(Type.CSV)) {
             return new CompressedTableFactory(type);
         } else {
             return null;
@@ -32,7 +35,12 @@ public class CompressedTableFactory {
         this.keyHeaders = keyHeaders;
         return this;
     }
-    public CompressedTable readFile(String filename, char delimeter) throws IOException {
+
+    public CompressedTable readCSVFile(String filename) throws IOException {
+        return null;
+    }
+
+    public CompressedTable readCSVFile(String filename, char delimeter) throws IOException {
         FileReader in = new FileReader(filename);
         CSVFormat format = CSVFormat.RFC4180.builder()
                 .setDelimiter(delimeter)
@@ -41,10 +49,10 @@ public class CompressedTableFactory {
                 .setTrim(true)
                 .build();
         CompressedTable compressedTable = new CompressedTable();
-        if (keyHeaders!=null) {
+        if (keyHeaders != null) {
             compressedTable.setKeyHeaders(keyHeaders);
         }
-        format.parse(in).stream().forEach(re->{
+        format.parse(in).stream().forEach(re -> {
             try {
                 System.out.println(re);
                 compressedTable.appendRow(re.values(), true);
@@ -59,8 +67,8 @@ public class CompressedTableFactory {
     public static void main(String[] a) throws IOException {
         CompressedTable compressedTable = CompressedTableFactory
                 .build(Type.CSV)
-                .headerKeys(new String[]{"Name","Age"})
-                .readFile(Paths.get("biostats.csv").toString(),',');
+                .headerKeys(new String[]{"Name", "Age"})
+                .readCSVFile(Paths.get("biostats.csv").toString(), ',');
         System.out.println(compressedTable.size());
         System.out.println(compressedTable.getKeyedMapping().size());
     }

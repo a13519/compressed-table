@@ -11,9 +11,10 @@ import java.util.zip.DataFormatException;
 
 public class CompressedContent extends CompressedByteArray implements Content {
 
-    private CompressedContent(){
+    private CompressedContent() {
         super();
     }
+
     public static CompressedContent load(List<String> fields) throws IOException {
         CompressedContent compressedContent = new CompressedContent();
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
@@ -21,6 +22,7 @@ public class CompressedContent extends CompressedByteArray implements Content {
         compressedContent.loadContent(bao.toByteArray());
         return compressedContent;
     }
+
     public static CompressedContent load(String[] fields) throws IOException {
         CompressedContent compressedContent = new CompressedContent();
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
@@ -28,6 +30,7 @@ public class CompressedContent extends CompressedByteArray implements Content {
         compressedContent.loadContent(bao.toByteArray());
         return compressedContent;
     }
+
     @Override
     public List<String> form() throws DataFormatException, IOException {
         ByteArrayInputStream bao = new ByteArrayInputStream(decompress(super.getByteArray(), false));

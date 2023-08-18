@@ -17,12 +17,13 @@ import java.util.Optional;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CompressedRow implements Row{
+public class CompressedRow implements Row {
     private StringKey stringKey;
     private CompressedContent compressedContent;
+
     public static Optional<Row> build(String[] headerkeys, Map<String, Integer> headermapping, List<String> fields) throws IOException {
         StringKey k = null;
-        if (headerkeys!=null&&headermapping!=null&&fields!=null) {
+        if (headerkeys != null && headermapping != null && fields != null) {
             k = new StringKey();
             k.setKey(headerkeys, headermapping, fields);
         }

@@ -32,25 +32,28 @@ public class CompressedTable implements ImmutableTable {
     }
 
     public void appendRow(List<String> fields, boolean isIncludeHeader) throws IOException {
-        if (isIncludeHeader && onHeader){
+        if (isIncludeHeader && onHeader) {
             setHeaders(fields.toArray(new String[]{}));
             onHeader = false;
         } else {
             appendRow(fields);
         }
     }
+
     public void appendRow(String[] fields) throws IOException {
         appendRow(Arrays.asList(fields));
     }
+
     public void appendRow(String[] fields, boolean isIncludeHeader) throws IOException {
         appendRow(Arrays.asList(fields), isIncludeHeader);
     }
+
     public void appendRow(List<String> fields) throws IOException {
         if (fields != null) {
             Optional<Row> ocr = CompressedRow.build(headerkeys, headerMapping, fields);
             ocr.ifPresent(row -> {
                 this.rows.add(row);
-                if (row.getKey()!=null) {
+                if (row.getKey() != null) {
                     keyedMapping.put(row.getKey().toString(), row);
                 }
             });
