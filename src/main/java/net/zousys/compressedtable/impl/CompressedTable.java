@@ -2,38 +2,57 @@ package net.zousys.compressedtable.impl;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.zousys.compressedtable.ImmutableTable;
 import net.zousys.compressedtable.Key;
 import net.zousys.compressedtable.Row;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.zip.DataFormatException;
 
 @NoArgsConstructor
 public class CompressedTable implements ImmutableTable {
-    private Map<String, Row> mapping = new HashMap<>();
+    @Getter
+    private Map<String, Row> keyedMapping = new HashMap<>();
     private List<Row> rows = new ArrayList<>();
     @Getter
     private String[] headers;
-    private Map<String, Integer> headermapping = new HashMap<>();
+    @Setter
+    private Map<String, Integer> headerMapping = new HashMap<>();
     @Getter
     private String[] headerkeys;
+    private boolean onHeader = true;
 
     public void setHeaders(String[] headers) {
         this.headers = headers;
         int ind = 0;
         for (String header : headers) {
-            headermapping.put(header, ind++);
+            headerMapping.put(header, ind++);
         }
     }
 
+    public void appendRow(List<String> fields, boolean isIncludeHeader) throws IOException {
+        if (isIncludeHeader && onHeader){
+            setHeaders(fields.toArray(new String[]{}));
+            onHeader = false;
+        } else {
+            appendRow(fields);
+        }
+    }
+    public void appendRow(String[] fields) throws IOException {
+        appendRow(Arrays.asList(fields));
+    }
+    public void appendRow(String[] fields, boolean isIncludeHeader) throws IOException {
+        appendRow(Arrays.asList(fields), isIncludeHeader);
+    }
     public void appendRow(List<String> fields) throws IOException {
         if (fields != null) {
-            Optional<Row> ocr = CompressedRow.build(headerkeys, headermapping, fields);
+            Optional<Row> ocr = CompressedRow.build(headerkeys, headerMapping, fields);
             ocr.ifPresent(row -> {
                 this.rows.add(row);
-                mapping.put(row.getKey().toString(), row);
+                if (row.getKey()!=null) {
+                    keyedMapping.put(row.getKey().toString(), row);
+                }
             });
         }
     }
@@ -46,7 +65,7 @@ public class CompressedTable implements ImmutableTable {
 
     @Override
     public Optional<Row> seekByKey(Key key) {
-        return Optional.of(mapping.get(key));
+        return Optional.of(keyedMapping.get(key));
     }
 
     @Override

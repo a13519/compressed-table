@@ -21,14 +21,14 @@ public class CompressedRow implements Row{
     private StringKey stringKey;
     private CompressedContent compressedContent;
     public static Optional<Row> build(String[] headerkeys, Map<String, Integer> headermapping, List<String> fields) throws IOException {
+        StringKey k = null;
         if (headerkeys!=null&&headermapping!=null&&fields!=null) {
-            StringKey k = new StringKey();
+            k = new StringKey();
             k.setKey(headerkeys, headermapping, fields);
-            CompressedContent compressedContent = CompressedContent.load(fields);
-            CompressedRow compressedRow = new CompressedRow(k, compressedContent);
-            return Optional.of(compressedRow);
         }
-        return Optional.empty();
+        CompressedContent compressedContent = CompressedContent.load(fields);
+        CompressedRow compressedRow = new CompressedRow(k, compressedContent);
+        return Optional.of(compressedRow);
     }
 
     @Override
