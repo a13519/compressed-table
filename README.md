@@ -1,1 +1,1 @@
-# compressedTable
+# Compressed Table
