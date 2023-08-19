@@ -17,9 +17,9 @@ public class CompressedContent extends CompressedByteArray implements Content {
 
     public static CompressedContent load(List<String> fields) throws IOException {
         CompressedContent compressedContent = new CompressedContent();
-        ByteArrayOutputStream bao = new ByteArrayOutputStream();
-        fields.stream().forEach(field -> bao.writeBytes(field.getBytes(StandardCharsets.UTF_8)));
-        compressedContent.loadContent(bao.toByteArray());
+        StringWriter bw = new StringWriter();
+        fields.forEach(field -> bw.write(field+"\n"));
+        compressedContent.loadContent(String.valueOf(bw).getBytes());
         return compressedContent;
     }
 

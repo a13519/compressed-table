@@ -18,6 +18,7 @@ public class CompressedTable implements ImmutableTable {
     @Getter
     private String[] headers;
     @Setter
+    @Getter
     private Map<String, Integer> headerMapping = new HashMap<>();
     @Getter
     private String[] headerkeys;
@@ -50,13 +51,12 @@ public class CompressedTable implements ImmutableTable {
 
     public void appendRow(List<String> fields) throws IOException {
         if (fields != null) {
-            Optional<Row> ocr = CompressedRow.build(headerkeys, headerMapping, fields);
-            ocr.ifPresent(row -> {
-                this.rows.add(row);
-                if (row.getKey() != null) {
-                    keyedMapping.put(row.getKey().toString(), row);
-                }
-            });
+            CompressedRow compressedRow = new CompressedRow(this);
+            compressedRow.make(fields);
+            this.rows.add(compressedRow);
+            if (compressedRow.getKey() != null) {
+                    keyedMapping.put(compressedRow.getKey().toString(), compressedRow);
+            }
         }
     }
 
