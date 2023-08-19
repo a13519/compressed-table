@@ -63,24 +63,4 @@ public class CompressedTableFactory {
 
         return compressedTable;
     }
-
-    public static void main(String[] a) throws IOException {
-        CompressedTable beforetable = CompressedTableFactory
-                .build(Type.CSV)
-                .headerKeys(new String[]{"Name", "Age"})
-                .readCSVFile(Paths.get("biostats.csv").toString(), ',');
-        CompressedTable aftertable = CompressedTableFactory
-                .build(Type.CSV)
-                .headerKeys(new String[]{"Name", "Age"})
-                .readCSVFile(Paths.get("biostats1.csv").toString(), ',');
-
-        ComparisonResult cr =
-                CompressedComparator.builder()
-                        .before(beforetable)
-                .after(aftertable)
-                .build()
-                        .setIgnoredFields(new String[]{"Height (in)"})
-                .compare();
-
-    }
 }
