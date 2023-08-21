@@ -7,6 +7,7 @@ import org.apache.commons.csv.CSVFormat;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class CompressedTableFactory {
     public static enum Type {
@@ -23,12 +24,16 @@ public class CompressedTableFactory {
         this.type = type;
     }
 
-    public static CompressedTableFactory build(Type type) {
-        if (type.equals(Type.CSV)) {
-            return new CompressedTableFactory(type);
-        } else {
+    public static CompressedTableFactory build(String type) {
+        if (type == null){
             return null;
         }
+        switch (type.toLowerCase()){
+            case "csv":{
+                return new CompressedTableFactory(Type.CSV);
+            }
+        }
+        return null;
     }
 
     public CompressedTableFactory headerKeys(String[] keyHeaders) {
