@@ -26,16 +26,9 @@ public class ComparisonResult {
         String stringkey;
         @Getter
         List<ResultField> fields = new ArrayList<>();
-
-        public boolean isMismatch() {
-            AtomicBoolean r = new AtomicBoolean(false);
-            fields.forEach(mf -> {
-                if (mf.missmatched){
-                    r.set(true);
-                }
-            });
-            return r.get();
-        }
+        @Getter
+        @Setter
+        boolean unifiedMismatch;
     }
     @Builder
     @Getter

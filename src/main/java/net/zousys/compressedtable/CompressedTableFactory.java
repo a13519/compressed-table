@@ -59,7 +59,6 @@ public class CompressedTableFactory {
         }
         format.parse(in).stream().forEach(re -> {
             try {
-                System.out.println(re);
                 compressedTable.appendRow(re.values(), true);
             } catch (IOException e) {
                 //

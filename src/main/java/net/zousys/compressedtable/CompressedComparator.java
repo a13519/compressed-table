@@ -41,7 +41,7 @@ public class CompressedComparator {
                                     ignoredFields,
                                     before.getHeaderMapping(),
                                     after.getHeaderMapping());
-                    if (mismatch.isMismatch()){
+                    if (mismatch.isUnifiedMismatch()){
                         comparisonResult.getMismatches().add(mismatch);
                     } else {
                         comparisonResult.getMatched().add(key);
@@ -78,6 +78,7 @@ public class CompressedComparator {
                 if (!fieldsA.get(headerMapA.get(headerA))
                         .equals(fieldsB.get(headerMapB.get(headerA)))) {
                     rf.missmatched=true;
+                    rowResult.unifiedMismatch=true;
                 }
             }
         });
