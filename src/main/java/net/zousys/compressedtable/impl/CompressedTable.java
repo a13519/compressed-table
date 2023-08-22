@@ -16,7 +16,7 @@ public class CompressedTable implements ImmutableTable {
     private Map<String, Row> keyedMapping = new HashMap<>();
     private List<Row> rows = new ArrayList<>();
     @Getter
-    private String[] headers;
+    private List<String> headers;
     @Setter
     @Getter
     private Map<String, Integer> headerMapping = new HashMap<>();
@@ -25,7 +25,7 @@ public class CompressedTable implements ImmutableTable {
     private boolean onHeader = true;
 
     public void setHeaders(String[] headers) {
-        this.headers = headers;
+        this.headers = List.of(headers);
         int ind = 0;
         for (String header : headers) {
             headerMapping.put(header, ind++);

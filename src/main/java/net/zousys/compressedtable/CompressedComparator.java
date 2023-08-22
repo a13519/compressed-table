@@ -17,6 +17,8 @@ public class CompressedComparator {
 
     private CompressedTable after;
 
+    private boolean trim;
+
     public CompressedComparator setIgnoredFields(String[] fields) {
         ignoredFields = new HashSet<>();
         ignoredFields.addAll(Arrays.stream(fields).collect(Collectors.toSet()));
@@ -24,13 +26,8 @@ public class CompressedComparator {
     }
 
     public ComparisonResult compare() {
-        ComparisonResult comparisonResult = new ComparisonResult();
-
-        Set<String> beforeKeyset = before.getKeyedMapping().keySet();
-        Set<String> afterKeyset = after.getKeyedMapping().keySet();
-        contains(afterKeyset, beforeKeyset, comparisonResult.getBeforeMissed());
-        contains(beforeKeyset, afterKeyset, comparisonResult.getAfterMissed());
-        beforeKeyset.forEach(key->{
+        ComparisonResult comparisonResult = new ComparisonResult(before, after);
+        before.getKeyedMapping().keySet().forEach(key->{
             Row beforeRow = before.getKeyedMapping().get(key);
             Row afterRow = after.getKeyedMapping().get(key);
             if (afterRow!=null){
@@ -39,8 +36,10 @@ public class CompressedComparator {
                             compareRow(beforeRow,
                                     afterRow,
                                     ignoredFields,
-                                    before.getHeaderMapping(),
-                                    after.getHeaderMapping());
+                                    before,
+                                    after,
+                                    trim,
+                                    comparisonResult);
                     if (mismatch.isUnifiedMismatch()){
                         comparisonResult.getMismatches().add(mismatch);
                     } else {
@@ -60,35 +59,40 @@ public class CompressedComparator {
             Row a,
             Row b,
             Set<String> ignoredFields,
-            Map<String, Integer> headerMapA,
-            Map<String, Integer> headerMapB) throws DataFormatException, IOException {
+            CompressedTable before,
+            CompressedTable after,
+            boolean trim,
+            ComparisonResult comparisonResult) throws DataFormatException, IOException {
 
         List<String> fieldsA = a.getContent().form();
         List<String> fieldsB = b.getContent().form();
 
         ComparisonResult.RowResult rowResult = new ComparisonResult.RowResult();
         rowResult.setStringkey(a.getKey().toString());
-        headerMapA.keySet().forEach(headerA->{
+
+        for (String headerA : comparisonResult.getUnitedHeaders()) {
+            Integer beforeInd = before.getHeaderMapping().get(headerA);
+            Integer afterInd = after.getHeaderMapping().get(headerA);
+            String fvbefore = beforeInd==null?null:fieldsA.get(beforeInd);
+            String fvafter = afterInd==null?null:fieldsB.get(afterInd);
             ComparisonResult.ResultField rf = ComparisonResult.ResultField.builder()
-                            .beforeField(fieldsA.get(headerMapA.get(headerA)))
-                                    .afterField(fieldsB.get(headerMapB.get(headerA)))
-                                            .build();
+                    .beforeField(trim&&fvbefore!=null?fvbefore.trim():fvbefore)
+                    .afterField(trim&&fvafter!=null?fvafter.trim():fvafter)
+                    .build();
             rowResult.getFields().add(rf);
-            if (ignoredFields==null || !ignoredFields.contains(headerA)) {
-                if (!fieldsA.get(headerMapA.get(headerA))
-                        .equals(fieldsB.get(headerMapB.get(headerA)))) {
+
+            if (ignoredFields!=null && ignoredFields.contains(headerA)) {
+                rf.setIgnored(true);
+            } else {
+                if ((rf.getBeforeField() == null || rf.getAfterField() == null)
+                        ||!rf.getBeforeField().equals(rf.getAfterField())) {
                     rf.missmatched=true;
                     rowResult.unifiedMismatch=true;
                 }
             }
-        });
+        }
+
         return rowResult;
     }
-    private static final void contains(Set<String> a, Set<String> b, Set<String> register) {
-        a.forEach(key->{
-            if (!b.contains(key)) {
-                register.add(key);
-            }
-        });
-    }
+
 }

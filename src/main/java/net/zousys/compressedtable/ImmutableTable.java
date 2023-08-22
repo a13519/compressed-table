@@ -6,7 +6,7 @@ import java.util.Optional;
 public interface ImmutableTable {
     List<Row> getContents();
 
-    String[] getHeaders();
+    List<String> getHeaders();
 
     Optional<Row> seekByKey(Key key);
 
