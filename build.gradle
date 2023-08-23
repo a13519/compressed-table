@@ -22,7 +22,7 @@ publishing {
 }
 
 group = 'net.zousys'
-version = '0.5'
+version = '0.5.1'
 
 java {
     sourceCompatibility = '11'

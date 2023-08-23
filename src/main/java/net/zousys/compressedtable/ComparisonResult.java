@@ -20,6 +20,7 @@ public class ComparisonResult {
     private List<String> matched = new ArrayList<>();
     private List<RowResult> mismatches = new ArrayList<>();
     private List<String> unitedHeaders;
+    private Map<String, Integer> unitedHeaderMapping = new HashMap<>();
 
     public ComparisonResult(@NonNull CompressedTable before, @NonNull CompressedTable after) {
         this.before = before;
@@ -33,6 +34,7 @@ public class ComparisonResult {
 
     public void uniteHeaders() {
         unitedHeaders = Stream.concat(before.getHeaders().stream(),beforeMissedHeaders.stream()).collect(Collectors.toList());
+        unitedHeaders.stream().forEach(a->unitedHeaderMapping.put(a, unitedHeaderMapping.size()));
     }
 
     @NoArgsConstructor
