@@ -37,7 +37,7 @@ public class StringKey implements Key {
             Arrays.stream(keyheaders).forEach(header -> {
                 try {
                     keys.add(fields.get(map.get(header)));
-                } catch (NullPointerException e) {
+                } catch (Exception e) {
                     // ignore
                 }
             });
