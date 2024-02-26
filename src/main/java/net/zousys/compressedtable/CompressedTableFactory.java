@@ -14,7 +14,9 @@ public class CompressedTableFactory {
         CSV, EXCEL
     }
 
-    ;
+    @Getter
+    private int ignoredLines;
+
     @Getter
     private Type type;
     @Getter
@@ -34,6 +36,11 @@ public class CompressedTableFactory {
             }
         }
         return null;
+    }
+
+    public CompressedTableFactory ignoredLines(int number) {
+        this.ignoredLines = number;
+        return this;
     }
 
     public CompressedTableFactory headerKeys(String[] keyHeaders) {
@@ -57,7 +64,7 @@ public class CompressedTableFactory {
         if (keyHeaders != null) {
             compressedTable.setKeyHeaders(keyHeaders);
         }
-        format.parse(in).stream().forEach(re -> {
+        format.parse(in).stream().skip(ignoredLines).forEach(re -> {
             try {
                 compressedTable.appendRow(re.values(), true);
             } catch (IOException e) {

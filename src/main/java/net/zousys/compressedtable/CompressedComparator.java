@@ -18,13 +18,14 @@ public class CompressedComparator {
 
     private CompressedTable after;
 
-    private Set<String> beforeMissed = new HashSet<>();
-    private Set<String> afterMissed = new HashSet<>();
-    private List<String> beforeMissedHeaders = new ArrayList<>();
-    private List<String> afterMissedHeaders = new ArrayList<>();
+    private Set<String> beforeMissed;
+    private Set<String> afterMissed;
+    private List<String> beforeMissedHeaders;
+    private List<String> afterMissedHeaders;
 
     private List<String> unitedHeaders;
-    private Map<String, Integer> unitedHeaderMapping = new HashMap<>();
+
+    private Map<String, Integer> unitedHeaderMapping;
 
     private BookKeeper bookKeeper;
 
@@ -147,6 +148,10 @@ public class CompressedComparator {
     }
 
     private void pickMissed() {
+        beforeMissed = new HashSet<>();
+        afterMissed = new HashSet<>();
+        beforeMissedHeaders = new ArrayList<>();
+        afterMissedHeaders = new ArrayList<>();
         contains(after.getKeyedMapping().keySet(), before.getKeyedMapping().keySet(), beforeMissed);
         contains(before.getKeyedMapping().keySet(), after.getKeyedMapping().keySet(), afterMissed);
         contains(after.getHeaders(), before.getHeaders(), beforeMissedHeaders);
@@ -155,6 +160,8 @@ public class CompressedComparator {
     }
 
     public void uniteHeaders() {
+        unitedHeaders = new ArrayList<>();
+        unitedHeaderMapping = new HashMap<>();
         unitedHeaders = Stream.concat(before.getHeaders().stream(),beforeMissedHeaders.stream()).collect(Collectors.toList());
         unitedHeaders.stream().forEach(a->unitedHeaderMapping.put(a, unitedHeaderMapping.size()));
     }
