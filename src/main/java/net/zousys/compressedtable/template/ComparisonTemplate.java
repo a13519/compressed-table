@@ -17,8 +17,8 @@ import java.util.Map;
 @Data
 public class ComparisonTemplate {
     private String resultfile;
-    private XSSFWorkbook book;
     private XSSFSheet spreadsheet;
+    private XSSFWorkbook book;
     private int ignrn = 0;
     private int rowid = 0;
     private int coln = 0;
@@ -70,6 +70,7 @@ public class ComparisonTemplate {
         Cell keyCell = row.createCell(cellid++);
         keyCell.setCellValue(rowResult.getStringkey());
         List<ComparisonResult.ResultField> fields = rowResult.getFields();
+        int x = 0;
         for (String header : comparisonResult.getUnitedHeaders()){
             Cell cell = row.createCell(cellid++);
             Integer bheaderInd = comparisonResult.getBefore().getHeaderMapping().get(header);
@@ -77,7 +78,7 @@ public class ComparisonTemplate {
                 cell.setCellValue("");
                 cell.setCellStyle(styles.get("nullbefore"));
             } else {
-                ComparisonResult.ResultField rf = fields.get(comparisonResult.getUnitedHeaderMapping().get(header));
+                ComparisonResult.ResultField rf = fields.get(x++);
                 cell.setCellValue(rf.getBeforeField());
                 if (fields.get(bheaderInd).isMissmatched()) {
                     cell.setCellStyle(styles.get("missmatchbefore"));
@@ -98,7 +99,7 @@ public class ComparisonTemplate {
                 cell.setCellValue("");
                 cell.setCellStyle(styles.get("nullafter"));
             } else {
-                ComparisonResult.ResultField rf = fields.get(comparisonResult.getUnitedHeaderMapping().get(header));
+                ComparisonResult.ResultField rf = fields.get(x++);
                 cell.setCellValue(rf.getAfterField());
                 if (fields.get(aheaderInd).isMissmatched()) {
                     cell.setCellStyle(styles.get("missmatchafter"));
