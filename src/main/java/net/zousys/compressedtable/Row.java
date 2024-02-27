@@ -4,4 +4,6 @@ public interface Row {
     Key getKey();
     ImmutableTable getTable();
     Content getContent();
+
+    long hash();
 }

@@ -10,4 +10,6 @@ public interface Content {
     byte[] getByteArray();
 
     float getCompressionRatio();
+
+    long hash();
 }
