@@ -10,11 +10,19 @@ import java.util.List;
 import java.util.zip.DataFormatException;
 
 public class CompressedContent extends CompressedByteArray implements Content {
-
+    /**
+     *
+     */
     private CompressedContent() {
         super();
     }
 
+    /**
+     *
+     * @param fields
+     * @return
+     * @throws IOException
+     */
     public static CompressedContent load(List<String> fields) throws IOException {
         CompressedContent compressedContent = new CompressedContent();
         StringWriter bw = new StringWriter();
@@ -23,6 +31,12 @@ public class CompressedContent extends CompressedByteArray implements Content {
         return compressedContent;
     }
 
+    /**
+     *
+     * @param fields
+     * @return
+     * @throws IOException
+     */
     public static CompressedContent load(String[] fields) throws IOException {
         CompressedContent compressedContent = new CompressedContent();
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
@@ -31,6 +45,12 @@ public class CompressedContent extends CompressedByteArray implements Content {
         return compressedContent;
     }
 
+    /**
+     *
+     * @return
+     * @throws DataFormatException
+     * @throws IOException
+     */
     @Override
     public List<String> form() throws DataFormatException, IOException {
         ByteArrayInputStream bao = new ByteArrayInputStream(decompress(super.getByteArray(), false));
@@ -41,6 +61,15 @@ public class CompressedContent extends CompressedByteArray implements Content {
             r.add(line);
         }
         return r;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public long hash() {
+        return getHash();
     }
 
 }

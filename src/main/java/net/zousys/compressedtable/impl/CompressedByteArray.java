@@ -1,5 +1,6 @@
 package net.zousys.compressedtable.impl;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.ByteArrayOutputStream;
@@ -14,6 +15,8 @@ public class CompressedByteArray {
     private byte[] bytearray;
     private long beforesize;
     private long aftersize;
+    @Getter
+    private long hash;
 
     public void loadContent(byte[] bytearray) throws IOException {
         compress(bytearray);
@@ -30,6 +33,7 @@ public class CompressedByteArray {
         this.beforesize = bytearray.length;
         this.bytearray = compress(bytearray, Deflater.BEST_COMPRESSION, false);
         this.aftersize = this.bytearray.length;
+        this.hash = java.util.Arrays.hashCode(bytearray);
     }
 
     public byte[] formBytes() throws DataFormatException, IOException {

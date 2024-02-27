@@ -45,4 +45,9 @@ public class CompressedRow implements Row {
     public Content getContent() {
         return compressedContent;
     }
+
+    @Override
+    public long hash() {
+        return compressedContent.getHash();
+    }
 }

@@ -11,9 +11,10 @@ public interface BookKeeper {
     void handleMissedBeforeHeader(List<String> headers);
     void handleMissedAfterHeader(List<String> headers);
 
+    void updateUnitedHeaders(List<String> unitedHeaders);
     void handleMissMatched(ComparisonResult.RowResult mismatch);
 
     void handleMatched(String key);
-
+    void handleNotice(String key);
     void appendInformation();
 }
