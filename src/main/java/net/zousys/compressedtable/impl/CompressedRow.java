@@ -2,13 +2,12 @@ package net.zousys.compressedtable.impl;
 
 import lombok.*;
 import net.zousys.compressedtable.Content;
-import net.zousys.compressedtable.ImmutableTable;
+import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.Key;
 import net.zousys.compressedtable.Row;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,7 +36,7 @@ public class CompressedRow implements Row {
     }
 
     @Override
-    public ImmutableTable getTable() {
+    public GeneralTable getTable() {
         return compressedTable;
     }
 

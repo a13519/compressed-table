@@ -11,7 +11,7 @@ import java.util.zip.DataFormatException;
 
 @Builder
 public class CompressedComparator {
-
+    private ComparatorListener comparatorListener;
     private Set<String> ignoredFields;
 
     private CompressedTable before;
@@ -33,7 +33,6 @@ public class CompressedComparator {
 
     private Map<String, Integer> unitedHeaderMapping;
 
-    private BookKeeper bookKeeper;
 
     private boolean trim;
 
@@ -44,20 +43,30 @@ public class CompressedComparator {
     }
 
     public void compare() {
-
+        // missed in before
         contains(after.getKeyedMapping().keySet(), before.getKeyedMapping().keySet(), beforeMissed, null);
-        bookKeeper.handleMissedInBefore(beforeMissed);
+        comparatorListener.handleMissedInBefore(beforeMissed);
+        // remove from after
+        after.removeRowsByKey(beforeMissed);
+
+        // missed in after
         contains(before.getKeyedMapping().keySet(), after.getKeyedMapping().keySet(), afterMissed, shared);
-        bookKeeper.handleMissedInAfter(afterMissed);
+        comparatorListener.handleMissedInAfter(afterMissed);
+        // remove from before
+        before.removeRowsByKey(afterMissed);
+
+        // for comparator
         shared.removeAll(beforeMissed);
+
         beforeMissed = null;
         afterMissed = null;
+        // headers
         contains(after.getHeaders(), before.getHeaders(), beforeMissedHeaders, null);
-        bookKeeper.handleMissedBeforeHeader(beforeMissedHeaders);
+        comparatorListener.handleMissedBeforeHeader(beforeMissedHeaders);
         contains(before.getHeaders(), after.getHeaders(), afterMissedHeaders, null);
-        bookKeeper.handleMissedAfterHeader(afterMissedHeaders);
+        comparatorListener.handleMissedAfterHeader(afterMissedHeaders);
         uniteHeaders();
-        bookKeeper.updateUnitedHeaders(unitedHeaders);
+        comparatorListener.updateUnitedHeaders(unitedHeaders);
 
         beforeMissedHeaders = null;
         afterMissedHeaders = null;
@@ -67,46 +76,60 @@ public class CompressedComparator {
         shared.forEach(key -> {
             if (before.getKeyedMapping().get(key).getContent().hash()==
                     after.getKeyedMapping().get(key).getContent().hash()) {
-                bookKeeper.handleMatched(key);
                 ml.add(key);
+                comparatorListener.handleMatched(key);
+                // remove from before and after
+                after.removeRowByKey(key);
+                before.removeRowByKey(key);
             } else {
                 mml.add(key);
+                try {
+                    ComparisonResult.RowResult mismatch =
+                            compareRow(
+                                    key,
+                                    ignoredFields,
+                                    before,
+                                    after,
+                                    trim,
+                                    unitedHeaders);
+                    comparatorListener.handleMisMatched(mismatch);
+                    // remove from before and after
+                    after.removeRowByKey(key);
+                    before.removeRowByKey(key);
+                } catch (DataFormatException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
-        bookKeeper.handleMatchedList(ml);
-        bookKeeper.handleMisMatchedList(mml);
+        comparatorListener.handleMatchedList(ml);
+        comparatorListener.handleMisMatchedList(mml);
 
-        mml.forEach(key -> {
-            try {
-                ComparisonResult.RowResult mismatch =
-                        compareRow(
-                                before.getKeyedMapping().get(key),
-                                after.getKeyedMapping().get(key),
-                                ignoredFields,
-                                before,
-                                after,
-                                trim,
-                                unitedHeaders);
-                bookKeeper.handleMisMatched(mismatch);
-            } catch (DataFormatException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
-
+    /**
+     *
+     * @param key
+     * @param ignoredFields
+     * @param before
+     * @param after
+     * @param trim
+     * @param unitedHeaders
+     * @return
+     * @throws DataFormatException
+     * @throws IOException
+     */
     private static final ComparisonResult.RowResult compareRow(
-            Row a,
-            Row b,
+            String key,
             Set<String> ignoredFields,
             CompressedTable before,
             CompressedTable after,
             boolean trim,
             List<String> unitedHeaders) throws DataFormatException, IOException {
-
+        Row a = before.seekByKey(key).orElseThrow();
+        Row b = after.seekByKey(key).orElseThrow();
         List<String> fieldsA = a.getContent().form();
         List<String> fieldsB = b.getContent().form();
 

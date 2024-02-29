@@ -1,10 +1,15 @@
 package net.zousys.compressedtable;
 
+import net.zousys.compressedtable.impl.CompressedTable;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-public interface BookKeeper {
+public interface ComparatorListener {
+
+    void handleBeforeLoaded(CompressedTable before);
+    void handleAfterLoaded(CompressedTable after);
+
     void handleMissedInBefore(Set<String> entries);
     void handleMissedInAfter(Set<String> entries);
 

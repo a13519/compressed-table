@@ -2,7 +2,7 @@ package net.zousys.compressedtable;
 
 public interface Row {
     Key getKey();
-    ImmutableTable getTable();
+    GeneralTable getTable();
     Content getContent();
 
     long hash();

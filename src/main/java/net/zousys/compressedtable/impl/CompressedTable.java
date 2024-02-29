@@ -3,7 +3,7 @@ package net.zousys.compressedtable.impl;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.zousys.compressedtable.ImmutableTable;
+import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.Key;
 import net.zousys.compressedtable.Row;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.*;
 
 @NoArgsConstructor
-public class CompressedTable implements ImmutableTable {
+public class CompressedTable implements GeneralTable {
     @Getter
     private Map<String, Row> keyedMapping = new HashMap<>();
     private List<Row> rows = new ArrayList<>();
@@ -72,6 +72,11 @@ public class CompressedTable implements ImmutableTable {
     }
 
     @Override
+    public Optional<Row> seekByKey(String key) {
+        return Optional.of(keyedMapping.get(key));
+    }
+
+    @Override
     public Optional<Row> seekByIndex(int index) {
         return Optional.of(rows.get(index));
     }
@@ -84,6 +89,36 @@ public class CompressedTable implements ImmutableTable {
     @Override
     public void setKeyHeaders(String[] keys) {
         this.headerkeys = keys;
+    }
+
+    @Override
+    public void removeRowByKey(String key) {
+        if (key != null) {
+            Row row = keyedMapping.remove(key);
+            if (row != null) {
+                rows.remove(row);
+            }
+        }
+    }
+
+    @Override
+    public void removeRow(Row row) {
+        if (row != null) {
+            rows.remove(row);
+            if (row.getKey()!=null) {
+                keyedMapping.remove(row.getKey());
+            }
+        }
+    }
+
+    @Override
+    public void removeRowsByKey(Collection<String> keys) {
+        keys.forEach(this::removeRowByKey);
+    }
+
+    @Override
+    public void removeRows(Collection<Row> rows) {
+        rows.forEach(this::removeRow);
     }
 
 }
