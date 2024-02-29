@@ -44,6 +44,7 @@ public class CompressedComparator {
     }
 
     public void compare() {
+
         contains(after.getKeyedMapping().keySet(), before.getKeyedMapping().keySet(), beforeMissed, null);
         bookKeeper.handleMissedInBefore(beforeMissed);
         contains(before.getKeyedMapping().keySet(), after.getKeyedMapping().keySet(), afterMissed, shared);
@@ -58,15 +59,23 @@ public class CompressedComparator {
         uniteHeaders();
         bookKeeper.updateUnitedHeaders(unitedHeaders);
 
+        beforeMissedHeaders = null;
+        afterMissedHeaders = null;
+
+        ArrayList<String> ml = new ArrayList<>();
         ArrayList<String> mml = new ArrayList<>();
         shared.forEach(key -> {
             if (before.getKeyedMapping().get(key).getContent().hash()==
                     after.getKeyedMapping().get(key).getContent().hash()) {
                 bookKeeper.handleMatched(key);
+                ml.add(key);
             } else {
                 mml.add(key);
             }
         });
+
+        bookKeeper.handleMatchedList(ml);
+        bookKeeper.handleMisMatchedList(mml);
 
         mml.forEach(key -> {
             try {
@@ -79,7 +88,7 @@ public class CompressedComparator {
                                 after,
                                 trim,
                                 unitedHeaders);
-                bookKeeper.handleMissMatched(mismatch);
+                bookKeeper.handleMisMatched(mismatch);
             } catch (DataFormatException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
@@ -179,47 +188,6 @@ public class CompressedComparator {
         unitedHeaderMapping = new HashMap<>();
         unitedHeaders = Stream.concat(before.getHeaders().stream(),beforeMissedHeaders.stream()).collect(Collectors.toList());
         unitedHeaders.stream().forEach(a->unitedHeaderMapping.put(a, unitedHeaderMapping.size()));
-    }
-
-    private void compare4Keeper() {
-        contains(after.getKeyedMapping().keySet(), before.getKeyedMapping().keySet(), beforeMissed, null);
-        bookKeeper.handleMissedInBefore(beforeMissed);
-        beforeMissed = null;
-        contains(before.getKeyedMapping().keySet(), after.getKeyedMapping().keySet(), afterMissed, shared);
-        bookKeeper.handleMissedInAfter(afterMissed);
-        afterMissed = null;
-        contains(after.getHeaders(), before.getHeaders(), beforeMissedHeaders, null);
-        bookKeeper.handleMissedBeforeHeader(beforeMissedHeaders);
-        contains(before.getHeaders(), after.getHeaders(), afterMissedHeaders, null);
-        bookKeeper.handleMissedAfterHeader(afterMissedHeaders);
-        uniteHeaders();
-        bookKeeper.updateUnitedHeaders(unitedHeaders);
-
-        before.getKeyedMapping().keySet().forEach(key->{
-            Row beforeRow = before.getKeyedMapping().get(key);
-            Row afterRow = after.getKeyedMapping().get(key);
-            if (afterRow!=null){
-                try {
-                    ComparisonResult.RowResult mismatch =
-                            compareRow(beforeRow,
-                                    afterRow,
-                                    ignoredFields,
-                                    before,
-                                    after,
-                                    trim,
-                                    unitedHeaders);
-                    if (mismatch.isUnifiedMismatch()){
-                        bookKeeper.handleMissMatched(mismatch);
-                    } else {
-                        bookKeeper.handleMatched(key);
-                    }
-                } catch (DataFormatException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
     }
 
 
