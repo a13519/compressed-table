@@ -3,9 +3,10 @@ package net.zousys.compressedtable;
 import lombok.*;
 import net.zousys.compressedtable.impl.CompressedTable;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -41,6 +42,7 @@ public class ComparisonResult {
         @Setter
         boolean unifiedMismatch;
     }
+
     @Builder
     @Getter
     @Setter

@@ -2,76 +2,122 @@ package net.zousys.compressedtable;
 
 import lombok.Getter;
 import net.zousys.compressedtable.impl.CompressedTable;
-import org.apache.commons.csv.CSVFormat;
+import net.zousys.compressedtable.sterotype.CSVParser;
+import net.zousys.compressedtable.sterotype.ExcelParser;
 
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Optional;
+import java.io.InputStream;
 
 public class CompressedTableFactory {
     public static enum Type {
         CSV, EXCEL
     }
 
-    @Getter
-    private int ignoredLines;
-
+    private int ignoredLines = 0;
+    private String[] keyHeaders = new String[]{};
+    private char delimeter = ',';
     @Getter
     private Type type;
-    @Getter
-    private String[] keyHeaders;
 
     private CompressedTableFactory(Type type) {
         this.type = type;
     }
 
-    public static CompressedTableFactory build(String type) {
-        if (type == null){
-            return null;
-        }
-        switch (type.toLowerCase()){
-            case "csv":{
-                return new CompressedTableFactory(Type.CSV);
-            }
-        }
-        return null;
-    }
-
-    public CompressedTableFactory ignoredLines(int number) {
-        this.ignoredLines = number;
+    /**
+     * @param delimeter
+     * @return
+     */
+    public CompressedTableFactory delimeter(char delimeter) {
+        this.delimeter = delimeter;
         return this;
     }
 
-    public CompressedTableFactory headerKeys(String[] keyHeaders) {
+    /**
+     * @param ignoredLines
+     * @return
+     */
+    public CompressedTableFactory ignoredLines(int ignoredLines) {
+        this.ignoredLines = ignoredLines;
+        return this;
+    }
+
+    /**
+     * @param keyHeaders
+     * @return
+     */
+    public CompressedTableFactory keyHeaders(String[] keyHeaders) {
         this.keyHeaders = keyHeaders;
         return this;
     }
 
-    public CompressedTable readCSVFile(String filename) throws IOException {
+    /**
+     * @param type
+     * @return
+     */
+    public static CompressedTableFactory build(String type) {
+        if (type == null) {
+            return null;
+        }
+        switch (type.toLowerCase()) {
+            case "csv": {
+                return new CompressedTableFactory(Type.CSV);
+            }
+            case "excel": {
+                return new CompressedTableFactory(Type.EXCEL);
+            }
+        }
+
         return null;
     }
 
-    public CompressedTable readCSVFile(String filename, char delimeter) throws IOException {
-        FileReader in = new FileReader(filename);
-        CSVFormat format = CSVFormat.RFC4180.builder()
-                .setDelimiter(delimeter)
-                .setIgnoreEmptyLines(true)
-                .setIgnoreSurroundingSpaces(true)
-                .setTrim(true)
-                .build();
-        CompressedTable compressedTable = new CompressedTable();
-        if (keyHeaders != null) {
-            compressedTable.setKeyHeaders(keyHeaders);
+    /**
+     * @param filename
+     * @return
+     * @throws IOException
+     */
+    public CompressedTable parse(String filename) throws IOException {
+        if (filename != null) {
+            return parse(new File(filename));
+        } else {
+            return null;
         }
-        format.parse(in).stream().skip(ignoredLines).forEach(re -> {
-            try {
-                compressedTable.appendRow(re.values(), true);
-            } catch (IOException e) {
-                //
-            }
-        });
-
-        return compressedTable;
     }
+
+    /**
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public CompressedTable parse(File file) throws IOException {
+        if (file != null && file.exists()) {
+            return parse(new FileInputStream(file));
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param inputSteam
+     * @return
+     */
+    public CompressedTable parse(InputStream inputSteam) throws IOException {
+        switch (this.type) {
+            case CSV: {
+                return CSVParser.builder()
+                        .delimeter(delimeter)
+                        .ignoredLines(ignoredLines)
+                        .keyHeaders(keyHeaders).build()
+                        .parse(inputSteam);
+            }
+            case EXCEL: {
+                return ExcelParser.builder()
+                        .build().parse(inputSteam);
+            }
+        }
+        return null;
+    }
+
+
 }
