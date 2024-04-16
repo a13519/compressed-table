@@ -55,7 +55,7 @@ public class CompressedTable implements GeneralTable {
             compressedRow.make(fields);
             this.rows.add(compressedRow);
             if (compressedRow.getKey() != null) {
-                    keyedMapping.put(compressedRow.getKey().toString(), compressedRow);
+                keyedMapping.put(compressedRow.getKey().toString(), compressedRow);
             }
         }
     }
@@ -105,7 +105,7 @@ public class CompressedTable implements GeneralTable {
     public void removeRow(Row row) {
         if (row != null) {
             rows.remove(row);
-            if (row.getKey()!=null) {
+            if (row.getKey() != null) {
                 keyedMapping.remove(row.getKey());
             }
         }

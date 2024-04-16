@@ -10,6 +10,7 @@ public interface GeneralTable {
     List<String> getHeaders();
 
     Optional<Row> seekByKey(Key key);
+
     Optional<Row> seekByKey(String key);
 
     Optional<Row> seekByIndex(int index);
@@ -17,8 +18,12 @@ public interface GeneralTable {
     int size();
 
     void setKeyHeaders(String[] keys);
+
     void removeRowByKey(String key);
+
     void removeRow(Row row);
+
     void removeRowsByKey(Collection<String> keys);
+
     void removeRows(Collection<Row> rows);
 }

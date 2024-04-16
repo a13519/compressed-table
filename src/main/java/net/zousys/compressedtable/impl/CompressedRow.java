@@ -1,6 +1,9 @@
 package net.zousys.compressedtable.impl;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.zousys.compressedtable.Content;
 import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.Key;

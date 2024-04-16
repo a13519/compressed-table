@@ -3,8 +3,6 @@ package net.zousys.compressedtable.impl;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j;
-import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.Key;
 
 import java.util.ArrayList;
@@ -24,6 +22,7 @@ public class StringKey implements Key {
         sk.setKey(keyheaders, map, fields);
         return sk;
     }
+
     @Override
     public String toString() {
         return "{" + keys +

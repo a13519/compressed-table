@@ -74,7 +74,7 @@ public class CompressedComparator {
         ArrayList<String> ml = new ArrayList<>();
         ArrayList<String> mml = new ArrayList<>();
         shared.forEach(key -> {
-            if (before.getKeyedMapping().get(key).getContent().hash()==
+            if (before.getKeyedMapping().get(key).getContent().hash() ==
                     after.getKeyedMapping().get(key).getContent().hash()) {
                 ml.add(key);
                 comparatorListener.handleMatched(key);
@@ -110,7 +110,6 @@ public class CompressedComparator {
     }
 
     /**
-     *
      * @param key
      * @param ignoredFields
      * @param before
@@ -139,21 +138,21 @@ public class CompressedComparator {
         for (String headerA : unitedHeaders) {
             Integer beforeInd = before.getHeaderMapping().get(headerA);
             Integer afterInd = after.getHeaderMapping().get(headerA);
-            String fvbefore = beforeInd==null?null:fieldsA.get(beforeInd);
-            String fvafter = afterInd==null?null:fieldsB.get(afterInd);
+            String fvbefore = beforeInd == null ? null : fieldsA.get(beforeInd);
+            String fvafter = afterInd == null ? null : fieldsB.get(afterInd);
             ComparisonResult.ResultField rf = ComparisonResult.ResultField.builder()
-                    .beforeField(trim&&fvbefore!=null?fvbefore.trim():fvbefore)
-                    .afterField(trim&&fvafter!=null?fvafter.trim():fvafter)
+                    .beforeField(trim && fvbefore != null ? fvbefore.trim() : fvbefore)
+                    .afterField(trim && fvafter != null ? fvafter.trim() : fvafter)
                     .build();
             rowResult.getFields().add(rf);
 
-            if (ignoredFields!=null && ignoredFields.contains(headerA)) {
+            if (ignoredFields != null && ignoredFields.contains(headerA)) {
                 rf.setIgnored(true);
             } else {
                 if ((rf.getBeforeField() == null || rf.getAfterField() == null)
-                        ||!rf.getBeforeField().equals(rf.getAfterField())) {
-                    rf.missmatched=true;
-                    rowResult.unifiedMismatch=true;
+                        || !rf.getBeforeField().equals(rf.getAfterField())) {
+                    rf.missmatched = true;
+                    rowResult.unifiedMismatch = true;
                 }
             }
         }
@@ -163,7 +162,7 @@ public class CompressedComparator {
 
 
     public static final void contains(Set<String> a, Set<String> b, Set<String> register, Set<String> deregister) {
-        a.forEach(key->{
+        a.forEach(key -> {
             if (!b.contains(key)) {
                 register.add(key);
             } else {
@@ -173,8 +172,9 @@ public class CompressedComparator {
             }
         });
     }
+
     public static final void contains(List<String> a, List<String> b, List<String> register, List<String> deregister) {
-        a.forEach(key->{
+        a.forEach(key -> {
             if (!b.contains(key)) {
                 register.add(key);
             } else {
@@ -184,12 +184,13 @@ public class CompressedComparator {
             }
         });
     }
+
     public static final void contains(String[] as, String[] bs, List<String> register) {
         List<String> a = new ArrayList<>();
         List<String> b = new ArrayList<>();
         a.addAll(Arrays.stream(as).collect(Collectors.toSet()));
         b.addAll(Arrays.stream(bs).collect(Collectors.toSet()));
-        a.forEach(key->{
+        a.forEach(key -> {
             if (!b.contains(key)) {
                 register.add(key);
             }
@@ -209,8 +210,8 @@ public class CompressedComparator {
     public void uniteHeaders() {
         unitedHeaders = new ArrayList<>();
         unitedHeaderMapping = new HashMap<>();
-        unitedHeaders = Stream.concat(before.getHeaders().stream(),beforeMissedHeaders.stream()).collect(Collectors.toList());
-        unitedHeaders.stream().forEach(a->unitedHeaderMapping.put(a, unitedHeaderMapping.size()));
+        unitedHeaders = Stream.concat(before.getHeaders().stream(), beforeMissedHeaders.stream()).collect(Collectors.toList());
+        unitedHeaders.stream().forEach(a -> unitedHeaderMapping.put(a, unitedHeaderMapping.size()));
     }
 
 

@@ -18,7 +18,6 @@ public class CompressedContent extends CompressedByteArray implements Content {
     }
 
     /**
-     *
      * @param fields
      * @return
      * @throws IOException
@@ -26,13 +25,12 @@ public class CompressedContent extends CompressedByteArray implements Content {
     public static CompressedContent load(List<String> fields) throws IOException {
         CompressedContent compressedContent = new CompressedContent();
         StringWriter bw = new StringWriter();
-        fields.forEach(field -> bw.write(field+"\n"));
+        fields.forEach(field -> bw.write(field + "\n"));
         compressedContent.loadContent(String.valueOf(bw).getBytes());
         return compressedContent;
     }
 
     /**
-     *
      * @param fields
      * @return
      * @throws IOException
@@ -46,7 +44,6 @@ public class CompressedContent extends CompressedByteArray implements Content {
     }
 
     /**
-     *
      * @return
      * @throws DataFormatException
      * @throws IOException
@@ -64,7 +61,6 @@ public class CompressedContent extends CompressedByteArray implements Content {
     }
 
     /**
-     *
      * @return
      */
     @Override

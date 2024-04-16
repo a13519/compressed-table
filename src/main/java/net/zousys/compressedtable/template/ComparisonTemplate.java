@@ -33,16 +33,17 @@ public class ComparisonTemplate {
      */
     private Map<String, XSSFCellStyle> styles;
     private static int cellid = 0;
+
     public ComparisonTemplate(ComparisonResult comparisonResult, String sheet, String resultfile) {
         this.comparisonResult = comparisonResult;
         this.resultfile = resultfile;
         book = new XSSFWorkbook();
-        spreadsheet = book.createSheet(sheet == null ?"Data":sheet);
+        spreadsheet = book.createSheet(sheet == null ? "Data" : sheet);
         DataFormat format = book.createDataFormat();
         populate();
     }
 
-    public void save () throws Exception {
+    public void save() throws Exception {
         List<ComparisonResult.RowResult> rows = comparisonResult.getMismatches();
         for (ComparisonResult.RowResult rowResult : rows) {
             append(rowResult, comparisonResult);
@@ -57,7 +58,7 @@ public class ComparisonTemplate {
         cellid = 0;
         Cell keyCell = row.createCell(cellid++);
         keyCell.setCellValue("Key");
-        comparisonResult.getUnitedHeaders().stream().forEach(a->{
+        comparisonResult.getUnitedHeaders().stream().forEach(a -> {
             Cell cell = row.createCell(cellid++);
             cell.setCellValue(a);
             cell.setCellStyle(styles.get("header"));
@@ -71,7 +72,7 @@ public class ComparisonTemplate {
         keyCell.setCellValue(rowResult.getStringkey());
         List<ComparisonResult.ResultField> fields = rowResult.getFields();
         int x = 0;
-        for (String header : comparisonResult.getUnitedHeaders()){
+        for (String header : comparisonResult.getUnitedHeaders()) {
             Cell cell = row.createCell(cellid++);
             Integer bheaderInd = comparisonResult.getBefore().getHeaderMapping().get(header);
             if (bheaderInd == null) {
@@ -92,7 +93,7 @@ public class ComparisonTemplate {
         keyCell = row.createCell(cellid++);
         keyCell.setCellValue("");
 
-        for (String header : comparisonResult.getUnitedHeaders()){
+        for (String header : comparisonResult.getUnitedHeaders()) {
             Cell cell = row.createCell(cellid++);
             Integer aheaderInd = comparisonResult.getAfter().getHeaderMapping().get(header);
             if (aheaderInd == null) {
@@ -107,8 +108,9 @@ public class ComparisonTemplate {
             }
         }
     }
+
     public void removeRows(int a) {
-        if (a > 0){
+        if (a > 0) {
             spreadsheet.removeRow(spreadsheet.getRow(a));
         } else {
             int b = spreadsheet.getLastRowNum() + a + 1;
