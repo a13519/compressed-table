@@ -12,17 +12,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 @Builder
 /**
  *
  */
 public class ExcelParser {
-    /**
-     *
-     */
-    public ExcelParser() {
-    }
+    private boolean dynamicWidth;
+    private int headerPosiction;
 
     /**
      * @param inputStream
@@ -36,16 +32,26 @@ public class ExcelParser {
             int from = sheet.getFirstRowNum();
             int to = sheet.getLastRowNum();
             CompressedTable compressedTable = new CompressedTable();
+            int columnNo = -1;
 
             for (int i = from; i <= to; i++) {
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 Iterator<Cell> cellIterator = row.cellIterator();
+                if (!dynamicWidth && headerPosiction == i) {
+                    columnNo = row.getLastCellNum();
+                }
+
                 ArrayList<String> arowarray = new ArrayList<>();
 
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
                     arowarray.add(stringvalue(cell));
                 }
+
+                while (arowarray.size()<columnNo) {
+                    arowarray.add("");
+                }
+
                 compressedTable.appendRow(arowarray);
             }
             return compressedTable;
