@@ -5,6 +5,7 @@ import net.zousys.compressedtable.impl.CompressedTable;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -35,25 +36,17 @@ public class ExcelParser {
             int columnNo = -1;
 
             for (int i = from; i <= to; i++) {
-                org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
-                Iterator<Cell> cellIterator = row.cellIterator();
-
                 ArrayList<String> arowarray = new ArrayList<>();
+                org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
+                int cn = row.getPhysicalNumberOfCells();
 
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    arowarray.add(stringvalue(cell));
+                for ( int j = 0 ; j < (columnNo==-1?cn:columnNo) ; j ++) {
+                    arowarray.add(stringvalue(row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)));
                 }
 
                 if (headerPosiction == i) {
-                    if (!dynamicWidth) {
-                        columnNo = row.getLastCellNum();
-                    }
+                    columnNo = cn;
                     compressedTable.setHeaders(arowarray.toArray(new String[0]));
-                }
-
-                while (arowarray.size()<columnNo) {
-                    arowarray.add("");
                 }
 
                 compressedTable.appendRow(arowarray);
@@ -68,6 +61,9 @@ public class ExcelParser {
      * @return
      */
     private String stringvalue(Cell cell) {
+        if (cell==null) {
+            return "";
+        }
         CellType type = cell.getCellType();
         if (type == CellType.NUMERIC) {
             if (DateUtil.isCellDateFormatted(cell)) {

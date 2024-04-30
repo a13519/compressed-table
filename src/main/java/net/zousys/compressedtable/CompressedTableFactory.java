@@ -23,10 +23,7 @@ public class CompressedTableFactory {
     private char delimeter = ',';
     @Getter
     private Type type;
-    /**
-     * This is for Excel Table, to constrain a dynamic row cell number or has fixed columns as headers
-     */
-    private boolean dynamicWidth = true;
+
     /**
      * the header row number
      */
@@ -38,16 +35,6 @@ public class CompressedTableFactory {
      */
     private CompressedTableFactory(Type type) {
         this.type = type;
-    }
-
-    /**
-     *
-     * @param dynamicWidth
-     * @return
-     */
-    public CompressedTableFactory dynamicWidth(boolean dynamicWidth) {
-        this.dynamicWidth = dynamicWidth;
-        return this;
     }
 
     /**
@@ -148,7 +135,6 @@ public class CompressedTableFactory {
             }
             case EXCEL: {
                 return ExcelParser.builder()
-                        .dynamicWidth(dynamicWidth)
                         .headerPosiction(headerPosition)
                         .build().parse(inputSteam);
             }
