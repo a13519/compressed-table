@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 @Builder
 /**
- *
+ * The Excel headers should be unique, the duplicated header will cause header missing
  */
 public class ExcelParser {
     private boolean dynamicWidth;
@@ -37,15 +37,19 @@ public class ExcelParser {
             for (int i = from; i <= to; i++) {
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 Iterator<Cell> cellIterator = row.cellIterator();
-                if (!dynamicWidth && headerPosiction == i) {
-                    columnNo = row.getLastCellNum();
-                }
 
                 ArrayList<String> arowarray = new ArrayList<>();
 
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
                     arowarray.add(stringvalue(cell));
+                }
+
+                if (headerPosiction == i) {
+                    if (!dynamicWidth) {
+                        columnNo = row.getLastCellNum();
+                    }
+                    compressedTable.setHeaders(arowarray.toArray(new String[0]));
                 }
 
                 while (arowarray.size()<columnNo) {
