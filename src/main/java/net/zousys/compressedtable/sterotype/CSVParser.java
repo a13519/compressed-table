@@ -19,7 +19,7 @@ public class CSVParser {
     private String[] keyHeaders = new String[]{};
     @Builder.Default
     private char delimeter = ',';
-
+    private int headerPosiction;
     /**
      * @param inputStream
      * @return
@@ -35,6 +35,7 @@ public class CSVParser {
                     .setTrim(true)
                     .build();
             CompressedTable compressedTable = new CompressedTable();
+            compressedTable.setHeaderRowNumber(headerPosiction);
             if (keyHeaders != null) {
                 compressedTable.setKeyHeaders(keyHeaders);
             }

@@ -23,7 +23,28 @@ public class CompressedTable implements GeneralTable {
     @Getter
     private String[] headerkeys;
     private boolean onHeader = true;
+    private int headerRowNumber = -1;
+    /**
+     *
+     * @param no
+     */
+    public void setHeaderRowNumber(int no){
+        this.headerRowNumber = no;
+    }
 
+    /**
+     *
+     * @return
+     */
+    @Override
+    public int getHeaderRowNumber() {
+        return headerRowNumber;
+    }
+
+    /**
+     *
+     * @param headers
+     */
     public void setHeaders(String[] headers) {
         this.headers = List.of(headers);
         int ind = 0;
@@ -119,6 +140,11 @@ public class CompressedTable implements GeneralTable {
     @Override
     public void removeRows(Collection<Row> rows) {
         rows.forEach(this::removeRow);
+    }
+
+    @Override
+    public void sort(String[] headers) {
+
     }
 
 }

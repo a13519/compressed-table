@@ -26,4 +26,9 @@ public interface GeneralTable {
     void removeRowsByKey(Collection<String> keys);
 
     void removeRows(Collection<Row> rows);
+
+    void sort(String[] headers);
+
+    void setHeaderRowNumber(int no);
+    int getHeaderRowNumber();
 }
