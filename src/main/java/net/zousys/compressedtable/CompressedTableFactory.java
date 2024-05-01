@@ -25,9 +25,9 @@ public class CompressedTableFactory {
     private Type type;
 
     /**
-     * the header row number
+     * the header row number, if this is not explictly set then there will be no header at all
      */
-    private int headerPosition = 0;
+    private int headerPosition = -1;
 
     /**
      *
@@ -130,6 +130,7 @@ public class CompressedTableFactory {
                 return CSVParser.builder()
                         .delimeter(delimeter)
                         .ignoredLines(ignoredLines)
+                        .headerPosiction(headerPosition)
                         .keyHeaders(keyHeaders).build()
                         .parse(inputSteam);
             }

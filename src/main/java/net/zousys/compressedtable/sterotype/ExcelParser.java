@@ -33,6 +33,8 @@ public class ExcelParser {
             int from = sheet.getFirstRowNum();
             int to = sheet.getLastRowNum();
             CompressedTable compressedTable = new CompressedTable();
+            compressedTable.setHeaderRowNumber(headerPosiction);
+
             int columnNo = -1;
 
             for (int i = from; i <= to; i++) {
