@@ -10,6 +10,9 @@ import net.zousys.compressedtable.Row;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * No 'RETURN' or newLine char should be in data
+ */
 @NoArgsConstructor
 public class CompressedTable implements GeneralTable {
     @Getter
