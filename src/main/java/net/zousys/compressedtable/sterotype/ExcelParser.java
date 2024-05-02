@@ -73,6 +73,11 @@ public class ExcelParser {
             }
             return "" + cell.getNumericCellValue();
         } else if (type == CellType.FORMULA) {
+            if (cell.getCachedFormulaResultType() == CellType.NUMERIC) {
+                return ""+cell.getNumericCellValue();
+            } else if (cell.getCachedFormulaResultType() == CellType.STRING) {
+                return cell.getRichStringCellValue().getString();
+            }
             return cell.getCellFormula();
         } else if (type == CellType.STRING) {
             return cell.getStringCellValue();
