@@ -40,18 +40,22 @@ public class ExcelParser {
             for (int i = from; i <= to; i++) {
                 ArrayList<String> arowarray = new ArrayList<>();
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
-                int cn = row.getPhysicalNumberOfCells();
+                if (row!=null) {
+                    int cn = row.getPhysicalNumberOfCells();
 
-                for ( int j = 0 ; j < (columnNo==-1?cn:columnNo) ; j ++) {
-                    arowarray.add(stringvalue(row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+                    for (int j = 0; j < (columnNo == -1 ? cn : columnNo); j++) {
+                        arowarray.add(stringvalue(row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+                    }
+
+                    if (headerPosiction == i) {
+                        columnNo = cn;
+                        compressedTable.setHeaders(arowarray.toArray(new String[0]));
+                    }
+
+                    compressedTable.appendRow(arowarray);
+                } else {
+                    // empty row
                 }
-
-                if (headerPosiction == i) {
-                    columnNo = cn;
-                    compressedTable.setHeaders(arowarray.toArray(new String[0]));
-                }
-
-                compressedTable.appendRow(arowarray);
             }
             return compressedTable;
         }
