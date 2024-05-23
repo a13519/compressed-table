@@ -65,6 +65,12 @@ public class ComparisonTemplate {
         });
     }
 
+    /**
+     *
+     * @param rowResult
+     * @param comparisonResult
+     * @throws Exception
+     */
     private void append(ComparisonResult.RowResult rowResult, ComparisonResult comparisonResult) throws Exception {
         XSSFRow row = spreadsheet.createRow(rowid++);
         cellid = 0;

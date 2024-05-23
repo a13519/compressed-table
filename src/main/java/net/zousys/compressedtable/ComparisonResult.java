@@ -24,6 +24,11 @@ public class ComparisonResult {
     private List<RowResult> mismatches = new ArrayList<>();
     private List<String> unitedHeaders;
 
+    /**
+     *
+     * @param before
+     * @param after
+     */
     public ComparisonResult(@NonNull CompressedTable before, @NonNull CompressedTable after) {
         this.before = before;
         this.after = after;
@@ -39,18 +44,32 @@ public class ComparisonResult {
         @Getter
         List<ResultField> fields = new ArrayList<>();
         @Getter
-        @Setter
-        boolean unifiedMismatch;
+        /**
+         * the mismatched row discrepancy counts
+         */
+        private int missMatchNumber;
+
+        /**
+         * add field result to row result
+         * @param resultField
+         */
+        public void addFieldResult(ResultField resultField) {
+            fields.add(resultField);
+            if (resultField.isMissmatched()&&!resultField.isIgnored()){
+                missMatchNumber++;
+            }
+        }
     }
 
     @Builder
     @Getter
     @Setter
     public static class ResultField {
-        String beforeField;
-        String afterField;
-        boolean missmatched;
-        boolean ignored;
+        private String name;
+        private String beforeField;
+        private String afterField;
+        private boolean missmatched;
+        private boolean ignored;
     }
 
 }
