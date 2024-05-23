@@ -27,6 +27,7 @@ public class CompressedTable implements GeneralTable {
     private String[] headerkeys;
     private boolean onHeader = true;
     private int headerRowNumber = -1;
+    private int physicalLineNumber = 0;
     /**
      *
      * @param no

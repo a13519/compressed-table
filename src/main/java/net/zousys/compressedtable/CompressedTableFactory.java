@@ -17,7 +17,6 @@ public class CompressedTableFactory {
     public static enum Type {
         CSV, EXCEL
     }
-
     private int ignoredLines = 0;
     private String[] keyHeaders = new String[]{};
     private char delimeter = ',';

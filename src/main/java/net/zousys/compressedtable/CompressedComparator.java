@@ -1,6 +1,7 @@
 package net.zousys.compressedtable;
 
 import lombok.Builder;
+import lombok.Getter;
 import net.zousys.compressedtable.impl.CompressedTable;
 
 import java.io.IOException;
@@ -33,15 +34,44 @@ public class CompressedComparator {
 
     private Map<String, Integer> unitedHeaderMapping;
 
+    @Getter
+    @Builder.Default
+    private Map<String, Integer> markers = new HashMap<>();
 
     private boolean trim;
 
+    /**
+     * This is to set the ignored colume of table in comparison, those columns won't be compared
+     *
+     * @param fields the columns
+     * @return
+     */
     public CompressedComparator setIgnoredFields(String[] fields) {
         ignoredFields = new HashSet<>();
         ignoredFields.addAll(Arrays.stream(fields).collect(Collectors.toSet()));
         return this;
     }
 
+    /**
+     * This is to count mismatched column time, later after the result spread sheet / csv generated, the header will mark the times of discrenpancies
+     * @param mismatch
+     */
+    private void addMarker(ComparisonResult.RowResult mismatch) {
+        for (ComparisonResult.ResultField arf : mismatch.getFields()) {
+            if (arf.isMissmatched()) {
+                Integer ai = markers.get(arf.getName());
+                if (ai == null) {
+                    markers.put(arf.getName(), 1);
+                } else {
+                    markers.put(arf.getName(), ai.intValue() + 1);
+                }
+            }
+        }
+    }
+    /**
+     * This is to compare two tables
+     *
+     */
     public void compare() {
         // missed in before
         contains(after.getKeyedMapping().keySet(), before.getKeyedMapping().keySet(), beforeMissed, null);
@@ -92,7 +122,10 @@ public class CompressedComparator {
                                     after,
                                     trim,
                                     unitedHeaders);
-                    comparatorListener.handleMisMatched(mismatch);
+                    if (mismatch.getMissMatchNumber() > 0) {
+                        addMarker(mismatch);
+                        comparatorListener.handleMisMatched(mismatch);
+                    }
                     // remove from before and after
                     after.removeRowByKey(key);
                     before.removeRowByKey(key);
@@ -140,21 +173,25 @@ public class CompressedComparator {
             Integer afterInd = after.getHeaderMapping().get(headerA);
             String fvbefore = beforeInd == null ? null : fieldsA.get(beforeInd);
             String fvafter = afterInd == null ? null : fieldsB.get(afterInd);
+
             ComparisonResult.ResultField rf = ComparisonResult.ResultField.builder()
+                    .name(headerA)
                     .beforeField(trim && fvbefore != null ? fvbefore.trim() : fvbefore)
                     .afterField(trim && fvafter != null ? fvafter.trim() : fvafter)
                     .build();
-            rowResult.getFields().add(rf);
+
 
             if (ignoredFields != null && ignoredFields.contains(headerA)) {
                 rf.setIgnored(true);
+                rf.setMissmatched(false);
             } else {
                 if ((rf.getBeforeField() == null || rf.getAfterField() == null)
                         || !rf.getBeforeField().equals(rf.getAfterField())) {
-                    rf.missmatched = true;
-                    rowResult.unifiedMismatch = true;
+                    rf.setMissmatched(true);
                 }
             }
+
+            rowResult.getFields().add(rf);
         }
 
         return rowResult;
@@ -207,6 +244,9 @@ public class CompressedComparator {
 
     }
 
+    /**
+     * Union of before and after table
+     */
     public void uniteHeaders() {
         unitedHeaders = new ArrayList<>();
         unitedHeaderMapping = new HashMap<>();
