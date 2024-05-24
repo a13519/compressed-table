@@ -7,6 +7,8 @@ import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.Key;
 import net.zousys.compressedtable.key.KeyHeaders;
 import net.zousys.compressedtable.Row;
+import net.zousys.compressedtable.key.KeyHeadersList;
+import net.zousys.compressedtable.key.KeyValue;
 
 import java.io.IOException;
 import java.util.*;
@@ -122,6 +124,16 @@ public class CompressedTable implements GeneralTable {
         }
     }
 
+    @Override
+    public Optional<Row> seekByKey(KeyValue keyValue) {
+        if (keyHeaderList==null||keyHeaderList.size()==0) {
+            return Optional.of(null);
+        } else {
+            Optional<Row> r = Optional.of(keyedMappingMap.get(keyValue.getName()).get(keyValue.getValue()));
+            return r;
+        }
+    }
+
 
     @Override
     public int size() {
@@ -144,12 +156,11 @@ public class CompressedTable implements GeneralTable {
     }
 
     @Override
-    public void removeRowByMainKey(String keyValue) {
+    public void removeRowByMainKey(KeyValue keyValue) {
         if (keyValue != null) {
-            keyedMappingMap.remove(keyHeaderList.get(0).getCompositedKeyValue()).get(keyValue);
-            Row row = keyedMappingMap.remove(keyHeaderList.get(0).getCompositedKeyValue()).get(keyValue);
+            Row row = keyedMappingMap.get(keyHeaderList.get(0).getCompositedKeyValue()).get(keyValue.getValue());
             if (row != null) {
-                rows.remove(row);
+                removeRow(row);
             }
         }
     }
@@ -159,13 +170,16 @@ public class CompressedTable implements GeneralTable {
         if (row != null) {
             rows.remove(row);
             if (row.getKey() != null) {
-                keyedMappingMap.remove(row.getKey().getMainKeyValue());
+                for (KeyHeaders akh : keyHeaderList){
+                    String kv = akh.getCompositedKeyValue();
+                    keyedMappingMap.get(kv).remove(row.getKey().getKeyValue(kv));
+                }
             }
         }
     }
 
     @Override
-    public void removeRowsByMainKey(Collection<String> keys) {
+    public void removeRowsByMainKey(Collection<KeyValue> keys) {
         keys.forEach(this::removeRowByMainKey);
     }
 

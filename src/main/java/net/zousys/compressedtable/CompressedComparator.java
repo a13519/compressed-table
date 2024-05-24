@@ -3,6 +3,8 @@ package net.zousys.compressedtable;
 import lombok.Builder;
 import lombok.Getter;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.key.KeyHeaders;
+import net.zousys.compressedtable.key.KeyHeadersList;
 import net.zousys.compressedtable.key.KeyValue;
 
 import java.io.IOException;
@@ -21,15 +23,15 @@ public class CompressedComparator {
     private CompressedTable after;
 
     @Builder.Default
-    private Set<String> beforeMissed = new HashSet<>();
+    private Set<KeyValue> beforeMissed = new HashSet<>();
     @Builder.Default
-    private Set<String> afterMissed = new HashSet<>();
+    private Set<KeyValue> afterMissed = new HashSet<>();
     @Builder.Default
     private List<String> beforeMissedHeaders = new ArrayList<>();
     @Builder.Default
     private List<String> afterMissedHeaders = new ArrayList<>();
     @Builder.Default
-    private Set<String> shared = new HashSet<>();
+    private Set<KeyValue> shared = new HashSet<>();
 
     private List<String> unitedHeaders;
 
@@ -75,13 +77,13 @@ public class CompressedComparator {
      */
     public CompressedComparator compare() {
         // missed in before
-        contains(after.getKeyedMapping().keySet(), before.getKeyedMapping().keySet(), beforeMissed, null);
+        contains(after, before, beforeMissed, null);
         comparatorListener.handleMissedInBefore(beforeMissed);
         // remove from after
         after.removeRowsByMainKey(beforeMissed);
 
         // missed in after
-        contains(before.getKeyedMapping().keySet(), after.getKeyedMapping().keySet(), afterMissed, shared);
+        contains(before, after, afterMissed, shared);
         comparatorListener.handleMissedInAfter(afterMissed);
         // remove from before
         before.removeRowsByMainKey(afterMissed);
@@ -89,8 +91,6 @@ public class CompressedComparator {
         // for comparator
         shared.removeAll(beforeMissed);
 
-        beforeMissed = null;
-        afterMissed = null;
         // headers
         contains(after.getHeaders(), before.getHeaders(), beforeMissedHeaders, null);
         comparatorListener.handleMissedBeforeHeader(beforeMissedHeaders);
@@ -99,43 +99,56 @@ public class CompressedComparator {
         uniteHeaders();
         comparatorListener.updateUnitedHeaders(unitedHeaders);
 
-        beforeMissedHeaders = null;
-        afterMissedHeaders = null;
-
-        ArrayList<String> ml = new ArrayList<>();
-        ArrayList<String> mml = new ArrayList<>();
+        ArrayList<KeyValue> ml = new ArrayList<>();
+        ArrayList<KeyValue> mml = new ArrayList<>();
         shared.forEach(key -> {
-            if (before.getKeyedMapping().get(key).getContent().hash() ==
-                    after.getKeyedMapping().get(key).getContent().hash()) {
-                ml.add(key);
-                comparatorListener.handleMatched(key);
-                // remove from before and after
-                after.removeRowByMainKey(key);
-                before.removeRowByMainKey(key);
-            } else {
-                mml.add(key);
-                try {
-                    ComparisonResult.RowResult mismatch =
-                            compareRow(
-                                    key,
-                                    ignoredFields,
-                                    before,
-                                    after,
-                                    trim,
-                                    unitedHeaders);
-                    if (mismatch.getMissMatchNumber() > 0) {
-                        addMarker(mismatch);
-                        comparatorListener.handleMisMatched(mismatch);
+            Row atb = before.getKeyedMappingMap().get(key.getName()).get(key.getValue());
+            Row btb = null;
+            boolean identical = false;
+            for (KeyHeaders akh : after.getKeyHeaderList()) {
+                Map<String, Row> msk = after.getKeyedMappingMap().get(key.getName());
+                btb = msk==null?null:msk.get(key.getValue());
+                if (btb!=null) {
+                    if (atb.getContent().hash() == btb.getContent().hash()) {
+                        ml.add(key);
+                        identical = true;
+                        // remove from before and after
+                        after.removeRowByMainKey(key);
+                        before.removeRowByMainKey(key);
+                        comparatorListener.handleMatched(key);
+                        break;
                     }
-                    // remove from before and after
-                    after.removeRowByMainKey(key);
-                    before.removeRowByMainKey(key);
-                } catch (DataFormatException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
                 }
             }
+            if (!identical) {
+                if (btb==null){
+                    System.out.println("CC btb is null to "+atb.getKey().getMainKey());
+                } else {
+                    mml.add(key);
+                    try {
+                        ComparisonResult.RowResult mismatch =
+                                compareRow(
+                                        key,
+                                        ignoredFields,
+                                        before,
+                                        after,
+                                        trim,
+                                        unitedHeaders);
+                        if (mismatch.getMissMatchNumber() > 0) {
+                            addMarker(mismatch);
+                            comparatorListener.handleMisMatched(mismatch);
+                        }
+                        // remove from before and after
+                        after.removeRowByMainKey(key);
+                        before.removeRowByMainKey(key);
+                    } catch (DataFormatException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
         });
 
         comparatorListener.handleMatchedList(ml);
@@ -155,14 +168,14 @@ public class CompressedComparator {
      * @throws IOException
      */
     private static final ComparisonResult.RowResult compareRow(
-            String key,
+            KeyValue key,
             Set<String> ignoredFields,
             CompressedTable before,
             CompressedTable after,
             boolean trim,
             List<String> unitedHeaders) throws DataFormatException, IOException {
-        Row a = before.seekByMainKey(key).orElseThrow();
-        Row b = after.seekByMainKey(key).orElseThrow();
+        Row a = before.seekByKey(key).orElseThrow();
+        Row b = after.seekByKey(key).orElseThrow();
         List<String> fieldsA = a.getContent().form();
         List<String> fieldsB = b.getContent().form();
 
@@ -198,14 +211,37 @@ public class CompressedComparator {
         return rowResult;
     }
 
+    /**
+     *
+     * @param a
+     * @param b
+     * @param register
+     * @param deregister
+     */
+    public static final void contains(CompressedTable a, CompressedTable b, Set<KeyValue> register, Set<KeyValue> deregister) {
+        Set<String> keyMapnameset = a.getKeyedMappingMap().keySet();
+        keyMapnameset.forEach( akmv->contains(akmv, a, b, register, deregister));
+    }
 
-    public static final void contains(Set<Key> a, Set<Key> b, Set<KeyValue> register, Set<KeyValue> deregister) {
+    /**
+     *
+     * @param keyname
+     * @param act
+     * @param bct
+     * @param register
+     * @param deregister
+     */
+    public static final void contains(String keyname, CompressedTable act, CompressedTable bct, Set<KeyValue> register, Set<KeyValue> deregister) {
+        Map<String, Row> akvm = act.getKeyedMappingMap().get(keyname);
+        Map<String, Row> bkvm = bct.getKeyedMappingMap().get(keyname);
+        Set<String> a = akvm.keySet();
+        Set<String> b = bkvm.keySet();
         a.forEach(key -> {
             if (!b.contains(key)) {
-                register.add(key);
+                register.add(akvm.get(key).getKey().getKeyValue(key));
             } else {
                 if (deregister != null) {
-                    deregister.add(key);
+                    deregister.add(akvm.get(key).getKey().getKeyValue(key));
                 }
             }
         });
@@ -236,8 +272,8 @@ public class CompressedComparator {
     }
 
     private void pickMissed() {
-        contains(after.getKeyedMapping().keySet(), before.getKeyedMapping().keySet(), beforeMissed, null);
-        contains(before.getKeyedMapping().keySet(), after.getKeyedMapping().keySet(), afterMissed, shared);
+        contains(after, before, beforeMissed, null);
+        contains(before, after, afterMissed, shared);
 
         contains(after.getHeaders(), before.getHeaders(), beforeMissedHeaders, null);
         contains(before.getHeaders(), after.getHeaders(), afterMissedHeaders, null);
