@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -18,7 +20,7 @@ public class CompressedTableFactory {
         CSV, EXCEL
     }
     private int ignoredLines = 0;
-    private String[] keyHeaders = new String[]{};
+    private List<String[]> keyHeaderList = new ArrayList<>();
     private char delimeter = ',';
     @Getter
     private Type type;
@@ -65,11 +67,21 @@ public class CompressedTableFactory {
     }
 
     /**
-     * @param keyHeaders
+     * @param keyHeaderList
      * @return
      */
-    public CompressedTableFactory keyHeaders(String[] keyHeaders) {
-        this.keyHeaders = keyHeaders;
+    public CompressedTableFactory keyHeaderList(List<String[]> keyHeaderList) {
+        this.keyHeaderList = keyHeaderList;
+        return this;
+    }
+
+    /**
+     *
+     * @param headers
+     * @return
+     */
+    public CompressedTableFactory addKeyHeaders(String[] headers) {
+        keyHeaderList.add(headers);
         return this;
     }
 
@@ -130,7 +142,7 @@ public class CompressedTableFactory {
                         .delimeter(delimeter)
                         .ignoredLines(ignoredLines)
                         .headerPosiction(headerPosition)
-                        .keyHeaders(keyHeaders).build()
+                        .keyHeaderList(keyHeaderList).build()
                         .parse(inputSteam);
             }
             case EXCEL: {

@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
 @Builder
 /**
  * The Excel headers should be unique, the duplicated header will cause header missing
@@ -20,6 +22,18 @@ import java.util.Iterator;
 public class ExcelParser {
     private boolean dynamicWidth;
     private int headerPosiction;
+    @Builder.Default
+    private List<String[]> keyHeaderList = new ArrayList<>();
+
+    /**
+     *
+     * @param headers
+     * @return
+     */
+    public ExcelParser addKeyHeaders(String[] headers) {
+        keyHeaderList.add(headers);
+        return this;
+    }
 
     /**
      * @param inputStream
@@ -34,6 +48,10 @@ public class ExcelParser {
             int to = sheet.getLastRowNum();
             CompressedTable compressedTable = new CompressedTable();
             compressedTable.setHeaderRowNumber(headerPosiction);
+
+            if (keyHeaderList != null) {
+                compressedTable.setKeyHeaderList(keyHeaderList);
+            }
 
             int columnNo = -1;
 

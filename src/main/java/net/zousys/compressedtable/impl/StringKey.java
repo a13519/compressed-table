@@ -10,36 +10,85 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 //@Log4j
 public class StringKey implements Key {
-    private List<String> keys = new ArrayList<>();
+    private List<String[]> keyHeaderList = new ArrayList<>();
+    private List<String> keyList = new ArrayList<>();
 
-    public static StringKey create(String[] keyheaders, Map<String, Integer> map, List<String> fields) {
-        StringKey sk = new StringKey();
-        sk.setKey(keyheaders, map, fields);
+    private CompressedRow row;
+
+    /**
+     *
+     * @param row
+     */
+    private StringKey(List<String[]> keyHeaderList, CompressedRow row) {
+        this.row = row;
+    }
+
+    /**
+     *
+     * @param keyHeaderList
+     * @param fields
+     * @param row
+     * @return
+     */
+    public static StringKey create(List<String[]> keyHeaderList, List<String> fields, CompressedRow row) {
+        StringKey sk = new StringKey(keyHeaderList, row);
+        sk.cast(fields, row.getCompressedTable().getHeaderMapping());
         return sk;
     }
 
     @Override
-    public String toString() {
-        return "{" + keys +
-                '}';
+    public String getMainKey() {
+        if (keyHeaderList.size()>0){
+            return keyList.get(0);
+        } else {
+            return "";
+        }
     }
 
     @Override
-    public void setKey(String[] keyheaders, Map<String, Integer> map, List<String> fields) {
-        if (keyheaders != null && map != null && fields != null) {
-            keys = new ArrayList<>();
-            Arrays.stream(keyheaders).forEach(header -> {
-                try {
-                    keys.add(fields.get(map.get(header)));
-                } catch (Exception e) {
-                    // ignore
-                }
-            });
+    public String[] getKeys() {
+        return keyList.toArray(new String[]{});
+    }
+
+    @Override
+    public String getKey(int index) {
+        return keyList.get(index);
+    }
+
+    @Override
+    public String[] getKeyheaders(int index) {
+        return new String[0];
+    }
+
+    @Override
+    public int size() {
+        return keyList.size();
+    }
+
+    @Override
+    public void cast(List<String> fields, Map<String, Integer> headerMapping) {
+        if (keyHeaderList != null && row != null) {
+            keyList = new ArrayList<>();
+            for (String[] headers : keyHeaderList) {
+                StringBuffer sb = new StringBuffer();
+                Arrays.stream(headers).forEach(header -> {
+                    try {
+                        sb.append(fields.get(headerMapping.get(header)));
+                        sb.append("|");
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                });
+                keyList.add(sb.toString());
+            }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "{" + keyList + '}';
     }
 }

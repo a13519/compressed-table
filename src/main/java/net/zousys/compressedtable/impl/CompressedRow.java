@@ -9,6 +9,7 @@ import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.Key;
 import net.zousys.compressedtable.Row;
 
+import javax.print.DocFlavor;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 @Getter
 @Builder
 public class CompressedRow implements Row {
-    private StringKey stringKey;
+    private StringKey stringKey ;
     private CompressedContent compressedContent;
     private CompressedTable compressedTable;
 
@@ -25,10 +26,14 @@ public class CompressedRow implements Row {
         this.compressedTable = compressedTable;
     }
 
+    /**
+     *
+     * @param fields
+     * @throws IOException
+     */
     public void make(List<String> fields) throws IOException {
         if (compressedTable != null && fields != null) {
-            this.stringKey = new StringKey();
-            this.stringKey.setKey(compressedTable.getHeaderkeys(), compressedTable.getHeaderMapping(), fields);
+            this.stringKey = StringKey.create(compressedTable.getKeyHeaderList(), fields, this);
             this.compressedContent = CompressedContent.load(fields);
         }
     }

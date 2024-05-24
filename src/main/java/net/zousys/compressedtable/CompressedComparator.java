@@ -72,18 +72,18 @@ public class CompressedComparator {
      * This is to compare two tables
      *
      */
-    public void compare() {
+    public CompressedComparator compare() {
         // missed in before
         contains(after.getKeyedMapping().keySet(), before.getKeyedMapping().keySet(), beforeMissed, null);
         comparatorListener.handleMissedInBefore(beforeMissed);
         // remove from after
-        after.removeRowsByKey(beforeMissed);
+        after.removeRowsByMainKey(beforeMissed);
 
         // missed in after
         contains(before.getKeyedMapping().keySet(), after.getKeyedMapping().keySet(), afterMissed, shared);
         comparatorListener.handleMissedInAfter(afterMissed);
         // remove from before
-        before.removeRowsByKey(afterMissed);
+        before.removeRowsByMainKey(afterMissed);
 
         // for comparator
         shared.removeAll(beforeMissed);
@@ -109,8 +109,8 @@ public class CompressedComparator {
                 ml.add(key);
                 comparatorListener.handleMatched(key);
                 // remove from before and after
-                after.removeRowByKey(key);
-                before.removeRowByKey(key);
+                after.removeRowByMainKey(key);
+                before.removeRowByMainKey(key);
             } else {
                 mml.add(key);
                 try {
@@ -127,8 +127,8 @@ public class CompressedComparator {
                         comparatorListener.handleMisMatched(mismatch);
                     }
                     // remove from before and after
-                    after.removeRowByKey(key);
-                    before.removeRowByKey(key);
+                    after.removeRowByMainKey(key);
+                    before.removeRowByMainKey(key);
                 } catch (DataFormatException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
@@ -139,7 +139,7 @@ public class CompressedComparator {
 
         comparatorListener.handleMatchedList(ml);
         comparatorListener.handleMisMatchedList(mml);
-
+        return this;
     }
 
     /**
@@ -160,8 +160,8 @@ public class CompressedComparator {
             CompressedTable after,
             boolean trim,
             List<String> unitedHeaders) throws DataFormatException, IOException {
-        Row a = before.seekByKey(key).orElseThrow();
-        Row b = after.seekByKey(key).orElseThrow();
+        Row a = before.seekByMainKey(key).orElseThrow();
+        Row b = after.seekByMainKey(key).orElseThrow();
         List<String> fieldsA = a.getContent().form();
         List<String> fieldsB = b.getContent().form();
 

@@ -9,21 +9,23 @@ public interface GeneralTable {
 
     List<String> getHeaders();
 
-    Optional<Row> seekByKey(Key key);
-
-    Optional<Row> seekByKey(String key);
+    Optional<Row> seekByMainKey(String key);
 
     Optional<Row> seekByIndex(int index);
 
     int size();
 
-    void setKeyHeaders(String[] keys);
+    void addKeyHeaders(String[] keyHeaders);
 
-    void removeRowByKey(String key);
+    void setKeyHeaderList(List<String[]> keyHeaderList);
+
+    List<String[]> getKeyHeaderList();
+
+    void removeRowByMainKey(String key);
 
     void removeRow(Row row);
 
-    void removeRowsByKey(Collection<String> keys);
+    void removeRowsByMainKey(Collection<String> keys);
 
     void removeRows(Collection<Row> rows);
 

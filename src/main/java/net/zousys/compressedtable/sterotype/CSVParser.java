@@ -7,6 +7,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 /**
@@ -16,10 +18,16 @@ public class CSVParser {
     @Builder.Default
     private int ignoredLines = 0;
     @Builder.Default
-    private String[] keyHeaders = new String[]{};
+    private List<String[]> keyHeaderList = new ArrayList<>();
     @Builder.Default
     private char delimeter = ',';
     private int headerPosiction;
+
+    public CSVParser addKeyHeaders(String[] headers) {
+        keyHeaderList.add(headers);
+        return this;
+    }
+
     /**
      * @param inputStream
      * @return
@@ -36,8 +44,8 @@ public class CSVParser {
                     .build();
             CompressedTable compressedTable = new CompressedTable();
             compressedTable.setHeaderRowNumber(headerPosiction);
-            if (keyHeaders != null) {
-                compressedTable.setKeyHeaders(keyHeaders);
+            if (keyHeaderList != null) {
+                compressedTable.setKeyHeaderList(keyHeaderList);
             }
             format.parse(in).stream().skip(ignoredLines).forEach(re -> {
                 try {
