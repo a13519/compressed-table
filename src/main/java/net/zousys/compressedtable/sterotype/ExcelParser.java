@@ -1,6 +1,7 @@
 package net.zousys.compressedtable.sterotype;
 
 import lombok.Builder;
+import net.zousys.compressedtable.key.KeyHeaders;
 import net.zousys.compressedtable.impl.CompressedTable;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -12,7 +13,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Builder
@@ -23,14 +23,14 @@ public class ExcelParser {
     private boolean dynamicWidth;
     private int headerPosiction;
     @Builder.Default
-    private List<String[]> keyHeaderList = new ArrayList<>();
+    private List<KeyHeaders> keyHeaderList = new ArrayList<>();
 
     /**
      *
      * @param headers
      * @return
      */
-    public ExcelParser addKeyHeaders(String[] headers) {
+    public ExcelParser addKeyHeaders(KeyHeaders headers) {
         keyHeaderList.add(headers);
         return this;
     }

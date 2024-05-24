@@ -1,5 +1,7 @@
 package net.zousys.compressedtable;
 
+import net.zousys.compressedtable.key.KeyValue;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,8 +10,8 @@ import java.util.Map;
  */
 public interface Key {
     String getMainKey();
-    String[] getKeys();
-    String getKey(int index);
+    KeyValue getMainKeyValue();
+    KeyValue getKeyValue(String key);
     String[] getKeyheaders(int index);
     int size();
     void cast(List<String> fields, Map<String, Integer> headerMapping);

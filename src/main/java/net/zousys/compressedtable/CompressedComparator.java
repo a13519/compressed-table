@@ -3,6 +3,7 @@ package net.zousys.compressedtable;
 import lombok.Builder;
 import lombok.Getter;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.key.KeyValue;
 
 import java.io.IOException;
 import java.util.*;
@@ -198,7 +199,7 @@ public class CompressedComparator {
     }
 
 
-    public static final void contains(Set<String> a, Set<String> b, Set<String> register, Set<String> deregister) {
+    public static final void contains(Set<Key> a, Set<Key> b, Set<KeyValue> register, Set<KeyValue> deregister) {
         a.forEach(key -> {
             if (!b.contains(key)) {
                 register.add(key);

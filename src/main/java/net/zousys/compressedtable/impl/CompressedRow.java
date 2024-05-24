@@ -8,8 +8,8 @@ import net.zousys.compressedtable.Content;
 import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.Key;
 import net.zousys.compressedtable.Row;
+import net.zousys.compressedtable.key.StringKey;
 
-import javax.print.DocFlavor;
 import java.io.IOException;
 import java.util.List;
 

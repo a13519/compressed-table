@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.Key;
+import net.zousys.compressedtable.key.KeyHeaders;
 import net.zousys.compressedtable.Row;
 
 import java.io.IOException;
@@ -16,14 +17,14 @@ import java.util.*;
 @NoArgsConstructor
 public class CompressedTable implements GeneralTable {
     @Getter
-    private List<Map<String, Row>> keyedMappingList = new ArrayList<>();
+    private Map<String, Map<String, Row>> keyedMappingMap = new HashMap<>();
     private List<Row> rows = new ArrayList<>();
     @Getter
     private List<String> headers;
     @Setter
     @Getter
     private Map<String, Integer> headerMapping = new HashMap<>();
-    private List<String[]> keyHeaderList = new ArrayList<>();
+    private List<KeyHeaders> keyHeaderList = new ArrayList<>();
     private boolean onHeader = true;
     private int headerRowNumber = -1;
     @Getter
@@ -80,7 +81,14 @@ public class CompressedTable implements GeneralTable {
             compressedRow.make(fields);
             this.rows.add(compressedRow);
             if (compressedRow.getKey() != null) {
-                keyedMapping.put(compressedRow.getKey().getMainKey(), compressedRow);
+                for (KeyHeaders akey : keyHeaderList) {
+                    Map<String, Row> akmap = keyedMappingMap.get(akey.getCompositedKeyValue());
+                    if (akmap == null) {
+                        akmap = new HashMap<>();
+                        keyedMappingMap.put(akey.getCompositedKeyValue(), akmap);
+                    }
+                    akmap.put(akey.getCompositedKeyValue(), compressedRow);
+                }
             }
         }
     }
@@ -92,19 +100,28 @@ public class CompressedTable implements GeneralTable {
 
 
     @Override
-    public Optional<Row> seekByKey(Key key) {
-        return Optional.of(keyedMapping.get(key));
+    public Optional<Map<String, Row>> seekByKey(Key key) {
+        if (key==null) {
+            return Optional.of(null);
+        } else {
+            Map<String, Row> r = new HashMap<>();
+            for (KeyHeaders ak : this.keyHeaderList) {
+                r.put(ak.getCompositedKeyValue(), keyedMappingMap.get(ak.getCompositedKeyValue()).get(key.getKeyValue(ak.getCompositedKeyValue())));
+            }
+            return Optional.of(r);
+        }
     }
 
     @Override
-    public Optional<Row> seekByMainKey(String key) {
-        return Optional.of(keyedMapping.get(key));
+    public Optional<Row> seekByMainKey(String keyValue) {
+        if (keyHeaderList==null||keyHeaderList.size()==0) {
+            return Optional.of(null);
+        } else {
+        Optional<Row> r = Optional.of(keyedMappingMap.get(keyHeaderList.get(0).getCompositedKeyValue()).get(keyValue));
+        return r;
+        }
     }
 
-    @Override
-    public Optional<Row> seekByIndex(int index) {
-        return Optional.of(rows.get(index));
-    }
 
     @Override
     public int size() {
@@ -112,24 +129,25 @@ public class CompressedTable implements GeneralTable {
     }
 
     @Override
-    public void addKeyHeaders(String[] keyHeaders) {
+    public void addKeyHeaders(KeyHeaders keyHeaders) {
         keyHeaderList.add(keyHeaders);
     }
 
     @Override
-    public void setKeyHeaderList(List<String[]> keyHeaderList) {
+    public void setKeyHeaderList(List<KeyHeaders> keyHeaderList) {
         this.keyHeaderList = keyHeaderList;
     }
 
     @Override
-    public List<String[]> getKeyHeaderList() {
+    public List<KeyHeaders> getKeyHeaderList() {
         return keyHeaderList;
     }
 
     @Override
-    public void removeRowByMainKey(String key) {
-        if (key != null) {
-            Row row = keyedMapping.remove(key);
+    public void removeRowByMainKey(String keyValue) {
+        if (keyValue != null) {
+            keyedMappingMap.remove(keyHeaderList.get(0).getCompositedKeyValue()).get(keyValue);
+            Row row = keyedMappingMap.remove(keyHeaderList.get(0).getCompositedKeyValue()).get(keyValue);
             if (row != null) {
                 rows.remove(row);
             }
@@ -141,7 +159,7 @@ public class CompressedTable implements GeneralTable {
         if (row != null) {
             rows.remove(row);
             if (row.getKey() != null) {
-                keyedMapping.remove(row.getKey());
+                keyedMappingMap.remove(row.getKey().getMainKeyValue());
             }
         }
     }
