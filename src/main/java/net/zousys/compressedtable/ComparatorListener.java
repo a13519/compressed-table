@@ -31,5 +31,9 @@ public interface ComparatorListener {
 
     void handleNotice(String key);
 
+    void handleMarkers(java.util.Map<String, Integer> markers);
+
+    void handleUnitedHeaderMapping(java.util.Map<String, Integer> unitedHeadermapping);
+
     void appendInformation();
 }

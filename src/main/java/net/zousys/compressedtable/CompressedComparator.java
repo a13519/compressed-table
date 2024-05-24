@@ -109,7 +109,7 @@ public class CompressedComparator {
                 ml.add(key);
                 comparatorListener.handleMatched(key);
                 // remove from before and after
-                after.removeRowByKey(key);
+//                after.removeRowByKey(key);
                 before.removeRowByKey(key);
             } else {
                 mml.add(key);
@@ -137,9 +137,9 @@ public class CompressedComparator {
             }
         });
 
+        comparatorListener.handleMarkers(markers);
         comparatorListener.handleMatchedList(ml);
         comparatorListener.handleMisMatchedList(mml);
-
     }
 
     /**
@@ -185,13 +185,14 @@ public class CompressedComparator {
                 rf.setIgnored(true);
                 rf.setMissmatched(false);
             } else {
+                rf.setIgnored(false);
                 if ((rf.getBeforeField() == null || rf.getAfterField() == null)
                         || !rf.getBeforeField().equals(rf.getAfterField())) {
                     rf.setMissmatched(true);
                 }
             }
 
-            rowResult.getFields().add(rf);
+            rowResult.addFieldResult(rf);
         }
 
         return rowResult;
@@ -252,6 +253,7 @@ public class CompressedComparator {
         unitedHeaderMapping = new HashMap<>();
         unitedHeaders = Stream.concat(before.getHeaders().stream(), beforeMissedHeaders.stream()).collect(Collectors.toList());
         unitedHeaders.stream().forEach(a -> unitedHeaderMapping.put(a, unitedHeaderMapping.size()));
+        comparatorListener.handleUnitedHeaderMapping(unitedHeaderMapping);
     }
 
 
