@@ -89,7 +89,7 @@ public class CompressedTable implements GeneralTable {
                         akmap = new HashMap<>();
                         keyedMappingMap.put(akey.getCompositedKeyValue(), akmap);
                     }
-                    akmap.put(akey.getCompositedKeyValue(), compressedRow);
+                    akmap.put(compressedRow.getKey().getKeyValue(akey.getCompositedKeyValue()).getValue(), compressedRow);
                 }
             }
         }

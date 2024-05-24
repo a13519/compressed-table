@@ -30,6 +30,7 @@ public class StringKey implements Key {
      * @param row
      */
     private StringKey(List<KeyHeaders> keyHeaderList, CompressedRow row) {
+        this.keyHeadersList = keyHeaderList;
         this.row = row;
     }
 

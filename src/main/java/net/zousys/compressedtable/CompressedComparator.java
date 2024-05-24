@@ -180,7 +180,7 @@ public class CompressedComparator {
         List<String> fieldsB = b.getContent().form();
 
         ComparisonResult.RowResult rowResult = new ComparisonResult.RowResult();
-        rowResult.setStringkey(a.getKey().toString());
+        rowResult.setStringkey(a.getKey());
 
         for (String headerA : unitedHeaders) {
             Integer beforeInd = before.getHeaderMapping().get(headerA);
@@ -238,10 +238,18 @@ public class CompressedComparator {
         Set<String> b = bkvm.keySet();
         a.forEach(key -> {
             if (!b.contains(key)) {
-                register.add(akvm.get(key).getKey().getKeyValue(key));
+                Row ar = akvm.get(key);
+                Key ak = ar.getKey();
+                KeyValue av = ak.getKeyValue(key);
+                if (av!=null) {
+                    register.add(av);
+                }
             } else {
                 if (deregister != null) {
-                    deregister.add(akvm.get(key).getKey().getKeyValue(key));
+                    KeyValue av = akvm.get(key).getKey().getKeyValue(key);
+                    if (av != null) {
+                        deregister.add(av);
+                    }
                 }
             }
         });
