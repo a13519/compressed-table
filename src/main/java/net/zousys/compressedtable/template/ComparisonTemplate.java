@@ -57,7 +57,7 @@ public class ComparisonTemplate {
         XSSFRow row = spreadsheet.createRow(rowid++);
         cellid = 0;
         Cell keyCell = row.createCell(cellid++);
-        keyCell.setCellValue("Key");
+        keyCell.setCellValue("KeySet");
         comparisonResult.getUnitedHeaders().stream().forEach(a -> {
             Cell cell = row.createCell(cellid++);
             cell.setCellValue(a);

@@ -8,9 +8,10 @@ import java.util.Map;
 /**
  * The table composit key. It composits from header map with fields list
  */
-public interface Key {
+public interface KeySet {
     String getMainKey();
     KeyValue getMainKeyValue();
+    KeyValue getMatchedKeyValue();
     KeyValue getKeyValue(String key);
     String[] getKeyheaders(int index);
     int size();

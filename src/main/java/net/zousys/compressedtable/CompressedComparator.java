@@ -2,9 +2,9 @@ package net.zousys.compressedtable;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.key.KeyHeaders;
-import net.zousys.compressedtable.key.KeyHeadersList;
 import net.zousys.compressedtable.key.KeyValue;
 
 import java.io.IOException;
@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.DataFormatException;
 
+@Log4j2
 @Builder
 public class CompressedComparator {
     private ComparatorListener comparatorListener;
@@ -57,6 +58,7 @@ public class CompressedComparator {
 
     /**
      * This is to count mismatched column time, later after the result spread sheet / csv generated, the header will mark the times of discrenpancies
+     *
      * @param mismatch
      */
     private void addMarker(ComparisonResult.RowResult mismatch) {
@@ -71,9 +73,9 @@ public class CompressedComparator {
             }
         }
     }
+
     /**
      * This is to compare two tables
-     *
      */
     public CompressedComparator compare() {
         // missed in before
@@ -105,10 +107,10 @@ public class CompressedComparator {
             Row atb = before.getKeyedMappingMap().get(key.getName()).get(key.getValue());
             Row btb = null;
             boolean identical = false;
-            for (KeyHeaders akh : after.getKeyHeaderList()) {
+            for (KeyHeaders akh : after.getKeyHeaderList().getKeyHeadersList()) {
                 Map<String, Row> msk = after.getKeyedMappingMap().get(key.getName());
-                btb = msk==null?null:msk.get(key.getValue());
-                if (btb!=null) {
+                btb = msk == null ? null : msk.get(key.getValue());
+                if (btb != null) {
                     if (atb.getContent().hash() == btb.getContent().hash()) {
                         ml.add(key);
                         identical = true;
@@ -121,8 +123,8 @@ public class CompressedComparator {
                 }
             }
             if (!identical) {
-                if (btb==null){
-                    System.out.println("CC btb is null to "+atb.getKey().getMainKey());
+                if (btb == null) {
+                    System.out.println("CC btb is null to " + atb.getKey().getMainKey());
                 } else {
                     mml.add(key);
                     try {
@@ -212,6 +214,8 @@ public class CompressedComparator {
     }
 
     /**
+     * This is to find out the b records missed in table a
+     * It will go through every record in a and try to match b
      *
      * @param a
      * @param b
@@ -220,39 +224,76 @@ public class CompressedComparator {
      */
     public static final void contains(CompressedTable a, CompressedTable b, Set<KeyValue> register, Set<KeyValue> deregister) {
         Set<String> keyMapnameset = a.getKeyedMappingMap().keySet();
-        keyMapnameset.forEach( akmv->contains(akmv, a, b, register, deregister));
+        List<Set<KeyValue>> keySetMap = new ArrayList<>();
+
+        keyMapnameset.forEach(akmv -> {
+            try {
+                keySetMap.add(containsX(akmv, a, b));
+            } catch (MissingKeySetException mkse) {
+                log.error("key missed: " + mkse);
+            }
+        });
+
+        for (int i = 1 ; i <keySetMap.size(); i ++){
+            keySetMap.get(0).retainAll(keySetMap.get(i));
+        }
+        register.addAll(keySetMap.get(0));
+
     }
 
     /**
-     *
+     * @param keyname
+     * @param act
+     * @param bct
+     */
+    public static final Set<KeyValue> containsX(String keyname, CompressedTable act, CompressedTable bct) throws MissingKeySetException {
+        Map<String, Row> bkvm = bct.getKeyedMappingMap().get(keyname);
+        Map<String, Row> akvm = act.getKeyedMappingMap().get(keyname);
+
+        if (akvm == null) {
+            throw new MissingKeySetException("before table miss keyset of " + keyname);
+        }
+        if (bkvm == null) {
+            throw new MissingKeySetException("after table miss keyset of " + keyname);
+        }
+
+        Set<String> a = akvm.keySet();
+        Set<String> b = bkvm.keySet();
+        Set<KeyValue> r = new HashSet<>();
+
+        a.forEach(key -> {
+            if (!b.contains(key)) {
+                // this is the records from a missed in b
+                Row ar = akvm.get(key);
+                KeySet ak = ar.getKey();
+                KeyValue av = ak.getKeyValue(keyname);
+                if (av != null) {
+                    r.add(av);
+                }
+            }
+        });
+        return r;
+    }
+
+    /**
      * @param keyname
      * @param act
      * @param bct
      * @param register
      * @param deregister
      */
-    public static final void contains(String keyname, CompressedTable act, CompressedTable bct, Set<KeyValue> register, Set<KeyValue> deregister) {
-        Map<String, Row> akvm = act.getKeyedMappingMap().get(keyname);
+    public static final void contains(String keyname, CompressedTable act, CompressedTable bct, Set<KeyValue> register, Set<KeyValue> deregister) throws MissingKeySetException {
         Map<String, Row> bkvm = bct.getKeyedMappingMap().get(keyname);
+        Map<String, Row> akvm = act.getKeyedMappingMap().get(keyname);
+
+        if (bkvm == null) {
+            throw new MissingKeySetException();
+        }
+
+
         Set<String> a = akvm.keySet();
         Set<String> b = bkvm.keySet();
-        a.forEach(key -> {
-            if (!b.contains(key)) {
-                Row ar = akvm.get(key);
-                Key ak = ar.getKey();
-                KeyValue av = ak.getKeyValue(key);
-                if (av!=null) {
-                    register.add(av);
-                }
-            } else {
-                if (deregister != null) {
-                    KeyValue av = akvm.get(key).getKey().getKeyValue(key);
-                    if (av != null) {
-                        deregister.add(av);
-                    }
-                }
-            }
-        });
+
     }
 
     public static final void contains(List<String> a, List<String> b, List<String> register, List<String> deregister) {

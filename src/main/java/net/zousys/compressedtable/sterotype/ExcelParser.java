@@ -3,6 +3,7 @@ package net.zousys.compressedtable.sterotype;
 import lombok.Builder;
 import net.zousys.compressedtable.key.KeyHeaders;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.key.KeyHeadersList;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -23,7 +24,7 @@ public class ExcelParser {
     private boolean dynamicWidth;
     private int headerPosiction;
     @Builder.Default
-    private List<KeyHeaders> keyHeaderList = new ArrayList<>();
+    private KeyHeadersList keyHeaderList = new KeyHeadersList();
 
     /**
      *
@@ -31,7 +32,7 @@ public class ExcelParser {
      * @return
      */
     public ExcelParser addKeyHeaders(KeyHeaders headers) {
-        keyHeaderList.add(headers);
+        keyHeaderList.addHeaders(headers);
         return this;
     }
 

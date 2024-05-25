@@ -3,6 +3,7 @@ package net.zousys.compressedtable.sterotype;
 import lombok.Builder;
 import net.zousys.compressedtable.key.KeyHeaders;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.key.KeyHeadersList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -19,13 +20,13 @@ public class CSVParser {
     @Builder.Default
     private int ignoredLines = 0;
     @Builder.Default
-    private List<KeyHeaders> keyHeaderList = new ArrayList<>();
+    private KeyHeadersList keyHeaderList = new KeyHeadersList();
     @Builder.Default
     private char delimeter = ',';
     private int headerPosiction;
 
     public CSVParser addKeyHeaders(KeyHeaders headers) {
-        keyHeaderList.add(headers);
+        keyHeaderList.addHeaders(headers);
         return this;
     }
 

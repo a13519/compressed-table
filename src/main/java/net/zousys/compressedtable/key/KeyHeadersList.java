@@ -19,6 +19,11 @@ public class KeyHeadersList {
         return this;
     }
 
+    public KeyHeadersList addHeaders(KeyHeaders keyheaders) {
+        list.add(keyheaders);
+        return this;
+    }
+
     /**
      *
      * @return

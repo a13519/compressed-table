@@ -1,6 +1,7 @@
 package net.zousys.compressedtable;
 
 import net.zousys.compressedtable.key.KeyHeaders;
+import net.zousys.compressedtable.key.KeyHeadersList;
 import net.zousys.compressedtable.key.KeyValue;
 
 import java.util.Collection;
@@ -15,7 +16,7 @@ public interface GeneralTable {
 
     int getHeaderRowNumber();
 
-    Optional<Map<String, Row>> seekByKey(Key key);
+    Optional<Map<String, Row>> seekByKey(KeySet key);
 
     Optional<Row> seekByMainKey(String keyValue);
 
@@ -25,9 +26,9 @@ public interface GeneralTable {
 
     void addKeyHeaders(KeyHeaders keyHeaders);
 
-    void setKeyHeaderList(List<KeyHeaders> keyHeaderList);
+    void setKeyHeaderList(KeyHeadersList keyHeaderList);
 
-    List<KeyHeaders> getKeyHeaderList();
+    KeyHeadersList getKeyHeaderList();
 
     void removeRowByMainKey(KeyValue key);
 

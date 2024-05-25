@@ -1,20 +1,21 @@
 package net.zousys.compressedtable.key;
 
 import lombok.Getter;
-import net.zousys.compressedtable.Key;
+import net.zousys.compressedtable.KeySet;
 import net.zousys.compressedtable.impl.CompressedRow;
 
 import java.util.*;
 
 @Getter
 //@Log4j
-public class StringKey implements Key {
-    private List<KeyHeaders> keyHeadersList = new ArrayList<>();
+public class StringKey implements KeySet {
+    private KeyHeadersList keyHeadersList = new KeyHeadersList();
     /**
      * map key is StringKey's a value of key
      */
     private Map<String, KeyValue> keyValueList;
     private KeyValue mainKeyValue;
+    private KeyValue matchedKeyValue;
     private CompressedRow row;
 
     /**
@@ -29,7 +30,7 @@ public class StringKey implements Key {
      *
      * @param row
      */
-    private StringKey(List<KeyHeaders> keyHeaderList, CompressedRow row) {
+    private StringKey(KeyHeadersList keyHeaderList, CompressedRow row) {
         this.keyHeadersList = keyHeaderList;
         this.row = row;
     }
@@ -41,7 +42,7 @@ public class StringKey implements Key {
      * @param row
      * @return
      */
-    public static StringKey create(List<KeyHeaders> keyHeaderList, List<String> fields, CompressedRow row) {
+    public static StringKey create(KeyHeadersList keyHeaderList, List<String> fields, CompressedRow row) {
         StringKey sk = new StringKey(keyHeaderList, row);
         sk.cast(fields, row.getCompressedTable().getHeaderMapping());
         return sk;
@@ -78,7 +79,7 @@ public class StringKey implements Key {
         if (keyHeadersList != null && row != null) {
             keyValueList = new HashMap<>();
             int n = 0;
-            for (KeyHeaders headers : keyHeadersList) {
+            for (KeyHeaders headers : keyHeadersList.getKeyHeadersList()) {
                 StringBuffer sb = new StringBuffer();
                 Arrays.stream(headers.getKeyHeaders()).forEach(header -> {
                     try {

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.zousys.compressedtable.Content;
 import net.zousys.compressedtable.GeneralTable;
-import net.zousys.compressedtable.Key;
+import net.zousys.compressedtable.KeySet;
 import net.zousys.compressedtable.Row;
 import net.zousys.compressedtable.key.StringKey;
 
@@ -39,7 +39,7 @@ public class CompressedRow implements Row {
     }
 
     @Override
-    public Key getKey() {
+    public KeySet getKey() {
         return stringKey;
     }
 

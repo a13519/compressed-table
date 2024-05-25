@@ -3,6 +3,7 @@ package net.zousys.compressedtable;
 import lombok.Getter;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.key.KeyHeaders;
+import net.zousys.compressedtable.key.KeyHeadersList;
 import net.zousys.compressedtable.sterotype.CSVParser;
 import net.zousys.compressedtable.sterotype.ExcelParser;
 
@@ -21,7 +22,7 @@ public class CompressedTableFactory {
         CSV, EXCEL
     }
     private int ignoredLines = 0;
-    private List<KeyHeaders> keyHeaderList = new ArrayList<>();
+    private KeyHeadersList keyHeaderList = new KeyHeadersList();
     private char delimeter = ',';
     @Getter
     private Type type;
@@ -71,7 +72,7 @@ public class CompressedTableFactory {
      * @param keyHeaderList
      * @return
      */
-    public CompressedTableFactory keyHeaderList(List<KeyHeaders> keyHeaderList) {
+    public CompressedTableFactory keyHeaderList(KeyHeadersList keyHeaderList) {
         this.keyHeaderList = keyHeaderList;
         return this;
     }
@@ -82,7 +83,7 @@ public class CompressedTableFactory {
      * @return
      */
     public CompressedTableFactory addKeyHeaders(KeyHeaders headers) {
-        keyHeaderList.add(headers);
+        keyHeaderList.addHeaders(headers);
         return this;
     }
 
