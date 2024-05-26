@@ -75,7 +75,7 @@ public class ComparisonTemplate {
         XSSFRow row = spreadsheet.createRow(rowid++);
         cellid = 0;
         Cell keyCell = row.createCell(cellid++);
-        keyCell.setCellValue(rowResult.getStringkey().getMainKey());
+        keyCell.setCellValue(rowResult.getMatchedKey().getValue());
         List<ComparisonResult.ResultField> fields = rowResult.getFields();
         int x = 0;
         for (String header : comparisonResult.getUnitedHeaders()) {

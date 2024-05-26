@@ -30,11 +30,11 @@ public interface GeneralTable {
 
     KeyHeadersList getKeyHeaderList();
 
-    void removeRowByMainKey(KeyValue key);
+    void removeRowByMainKey(String key);
 
     void removeRow(Row row);
 
-    void removeRowsByMainKey(Collection<KeyValue> keys);
+    void removeRowsByMainKey(Collection<String> keys);
 
     void removeRows(Collection<Row> rows);
 

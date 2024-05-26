@@ -2,6 +2,7 @@ package net.zousys.compressedtable;
 
 import lombok.*;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.key.KeyValue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,7 +41,7 @@ public class ComparisonResult {
     public static class RowResult {
         @Setter
         @Getter
-        KeySet stringkey;
+        KeyValue matchedKey;
         @Getter
         List<ResultField> fields = new ArrayList<>();
         @Getter

@@ -23,16 +23,22 @@ public class CompressedComparator {
 
     private CompressedTable after;
 
+    /**
+     * main key
+     */
     @Builder.Default
-    private Set<KeyValue> beforeMissed = new HashSet<>();
+    private Set<String> beforeMissed = new HashSet<>();
+    /**
+     * main key
+     */
     @Builder.Default
-    private Set<KeyValue> afterMissed = new HashSet<>();
+    private Set<String> afterMissed = new HashSet<>();
     @Builder.Default
     private List<String> beforeMissedHeaders = new ArrayList<>();
     @Builder.Default
     private List<String> afterMissedHeaders = new ArrayList<>();
     @Builder.Default
-    private Set<KeyValue> shared = new HashSet<>();
+    private Set<String> shared = new HashSet<>();
 
     private List<String> unitedHeaders;
 
@@ -101,16 +107,20 @@ public class CompressedComparator {
         uniteHeaders();
         comparatorListener.updateUnitedHeaders(unitedHeaders);
 
-        ArrayList<KeyValue> ml = new ArrayList<>();
+        ArrayList<String> ml = new ArrayList<>();
         ArrayList<KeyValue> mml = new ArrayList<>();
         shared.forEach(key -> {
-            Row atb = before.getKeyedMappingMap().get(key.getName()).get(key.getValue());
+            Row atb = before.seekByMainKey(key).get();
             Row btb = null;
             boolean identical = false;
+            KeyValue compositedKey = null;
             for (KeyHeaders akh : after.getKeyHeaderList().getKeyHeadersList()) {
-                Map<String, Row> msk = after.getKeyedMappingMap().get(key.getName());
-                btb = msk == null ? null : msk.get(key.getValue());
+                String comkey = akh.getCompositedKeyValue();
+                String comkeyvA = atb.getKey().getKeyValue(akh.getCompositedKeyValue()).getValue();
+                Map<String, Row> msk = after.getKeyedMappingMap().get(akh.getCompositedKeyValue());
+                btb = msk == null ? null : msk.get(atb.getKey().getKeyValue(akh.getCompositedKeyValue()).getValue());
                 if (btb != null) {
+                    compositedKey = btb.getKey().getKeyValue(akh.getCompositedKeyValue());
                     if (atb.getContent().hash() == btb.getContent().hash()) {
                         ml.add(key);
                         identical = true;
@@ -123,33 +133,31 @@ public class CompressedComparator {
                 }
             }
             if (!identical) {
-                if (btb == null) {
-                    System.out.println("CC btb is null to " + atb.getKey().getMainKey());
-                } else {
-                    mml.add(key);
-                    try {
-                        ComparisonResult.RowResult mismatch =
-                                compareRow(
-                                        key,
-                                        ignoredFields,
-                                        before,
-                                        after,
-                                        trim,
-                                        unitedHeaders);
-                        if (mismatch.getMissMatchNumber() > 0) {
-                            addMarker(mismatch);
-                            comparatorListener.handleMisMatched(mismatch);
-                        }
-                        // remove from before and after
-                        after.removeRowByMainKey(key);
-                        before.removeRowByMainKey(key);
-                    } catch (DataFormatException e) {
-                        throw new RuntimeException(e);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+
+                mml.add(compositedKey);
+                try {
+                    ComparisonResult.RowResult mismatch =
+                            compareRow(
+                                    compositedKey,
+                                    ignoredFields,
+                                    before,
+                                    after,
+                                    trim,
+                                    unitedHeaders);
+                    if (mismatch.getMissMatchNumber() > 0) {
+                        addMarker(mismatch);
+                        comparatorListener.handleMisMatched(mismatch);
                     }
+                    // remove from before and after
+                    after.removeRowByMainKey(key);
+                    before.removeRowByMainKey(key);
+                } catch (DataFormatException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
+
 
         });
 
@@ -182,7 +190,7 @@ public class CompressedComparator {
         List<String> fieldsB = b.getContent().form();
 
         ComparisonResult.RowResult rowResult = new ComparisonResult.RowResult();
-        rowResult.setStringkey(a.getKey());
+        rowResult.setMatchedKey(key);
 
         for (String headerA : unitedHeaders) {
             Integer beforeInd = before.getHeaderMapping().get(headerA);
@@ -207,7 +215,7 @@ public class CompressedComparator {
                 }
             }
 
-            rowResult.getFields().add(rf);
+            rowResult.addFieldResult(rf);
         }
 
         return rowResult;
@@ -222,9 +230,9 @@ public class CompressedComparator {
      * @param register
      * @param deregister
      */
-    public static final void contains(CompressedTable a, CompressedTable b, Set<KeyValue> register, Set<KeyValue> deregister) {
+    public static final void contains(CompressedTable a, CompressedTable b, Set<String> register, Set<String> deregister) {
         Set<String> keyMapnameset = a.getKeyedMappingMap().keySet();
-        List<Set<KeyValue>> keySetMap = new ArrayList<>();
+        List<Set<String>> keySetMap = new ArrayList<>();
 
         keyMapnameset.forEach(akmv -> {
             try {
@@ -234,10 +242,17 @@ public class CompressedComparator {
             }
         });
 
-        for (int i = 1 ; i <keySetMap.size(); i ++){
+        for (int i = 1; i < keySetMap.size(); i++) {
             keySetMap.get(0).retainAll(keySetMap.get(i));
         }
         register.addAll(keySetMap.get(0));
+        if (deregister != null) {
+            for (Row arow : a.getContents()) {
+                if (!keySetMap.get(0).contains(arow.getKey().getMainKeyValue())) {
+                    deregister.add(arow.getKey().getMainKeyValue());
+                }
+            }
+        }
 
     }
 
@@ -246,7 +261,7 @@ public class CompressedComparator {
      * @param act
      * @param bct
      */
-    public static final Set<KeyValue> containsX(String keyname, CompressedTable act, CompressedTable bct) throws MissingKeySetException {
+    public static final Set<String> containsX(String keyname, CompressedTable act, CompressedTable bct) throws MissingKeySetException {
         Map<String, Row> bkvm = bct.getKeyedMappingMap().get(keyname);
         Map<String, Row> akvm = act.getKeyedMappingMap().get(keyname);
 
@@ -259,16 +274,15 @@ public class CompressedComparator {
 
         Set<String> a = akvm.keySet();
         Set<String> b = bkvm.keySet();
-        Set<KeyValue> r = new HashSet<>();
+        Set<String> r = new HashSet<>();
 
         a.forEach(key -> {
             if (!b.contains(key)) {
                 // this is the records from a missed in b
                 Row ar = akvm.get(key);
                 KeySet ak = ar.getKey();
-                KeyValue av = ak.getKeyValue(keyname);
-                if (av != null) {
-                    r.add(av);
+                if (ak != null) {
+                    r.add(ak.getMainKeyValue());
                 }
             }
         });
@@ -282,7 +296,11 @@ public class CompressedComparator {
      * @param register
      * @param deregister
      */
-    public static final void contains(String keyname, CompressedTable act, CompressedTable bct, Set<KeyValue> register, Set<KeyValue> deregister) throws MissingKeySetException {
+    public static final void contains(String keyname,
+                                      CompressedTable act,
+                                      CompressedTable bct,
+                                      Set<String> register,
+                                      Set<String> deregister) throws MissingKeySetException {
         Map<String, Row> bkvm = bct.getKeyedMappingMap().get(keyname);
         Map<String, Row> akvm = act.getKeyedMappingMap().get(keyname);
 

@@ -33,8 +33,8 @@ public class CompressedRow implements Row {
      */
     public void make(List<String> fields) throws IOException {
         if (compressedTable != null && fields != null) {
-            this.stringKey = StringKey.create(compressedTable.getKeyHeaderList(), fields, this);
             this.compressedContent = CompressedContent.load(fields);
+            this.stringKey = StringKey.create(compressedTable.getKeyHeaderList(), fields, this);
         }
     }
 

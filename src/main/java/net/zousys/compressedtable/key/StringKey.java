@@ -14,10 +14,9 @@ public class StringKey implements KeySet {
      * map key is StringKey's a value of key
      */
     private Map<String, KeyValue> keyValueList;
-    private KeyValue mainKeyValue;
     private KeyValue matchedKeyValue;
     private CompressedRow row;
-
+    private String mainKeyValue;
     /**
      *
      * @param row
@@ -44,18 +43,12 @@ public class StringKey implements KeySet {
      */
     public static StringKey create(KeyHeadersList keyHeaderList, List<String> fields, CompressedRow row) {
         StringKey sk = new StringKey(keyHeaderList, row);
-        sk.cast(fields, row.getCompressedTable().getHeaderMapping());
+        sk.cast(fields, row.getCompressedTable().getHeaderMapping(), row.getCompressedTable().getContents().size()+"."+row.getCompressedContent().hash());
         return sk;
     }
 
-
     @Override
-    public String getMainKey() {
-        return "";
-    }
-
-    @Override
-    public KeyValue getMainKeyValue() {
+    public String getMainKeyValue() {
         return mainKeyValue;
     }
 
@@ -75,10 +68,10 @@ public class StringKey implements KeySet {
     }
 
     @Override
-    public void cast(List<String> fields, Map<String, Integer> headerMapping) {
+    public void cast(List<String> fields, Map<String, Integer> headerMapping, String mainkey) {
+        mainKeyValue = mainkey;
         if (keyHeadersList != null && row != null) {
             keyValueList = new HashMap<>();
-            int n = 0;
             for (KeyHeaders headers : keyHeadersList.getKeyHeadersList()) {
                 StringBuffer sb = new StringBuffer();
                 Arrays.stream(headers.getKeyHeaders()).forEach(header -> {
@@ -89,9 +82,6 @@ public class StringKey implements KeySet {
                         // ignore
                     }
                 });
-                if (n++==0) {
-                    mainKeyValue = KeyValue.builder().name(headers.getCompositedKeyValue()).value(sb.toString()).build();
-                }
                 keyValueList.put(headers.getCompositedKeyValue(),
                         KeyValue.builder()
                                 .name(headers.getCompositedKeyValue())

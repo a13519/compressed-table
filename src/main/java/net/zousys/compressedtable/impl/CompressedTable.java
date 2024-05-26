@@ -20,6 +20,8 @@ import java.util.*;
 public class CompressedTable implements GeneralTable {
     @Getter
     private Map<String, Map<String, Row>> keyedMappingMap = new HashMap<>();
+    private Map<String, Row> mainKeyMap = new HashMap<>();
+
     private List<Row> rows = new ArrayList<>();
     @Getter
     private List<String> headers;
@@ -82,6 +84,8 @@ public class CompressedTable implements GeneralTable {
             CompressedRow compressedRow = new CompressedRow(this);
             compressedRow.make(fields);
             this.rows.add(compressedRow);
+            mainKeyMap.put(compressedRow.getKey().getMainKeyValue(), compressedRow);
+
             if (compressedRow.getKey() != null) {
                 for (KeyHeaders akey : keyHeaderList.getKeyHeadersList()) {
                     Map<String, Row> akmap = keyedMappingMap.get(akey.getCompositedKeyValue());
@@ -120,7 +124,7 @@ public class CompressedTable implements GeneralTable {
             return Optional.of(null);
         } else {
         Optional<Row> r = Optional.of(
-                keyedMappingMap.get(keyHeaderList.getKeyHeadersList().get(0).getCompositedKeyValue()).get(keyValue));
+                mainKeyMap.get(keyValue));
         return r;
         }
     }
@@ -157,9 +161,9 @@ public class CompressedTable implements GeneralTable {
     }
 
     @Override
-    public void removeRowByMainKey(KeyValue keyValue) {
-        if (keyValue != null) {
-            Row row = keyedMappingMap.get(keyHeaderList.getKeyHeadersList().get(0).getCompositedKeyValue()).get(keyValue.getValue());
+    public void removeRowByMainKey(String mainKey) {
+        if (mainKey != null) {
+            Row row = mainKeyMap.get(mainKey);
             if (row != null) {
                 removeRow(row);
             }
@@ -170,6 +174,7 @@ public class CompressedTable implements GeneralTable {
     public void removeRow(Row row) {
         if (row != null) {
             rows.remove(row);
+            mainKeyMap.remove(row.getKey().getMainKeyValue());
             if (row.getKey() != null) {
                 for (KeyHeaders akh : keyHeaderList.getKeyHeadersList()){
                     String kv = akh.getCompositedKeyValue();
@@ -180,7 +185,7 @@ public class CompressedTable implements GeneralTable {
     }
 
     @Override
-    public void removeRowsByMainKey(Collection<KeyValue> keys) {
+    public void removeRowsByMainKey(Collection<String> keys) {
         keys.forEach(this::removeRowByMainKey);
     }
 
