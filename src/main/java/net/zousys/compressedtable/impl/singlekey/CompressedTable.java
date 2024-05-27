@@ -1,14 +1,15 @@
-package net.zousys.compressedtable.impl;
+package net.zousys.compressedtable.impl.singlekey;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.KeySet;
-import net.zousys.compressedtable.key.KeyHeaders;
 import net.zousys.compressedtable.Row;
-import net.zousys.compressedtable.key.KeyHeadersList;
-import net.zousys.compressedtable.key.KeyValue;
+import net.zousys.compressedtable.impl.KeyHeaders;
+import net.zousys.compressedtable.impl.KeyHeadersList;
+import net.zousys.compressedtable.impl.KeyValue;
 
 import java.io.IOException;
 import java.util.*;
@@ -18,6 +19,8 @@ import java.util.*;
  */
 @NoArgsConstructor
 public class CompressedTable implements GeneralTable {
+    @Getter
+    private CompressedTableFactory.Mode mode;
     @Getter
     private Map<String, Map<String, Row>> keyedMappingMap = new HashMap<>();
     private Map<String, Row> mainKeyMap = new HashMap<>();

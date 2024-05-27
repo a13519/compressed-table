@@ -1,8 +1,8 @@
 package net.zousys.compressedtable;
 
-import net.zousys.compressedtable.key.KeyHeaders;
-import net.zousys.compressedtable.key.KeyHeadersList;
-import net.zousys.compressedtable.key.KeyValue;
+import net.zousys.compressedtable.impl.KeyHeaders;
+import net.zousys.compressedtable.impl.KeyHeadersList;
+import net.zousys.compressedtable.impl.KeyValue;
 
 import java.util.Collection;
 import java.util.List;

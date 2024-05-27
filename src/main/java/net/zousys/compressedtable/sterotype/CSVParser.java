@@ -1,16 +1,15 @@
 package net.zousys.compressedtable.sterotype;
 
 import lombok.Builder;
-import net.zousys.compressedtable.key.KeyHeaders;
-import net.zousys.compressedtable.impl.CompressedTable;
-import net.zousys.compressedtable.key.KeyHeadersList;
+import net.zousys.compressedtable.CompressedTableFactory;
+import net.zousys.compressedtable.impl.KeyHeaders;
+import net.zousys.compressedtable.impl.multikeys.CompressedTable;
+import net.zousys.compressedtable.impl.KeyHeadersList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Builder
 /**
@@ -24,7 +23,14 @@ public class CSVParser {
     @Builder.Default
     private char delimeter = ',';
     private int headerPosiction;
+    @Builder.Default
+    private CompressedTableFactory.Mode mode;
 
+    /**
+     *
+     * @param headers
+     * @return
+     */
     public CSVParser addKeyHeaders(KeyHeaders headers) {
         keyHeaderList.addHeaders(headers);
         return this;

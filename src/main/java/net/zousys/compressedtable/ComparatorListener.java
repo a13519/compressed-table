@@ -1,7 +1,7 @@
 package net.zousys.compressedtable;
 
-import net.zousys.compressedtable.impl.CompressedTable;
-import net.zousys.compressedtable.key.KeyValue;
+import net.zousys.compressedtable.impl.multikeys.CompressedTable;
+import net.zousys.compressedtable.impl.KeyValue;
 
 import java.util.List;
 import java.util.Map;

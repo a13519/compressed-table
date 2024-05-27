@@ -1,8 +1,7 @@
-package net.zousys.compressedtable.key;
+package net.zousys.compressedtable.impl;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Objects;

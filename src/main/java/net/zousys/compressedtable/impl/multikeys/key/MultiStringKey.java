@@ -1,17 +1,20 @@
-package net.zousys.compressedtable.key;
+package net.zousys.compressedtable.impl.multikeys.key;
 
 import lombok.Getter;
 import net.zousys.compressedtable.KeySet;
-import net.zousys.compressedtable.impl.CompressedRow;
+import net.zousys.compressedtable.impl.KeyHeaders;
+import net.zousys.compressedtable.impl.KeyHeadersList;
+import net.zousys.compressedtable.impl.KeyValue;
+import net.zousys.compressedtable.impl.multikeys.CompressedRow;
 
 import java.util.*;
 
 @Getter
 //@Log4j
-public class StringKey implements KeySet {
+public class MultiStringKey implements KeySet {
     private KeyHeadersList keyHeadersList = new KeyHeadersList();
     /**
-     * map key is StringKey's a value of key
+     * map key is MultiStringKey's a value of key
      */
     private Map<String, KeyValue> keyValueList;
     private KeyValue matchedKeyValue;
@@ -21,7 +24,7 @@ public class StringKey implements KeySet {
      *
      * @param row
      */
-    private StringKey(CompressedRow row) {
+    private MultiStringKey(CompressedRow row) {
         this.row = row;
     }
 
@@ -29,7 +32,7 @@ public class StringKey implements KeySet {
      *
      * @param row
      */
-    private StringKey(KeyHeadersList keyHeaderList, CompressedRow row) {
+    private MultiStringKey(KeyHeadersList keyHeaderList, CompressedRow row) {
         this.keyHeadersList = keyHeaderList;
         this.row = row;
     }
@@ -41,12 +44,17 @@ public class StringKey implements KeySet {
      * @param row
      * @return
      */
-    public static StringKey create(KeyHeadersList keyHeaderList, List<String> fields, CompressedRow row) {
-        StringKey sk = new StringKey(keyHeaderList, row);
+    public static MultiStringKey create(KeyHeadersList keyHeaderList, List<String> fields, CompressedRow row) {
+        MultiStringKey sk = new MultiStringKey(keyHeaderList, row);
         sk.cast(fields,
                 row.getCompressedTable().getHeaderMapping(),
                 System.currentTimeMillis()+"."+row.getCompressedContent().hash());
         return sk;
+    }
+
+    @Override
+    public String getMainKey() {
+        return "time-hash";
     }
 
     @Override
@@ -90,6 +98,11 @@ public class StringKey implements KeySet {
                                 .value(sb.toString()).build());
             }
         }
+    }
+
+    @Override
+    public void cast(List<String> fields, Map<String, Integer> headerMapping, KeyHeadersList keyHeaderLis) {
+        // empty for single key
     }
 
     @Override

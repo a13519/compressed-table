@@ -1,4 +1,4 @@
-package net.zousys.compressedtable.key;
+package net.zousys.compressedtable.impl;
 
 import lombok.Getter;
 

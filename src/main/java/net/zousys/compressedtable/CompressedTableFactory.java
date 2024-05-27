@@ -1,9 +1,9 @@
 package net.zousys.compressedtable;
 
 import lombok.Getter;
-import net.zousys.compressedtable.impl.CompressedTable;
-import net.zousys.compressedtable.key.KeyHeaders;
-import net.zousys.compressedtable.key.KeyHeadersList;
+import net.zousys.compressedtable.impl.multikeys.CompressedTable;
+import net.zousys.compressedtable.impl.KeyHeaders;
+import net.zousys.compressedtable.impl.KeyHeadersList;
 import net.zousys.compressedtable.sterotype.CSVParser;
 import net.zousys.compressedtable.sterotype.ExcelParser;
 
@@ -11,8 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -21,11 +19,16 @@ public class CompressedTableFactory {
     public static enum Type {
         CSV, EXCEL
     }
+    public static enum Mode {
+        SINGLE_KEY, MULTI_KEYS
+    }
     private int ignoredLines = 0;
     private KeyHeadersList keyHeaderList = new KeyHeadersList();
     private char delimeter = ',';
     @Getter
-    private Type type;
+    private Type type = Type.CSV;
+    @Getter
+    private Mode mode = Mode.SINGLE_KEY;
 
     /**
      * the header row number, if this is not explictly set then there will be no header at all
@@ -144,12 +147,14 @@ public class CompressedTableFactory {
                         .delimeter(delimeter)
                         .ignoredLines(ignoredLines)
                         .headerPosiction(headerPosition)
-                        .keyHeaderList(keyHeaderList).build()
+                        .keyHeaderList(keyHeaderList)
+                        .mode(mode).build()
                         .parse(inputSteam);
             }
             case EXCEL: {
                 return ExcelParser.builder()
                         .headerPosiction(headerPosition)
+                        .mode(mode)
                         .build().parse(inputSteam);
             }
         }

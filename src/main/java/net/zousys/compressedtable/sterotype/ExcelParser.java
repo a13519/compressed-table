@@ -1,9 +1,8 @@
 package net.zousys.compressedtable.sterotype;
 
 import lombok.Builder;
-import net.zousys.compressedtable.key.KeyHeaders;
-import net.zousys.compressedtable.impl.CompressedTable;
-import net.zousys.compressedtable.key.KeyHeadersList;
+import net.zousys.compressedtable.CompressedTableFactory;
+import net.zousys.compressedtable.impl.multikeys.CompressedTable;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -14,7 +13,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 @Builder
 /**
@@ -24,17 +22,7 @@ public class ExcelParser {
     private boolean dynamicWidth;
     private int headerPosiction;
     @Builder.Default
-    private KeyHeadersList keyHeaderList = new KeyHeadersList();
-
-    /**
-     *
-     * @param headers
-     * @return
-     */
-    public ExcelParser addKeyHeaders(KeyHeaders headers) {
-        keyHeaderList.addHeaders(headers);
-        return this;
-    }
+    private CompressedTableFactory.Mode mode = CompressedTableFactory.Mode.SINGLE_KEY;
 
     /**
      * @param inputStream
@@ -49,10 +37,6 @@ public class ExcelParser {
             int to = sheet.getLastRowNum();
             CompressedTable compressedTable = new CompressedTable();
             compressedTable.setHeaderRowNumber(headerPosiction);
-
-            if (keyHeaderList != null) {
-                compressedTable.setKeyHeaderList(keyHeaderList);
-            }
 
             int columnNo = -1;
 

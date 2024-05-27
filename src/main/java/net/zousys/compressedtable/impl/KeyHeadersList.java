@@ -1,6 +1,4 @@
-package net.zousys.compressedtable.key;
-
-import lombok.Builder;
+package net.zousys.compressedtable.impl;
 
 import java.util.ArrayList;
 import java.util.List;

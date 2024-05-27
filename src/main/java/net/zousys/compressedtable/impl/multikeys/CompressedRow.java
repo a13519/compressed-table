@@ -1,4 +1,4 @@
-package net.zousys.compressedtable.impl;
+package net.zousys.compressedtable.impl.multikeys;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +8,8 @@ import net.zousys.compressedtable.Content;
 import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.KeySet;
 import net.zousys.compressedtable.Row;
-import net.zousys.compressedtable.key.StringKey;
+import net.zousys.compressedtable.impl.CompressedContent;
+import net.zousys.compressedtable.impl.multikeys.key.MultiStringKey;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 @Getter
 @Builder
 public class CompressedRow implements Row {
-    private StringKey stringKey ;
+    private MultiStringKey multiStringKey;
     private CompressedContent compressedContent;
     private CompressedTable compressedTable;
 
@@ -34,13 +35,13 @@ public class CompressedRow implements Row {
     public void make(List<String> fields) throws IOException {
         if (compressedTable != null && fields != null) {
             this.compressedContent = CompressedContent.load(fields);
-            this.stringKey = StringKey.create(compressedTable.getKeyHeaderList(), fields, this);
+            this.multiStringKey = MultiStringKey.create(compressedTable.getKeyHeaderList(), fields, this);
         }
     }
 
     @Override
     public KeySet getKey() {
-        return stringKey;
+        return multiStringKey;
     }
 
     @Override
