@@ -4,6 +4,7 @@ import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.key.KeyValue;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface ComparatorListener {
@@ -29,6 +30,10 @@ public interface ComparatorListener {
     void handleMisMatchedList(List<KeyValue> keys);
 
     void updateUnitedHeaders(List<String> unitedHeaders);
+
+    void handleUnitedHeadrMapping(Map<String, Integer> unitedHeadermapping);
+
+    void handleMarkers(Map<String, Integer> markers);
 
     void handleNotice(String key);
 

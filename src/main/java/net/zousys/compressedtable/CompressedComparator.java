@@ -109,36 +109,43 @@ public class CompressedComparator {
 
         ArrayList<String> ml = new ArrayList<>();
         ArrayList<KeyValue> mml = new ArrayList<>();
-        shared.forEach(key -> {
-            Row atb = before.seekByMainKey(key).get();
-            Row btb = null;
+        shared.forEach(beforeMainKey -> {
+            Row beforeRow = before.seekByMainKey(beforeMainKey).get();
+            Row afterRow = null;
             boolean identical = false;
-            KeyValue compositedKey = null;
+            boolean matched = false;
+            KeyValue matchedKey = null;
+            KeyValue beforeKey = null;
+            String beforeKeyV;
+            Map<String, Row> msk = null;
             for (KeyHeaders akh : after.getKeyHeaderList().getKeyHeadersList()) {
-                String comkey = akh.getCompositedKeyValue();
-                String comkeyvA = atb.getKey().getKeyValue(akh.getCompositedKeyValue()).getValue();
-                Map<String, Row> msk = after.getKeyedMappingMap().get(akh.getCompositedKeyValue());
-                btb = msk == null ? null : msk.get(atb.getKey().getKeyValue(akh.getCompositedKeyValue()).getValue());
-                if (btb != null) {
-                    compositedKey = btb.getKey().getKeyValue(akh.getCompositedKeyValue());
-                    if (atb.getContent().hash() == btb.getContent().hash()) {
-                        ml.add(key);
+                String beforecomkey = akh.getCompositedKey();
+                beforeKey = beforeRow.getKey().getKeyValue(beforecomkey);
+                beforeKeyV = beforeKey.getValue();
+                msk = after.getKeyedMappingMap().get(beforecomkey);
+                afterRow = msk == null ? null : msk.get(beforeKeyV);
+                if (afterRow != null) {
+                    matched = true;
+                    matchedKey = beforeKey;
+                    if (matchedKey.getValue()!=null && beforeRow.getContent().hash() == afterRow.getContent().hash()) {
+                        ml.add(beforeMainKey);
                         identical = true;
                         // remove from before and after
-                        after.removeRowByMainKey(key);
-                        before.removeRowByMainKey(key);
-                        comparatorListener.handleMatched(key);
+//                        after.removeRowByMainKey(beforekey);
+//                        before.removeRowByMainKey(beforekey);
+                        comparatorListener.handleMatched(beforeMainKey);
                         break;
                     }
                 }
             }
-            if (!identical) {
-
-                mml.add(compositedKey);
+            if (!matched || matchedKey.getValue() == null) {
+                System.out.println("not match :" + beforeMainKey);
+            } else if (!identical) {
+                mml.add(matchedKey);
                 try {
                     ComparisonResult.RowResult mismatch =
                             compareRow(
-                                    compositedKey,
+                                    matchedKey,
                                     ignoredFields,
                                     before,
                                     after,
@@ -149,16 +156,14 @@ public class CompressedComparator {
                         comparatorListener.handleMisMatched(mismatch);
                     }
                     // remove from before and after
-                    after.removeRowByMainKey(key);
-                    before.removeRowByMainKey(key);
+//                    after.removeRowByMainKey(beforekey);
+//                    before.removeRowByMainKey(beforekey);
                 } catch (DataFormatException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
-
-
         });
 
         comparatorListener.handleMatchedList(ml);

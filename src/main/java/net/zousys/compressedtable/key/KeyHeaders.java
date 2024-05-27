@@ -22,7 +22,7 @@ public class KeyHeaders {
      *
      * @return
      */
-    public String getCompositedKeyValue() {
+    public String getCompositedKey() {
         return value;
     }
 }

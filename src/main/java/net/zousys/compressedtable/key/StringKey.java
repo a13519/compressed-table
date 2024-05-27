@@ -84,9 +84,9 @@ public class StringKey implements KeySet {
                         // ignore
                     }
                 });
-                keyValueList.put(headers.getCompositedKeyValue(),
+                keyValueList.put(headers.getCompositedKey(),
                         KeyValue.builder()
-                                .name(headers.getCompositedKeyValue())
+                                .name(headers.getCompositedKey())
                                 .value(sb.toString()).build());
             }
         }

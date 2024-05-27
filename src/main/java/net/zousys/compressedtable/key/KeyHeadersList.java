@@ -1,5 +1,7 @@
 package net.zousys.compressedtable.key;
 
+import lombok.Builder;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,9 @@ import java.util.List;
  *
  */
 public class KeyHeadersList {
+    /**
+     *
+     */
     private List<KeyHeaders> list = new ArrayList<>();
 
     /**
