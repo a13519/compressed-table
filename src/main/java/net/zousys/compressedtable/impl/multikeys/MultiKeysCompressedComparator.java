@@ -15,7 +15,7 @@ import java.util.zip.DataFormatException;
 
 @Log4j2
 @Builder
-public class CompressedComparator {
+public class MultiKeysCompressedComparator implements net.zousys.compressedtable.CompressedComparator {
     private ComparatorListener comparatorListener;
     private Set<String> ignoredFields;
 
@@ -56,7 +56,7 @@ public class CompressedComparator {
      * @param fields the columns
      * @return
      */
-    public CompressedComparator setIgnoredFields(String[] fields) {
+    public MultiKeysCompressedComparator setIgnoredFields(String[] fields) {
         ignoredFields = new HashSet<>();
         ignoredFields.addAll(Arrays.stream(fields).collect(Collectors.toSet()));
         return this;
@@ -67,7 +67,7 @@ public class CompressedComparator {
      *
      * @param mismatch
      */
-    private void addMarker(ComparisonResult.RowResult mismatch) {
+    public void addMarker(ComparisonResult.RowResult mismatch) {
         for (ComparisonResult.ResultField arf : mismatch.getFields()) {
             if (arf.isMissmatched()) {
                 Integer ai = markers.get(arf.getName());
@@ -83,7 +83,7 @@ public class CompressedComparator {
     /**
      * This is to compare two tables
      */
-    public CompressedComparator compare() {
+    public MultiKeysCompressedComparator compare() {
         // missed in before
         contains(after, before, beforeMissed, null);
         comparatorListener.handleMissedInBefore(beforeMissed);
@@ -362,6 +362,5 @@ public class CompressedComparator {
         unitedHeaders = Stream.concat(before.getHeaders().stream(), beforeMissedHeaders.stream()).collect(Collectors.toList());
         unitedHeaders.stream().forEach(a -> unitedHeaderMapping.put(a, unitedHeaderMapping.size()));
     }
-
 
 }
