@@ -1,7 +1,7 @@
 package net.zousys.compressedtable;
 
 import lombok.Getter;
-import net.zousys.compressedtable.impl.multikeys.CompressedTable;
+import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyHeaders;
 import net.zousys.compressedtable.impl.KeyHeadersList;
 import net.zousys.compressedtable.sterotype.CSVParser;
@@ -59,6 +59,16 @@ public class CompressedTableFactory {
      */
     public CompressedTableFactory delimeter(char delimeter) {
         this.delimeter = delimeter;
+        return this;
+    }
+
+    /**
+     *
+     * @param mode
+     * @return
+     */
+    public CompressedTableFactory mode(Mode mode) {
+        this.mode = mode;
         return this;
     }
 

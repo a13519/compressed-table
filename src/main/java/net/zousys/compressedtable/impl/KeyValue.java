@@ -10,9 +10,18 @@ import java.util.Objects;
 @Data
 @ToString
 public class KeyValue {
+    public static String MAINAME ="--MAIN--";
     private String name;
     private String value;
 
+    /**
+     *
+     * @param value
+     * @return
+     */
+    public static KeyValue main(String value) {
+        return KeyValue.builder().name(MAINAME).value(value).build();
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

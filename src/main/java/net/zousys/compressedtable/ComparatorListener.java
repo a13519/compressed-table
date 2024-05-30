@@ -1,6 +1,6 @@
 package net.zousys.compressedtable;
 
-import net.zousys.compressedtable.impl.multikeys.CompressedTable;
+import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyValue;
 
 import java.util.List;
@@ -30,6 +30,8 @@ public interface ComparatorListener {
     void handleMisMatchedList(List<KeyValue> keys);
 
     void updateUnitedHeaders(List<String> unitedHeaders);
+
+    void handleUnitedHeaderMapping(Map<String, Integer> unitedHeadermapping);
 
     void handleUnitedHeadrMapping(Map<String, Integer> unitedHeadermapping);
 

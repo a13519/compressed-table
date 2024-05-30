@@ -1,15 +1,16 @@
 package net.zousys.compressedtable.impl.multikeys.key;
 
+import lombok.Data;
 import lombok.Getter;
 import net.zousys.compressedtable.KeySet;
 import net.zousys.compressedtable.impl.KeyHeaders;
 import net.zousys.compressedtable.impl.KeyHeadersList;
 import net.zousys.compressedtable.impl.KeyValue;
-import net.zousys.compressedtable.impl.multikeys.CompressedRow;
+import net.zousys.compressedtable.impl.CompressedRow;
 
 import java.util.*;
 
-@Getter
+@Data
 //@Log4j
 public class MultiStringKey implements KeySet {
     private KeyHeadersList keyHeadersList = new KeyHeadersList();
@@ -20,6 +21,8 @@ public class MultiStringKey implements KeySet {
     private KeyValue matchedKeyValue;
     private CompressedRow row;
     private String mainKeyValue;
+    private String nativeKeyValue;
+
     /**
      *
      * @param row
@@ -47,14 +50,14 @@ public class MultiStringKey implements KeySet {
     public static MultiStringKey create(KeyHeadersList keyHeaderList, List<String> fields, CompressedRow row) {
         MultiStringKey sk = new MultiStringKey(keyHeaderList, row);
         sk.cast(fields,
-                row.getCompressedTable().getHeaderMapping(),
-                System.currentTimeMillis()+"."+row.getCompressedContent().hash());
+                row.getTable().getHeaderMapping(),
+                System.currentTimeMillis()+"."+row.getContent().hash());
         return sk;
     }
 
     @Override
-    public String getMainKey() {
-        return "time-hash";
+    public String getNativeKeyValue() {
+        return nativeKeyValue;
     }
 
     @Override
@@ -77,9 +80,8 @@ public class MultiStringKey implements KeySet {
         return keyValueList.size();
     }
 
-    @Override
-    public void cast(List<String> fields, Map<String, Integer> headerMapping, String mainkey) {
-        mainKeyValue = mainkey;
+    public void cast(List<String> fields, Map<String, Integer> headerMapping, String nativeKeyValue) {
+        this.nativeKeyValue = nativeKeyValue;
         if (keyHeadersList != null && row != null) {
             keyValueList = new HashMap<>();
             for (KeyHeaders headers : keyHeadersList.getKeyHeadersList()) {
@@ -98,11 +100,6 @@ public class MultiStringKey implements KeySet {
                                 .value(sb.toString()).build());
             }
         }
-    }
-
-    @Override
-    public void cast(List<String> fields, Map<String, Integer> headerMapping, KeyHeadersList keyHeaderLis) {
-        // empty for single key
     }
 
     @Override

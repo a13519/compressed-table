@@ -27,6 +27,9 @@ public class KeyHeadersList {
         return this;
     }
 
+    public int size() {
+        return list.size();
+    }
     /**
      *
      * @return

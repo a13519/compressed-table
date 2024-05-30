@@ -1,7 +1,7 @@
 package net.zousys.compressedtable;
 
 import lombok.*;
-import net.zousys.compressedtable.impl.multikeys.CompressedTable;
+import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyValue;
 
 import java.util.ArrayList;

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.zousys.compressedtable.KeySet;
+import net.zousys.compressedtable.impl.CompressedRow;
 import net.zousys.compressedtable.impl.KeyHeadersList;
 import net.zousys.compressedtable.impl.KeyValue;
 
@@ -16,19 +17,23 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 //@Log4j
-public class StringKey implements KeySet {
+public class SingleStringKey implements KeySet {
     private List<String> keys = new ArrayList<>();
+    private String nativeKeyValue;
 
     /**
      *
-     * @param keyHeaderLis
-     * @param map
+     * @param keyHeaderList
      * @param fields
+     * @param row
      * @return
      */
-    public static StringKey create(KeyHeadersList keyHeaderLis, Map<String, Integer> map, List<String> fields) {
-        StringKey sk = new StringKey();
-        sk.cast(fields, map, keyHeaderLis);
+    public static SingleStringKey create(KeyHeadersList keyHeaderList, List<String> fields, CompressedRow row) {
+        SingleStringKey sk = new SingleStringKey();
+        sk.cast(fields,
+                row.getTable().getHeaderMapping(),
+                keyHeaderList,
+                System.currentTimeMillis()+"."+row.getContent().hash());
         return sk;
     }
 
@@ -39,13 +44,13 @@ public class StringKey implements KeySet {
     }
 
     @Override
-    public String getMainKey() {
-        return "";
+    public String getNativeKeyValue() {
+        return nativeKeyValue;
     }
 
     @Override
     public String getMainKeyValue() {
-        return "";
+        return toString();
     }
 
     @Override
@@ -55,7 +60,7 @@ public class StringKey implements KeySet {
 
     @Override
     public KeyValue getKeyValue(String key) {
-        return null;
+        return KeyValue.builder().name(KeyValue.MAINAME).value(toString()).build();
     }
 
     @Override
@@ -69,25 +74,15 @@ public class StringKey implements KeySet {
     }
 
     /**
-     *
-     * @param fields
-     * @param headerMapping
-     * @param mainkey
-     */
-    public void cast(List<String> fields, Map<String, Integer> headerMapping, String mainkey) {
-
-    }
-
-    /**
      * for single key
      * @param fields
      * @param map
      * @param keyHeaderList
      */
-    @Override
-    public void cast(List<String> fields, Map<String, Integer> map, KeyHeadersList keyHeaderList) {
-        if (keyHeaderList != null && map != null && fields != null) {
+    public void cast(List<String> fields, Map<String, Integer> map, KeyHeadersList keyHeaderList, String nativeKeyValue) {
+        if (keyHeaderList != null && map != null && fields != null && keyHeaderList.getKeyHeadersList().size() == 1) {
             keys = new ArrayList<>();
+            this.nativeKeyValue = nativeKeyValue;
             Arrays.stream(keyHeaderList.getKeyHeadersList().get(0).getKeyHeaders()).forEach(header -> {
                 try {
                     keys.add(fields.get(map.get(header)));

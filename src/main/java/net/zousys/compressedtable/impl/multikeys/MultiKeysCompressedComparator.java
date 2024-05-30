@@ -2,8 +2,10 @@ package net.zousys.compressedtable.impl.multikeys;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.*;
+import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyHeaders;
 import net.zousys.compressedtable.impl.KeyValue;
 
@@ -15,14 +17,23 @@ import java.util.zip.DataFormatException;
 
 @Log4j2
 @Builder
+/**
+ *
+ */
 public class MultiKeysCompressedComparator implements net.zousys.compressedtable.CompressedComparator {
+    @Setter
     private ComparatorListener comparatorListener;
     private Set<String> ignoredFields;
-
+    @Setter
     private CompressedTable before;
-
+    @Setter
     private CompressedTable after;
-
+    @Setter
+    private List<String> unitedHeaders;
+    @Setter
+    private Map<String, Integer> unitedHeaderMapping;
+    @Setter
+    private boolean trim;
     /**
      * main key
      */
@@ -39,16 +50,10 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
     private List<String> afterMissedHeaders = new ArrayList<>();
     @Builder.Default
     private Set<String> shared = new HashSet<>();
-
-    private List<String> unitedHeaders;
-
-    private Map<String, Integer> unitedHeaderMapping;
-
     @Getter
     @Builder.Default
     private Map<String, Integer> markers = new HashMap<>();
 
-    private boolean trim;
 
     /**
      * This is to set the ignored colume of table in comparison, those columns won't be compared
@@ -57,7 +62,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
      * @return
      */
     public MultiKeysCompressedComparator setIgnoredFields(String[] fields) {
-        ignoredFields = new HashSet<>();
+        ignoredFields = new HashSet<>(Arrays.asList(fields));
         ignoredFields.addAll(Arrays.stream(fields).collect(Collectors.toSet()));
         return this;
     }
@@ -88,13 +93,13 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
         contains(after, before, beforeMissed, null);
         comparatorListener.handleMissedInBefore(beforeMissed);
         // remove from after
-        after.removeRowsByMainKey(beforeMissed);
+        after.removeRowsByNativeKey(beforeMissed);
 
         // missed in after
         contains(before, after, afterMissed, shared);
         comparatorListener.handleMissedInAfter(afterMissed);
         // remove from before
-        before.removeRowsByMainKey(afterMissed);
+        before.removeRowsByNativeKey(afterMissed);
 
         // for comparator
         shared.removeAll(beforeMissed);
@@ -110,7 +115,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
         ArrayList<String> ml = new ArrayList<>();
         ArrayList<KeyValue> mml = new ArrayList<>();
         shared.forEach(beforeMainKey -> {
-            Row beforeRow = before.seekByMainKey(beforeMainKey).get();
+            Row beforeRow = before.seekByNativeKey(beforeMainKey).get();
             Row afterRow = null;
             boolean identical = false;
             boolean matched = false;
@@ -236,7 +241,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
      * @param deregister
      */
     public static final void contains(CompressedTable a, CompressedTable b, Set<String> register, Set<String> deregister) {
-        Set<String> keyMapnameset = a.getKeyedMappingMap().keySet();
+        Set<String> keyMapnameset = a.getKeyedMappingMap().getKeyedMappingMap().keySet();
         List<Set<String>> keySetMap = new ArrayList<>();
 
         keyMapnameset.forEach(akmv -> {

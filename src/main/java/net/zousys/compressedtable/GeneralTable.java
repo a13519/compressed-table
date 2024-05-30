@@ -16,9 +16,7 @@ public interface GeneralTable {
 
     int getHeaderRowNumber();
 
-    Optional<Map<String, Row>> seekByKey(KeySet key);
-
-    Optional<Row> seekByMainKey(String keyValue);
+    Optional<Row> seekByNativeKey(String keyValue);
 
     Optional<Row> seekByKey(KeyValue keyValue);
 
@@ -30,11 +28,13 @@ public interface GeneralTable {
 
     KeyHeadersList getKeyHeaderList();
 
-    void removeRowByMainKey(String key);
+    void removeRowByNativeKey(String key);
 
     void removeRow(Row row);
 
-    void removeRowsByMainKey(Collection<String> keys);
+    void removeRowByKey(KeyValue key);
+
+    void removeRowsByNativeKey(Collection<String> keys);
 
     void removeRows(Collection<Row> rows);
 
@@ -42,4 +42,5 @@ public interface GeneralTable {
 
     void setHeaderRowNumber(int no);
 
+    Map<String, Integer> getHeaderMapping();
 }

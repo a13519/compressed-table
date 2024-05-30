@@ -2,7 +2,7 @@ package net.zousys.compressedtable.sterotype;
 
 import lombok.Builder;
 import net.zousys.compressedtable.CompressedTableFactory;
-import net.zousys.compressedtable.impl.multikeys.CompressedTable;
+import net.zousys.compressedtable.impl.CompressedTable;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
