@@ -49,7 +49,10 @@ public class CSVParser {
                     .setIgnoreSurroundingSpaces(true)
                     .setTrim(true)
                     .build();
-            CompressedTable compressedTable = new CompressedTable();
+            CompressedTable compressedTable = new CompressedTable(
+                    keyHeaderList.getKeyHeadersList().size()==1?
+                            CompressedTableFactory.Mode.SINGLE_KEY:
+                            CompressedTableFactory.Mode.MULTI_KEYS);
             compressedTable.setHeaderRowNumber(headerPosiction);
             if (keyHeaderList != null) {
                 compressedTable.setKeyHeaderList(keyHeaderList);

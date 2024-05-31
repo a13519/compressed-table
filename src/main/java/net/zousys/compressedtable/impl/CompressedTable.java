@@ -14,7 +14,6 @@ import java.util.*;
 /**
  * No 'RETURN' or newLine char should be in data
  */
-@NoArgsConstructor
 public class CompressedTable implements GeneralTable {
     @Getter
     private CompressedTableFactory.Mode mode;
@@ -46,6 +45,11 @@ public class CompressedTable implements GeneralTable {
     private int headerRowNumber = -1;
     @Getter
     private int physicalLineNumber = 0;
+
+    public CompressedTable(CompressedTableFactory.Mode mode) {
+        this.mode = mode;
+    }
+
     /**
      *
      * @param no
@@ -122,6 +126,8 @@ public class CompressedTable implements GeneralTable {
             this.rows.add(compressedRow);
             nativeKeyMap.put(compressedRow.getKey().getNativeKeyValue(), compressedRow);
 
+            System.out.println(compressedRow.getKey().getNativeKeyValue());
+
             if (compressedRow.getKey() != null) {
                 if (mode == CompressedTableFactory.Mode.SINGLE_KEY) {
                     // single key set
@@ -167,6 +173,15 @@ public class CompressedTable implements GeneralTable {
         }
     }
 
+    @Override
+    public Optional<Row> seekByMainKey(KeyValue keyValue) {
+        if (keyHeaderList==null||keyHeaderList.getKeyHeadersList().size()==0) {
+            return Optional.of(null);
+        } else {
+            Optional<Row> r = Optional.of(keyedMappingMap.getMainKeyedMapping().get(keyValue.getValue()));
+            return r;
+        }
+    }
 
     @Override
     public int size() {
@@ -189,9 +204,9 @@ public class CompressedTable implements GeneralTable {
     }
 
     @Override
-    public void removeRowByNativeKey(String mainKey) {
+    public void removeRowByNativeKey(KeyValue mainKey) {
         if (mainKey != null) {
-            Row row = nativeKeyMap.get(mainKey);
+            Row row = nativeKeyMap.get(mainKey.getValue());
             if (row != null) {
                 removeRow(row);
             }
@@ -202,6 +217,16 @@ public class CompressedTable implements GeneralTable {
     public void removeRowByKey(KeyValue key) {
         if (key != null) {
             Row row = this.keyedMappingMap.get(key.getName()).get(key.getValue());
+            if (row != null) {
+                removeRow(row);
+            }
+        }
+    }
+
+    @Override
+    public void removeRowByMainKey(KeyValue key) {
+        if (key != null) {
+            Row row = this.keyedMappingMap.getMainKeyedMapping().get(key.getValue());
             if (row != null) {
                 removeRow(row);
             }
@@ -228,7 +253,7 @@ public class CompressedTable implements GeneralTable {
     }
 
     @Override
-    public void removeRowsByNativeKey(Collection<String> keys) {
+    public void removeRowsByNativeKey(Collection<KeyValue> keys) {
         keys.forEach(this::removeRowByNativeKey);
     }
 

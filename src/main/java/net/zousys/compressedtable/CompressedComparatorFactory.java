@@ -2,6 +2,7 @@ package net.zousys.compressedtable;
 
 import lombok.Builder;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.multikeys.MultiKeysCompressedComparator;
 import net.zousys.compressedtable.impl.singlekey.SingleKeyCompressedComparator;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Log4j2
 /**
  *
  */
@@ -30,15 +32,13 @@ public class CompressedComparatorFactory {
     private Map<String, Integer> unitedHeaderMapping;
     @Setter
     private boolean trim;
-    @Setter
-    @Builder.Default
-    private CompressedTableFactory.Mode mode = CompressedTableFactory.Mode.SINGLE_KEY;
     /**
      *
      * @return
      */
     public CompressedComparator create() {
-        if (mode == CompressedTableFactory.Mode.MULTI_KEYS) {
+        if (before.getMode() == CompressedTableFactory.Mode.MULTI_KEYS &&
+                after.getMode() == CompressedTableFactory.Mode.MULTI_KEYS) {
             return MultiKeysCompressedComparator.builder()
                     .comparatorListener(comparatorListener)
                     .ignoredFields(ignoredFields)
@@ -48,7 +48,8 @@ public class CompressedComparatorFactory {
                     .unitedHeaderMapping(unitedHeaderMapping)
                     .trim(trim)
                     .build();
-        } else if (mode == CompressedTableFactory.Mode.SINGLE_KEY) {
+        } else if (before.getMode() == CompressedTableFactory.Mode.SINGLE_KEY &&
+                after.getMode() == CompressedTableFactory.Mode.SINGLE_KEY) {
             return SingleKeyCompressedComparator.builder()
                     .comparatorListener(comparatorListener)
                     .ignoredFields(ignoredFields)
@@ -58,6 +59,8 @@ public class CompressedComparatorFactory {
                     .unitedHeaderMapping(unitedHeaderMapping)
                     .trim(trim)
                     .build();
+        } else {
+            log.error("the before and after table has different mode");
         }
         return null;
     }

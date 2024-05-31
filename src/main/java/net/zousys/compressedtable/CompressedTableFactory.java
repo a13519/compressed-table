@@ -27,8 +27,6 @@ public class CompressedTableFactory {
     private char delimeter = ',';
     @Getter
     private Type type = Type.CSV;
-    @Getter
-    private Mode mode = Mode.SINGLE_KEY;
 
     /**
      * the header row number, if this is not explictly set then there will be no header at all
@@ -59,16 +57,6 @@ public class CompressedTableFactory {
      */
     public CompressedTableFactory delimeter(char delimeter) {
         this.delimeter = delimeter;
-        return this;
-    }
-
-    /**
-     *
-     * @param mode
-     * @return
-     */
-    public CompressedTableFactory mode(Mode mode) {
-        this.mode = mode;
         return this;
     }
 
@@ -158,13 +146,12 @@ public class CompressedTableFactory {
                         .ignoredLines(ignoredLines)
                         .headerPosiction(headerPosition)
                         .keyHeaderList(keyHeaderList)
-                        .mode(mode).build()
+                        .build()
                         .parse(inputSteam);
             }
             case EXCEL: {
                 return ExcelParser.builder()
                         .headerPosiction(headerPosition)
-                        .mode(mode)
                         .build().parse(inputSteam);
             }
         }

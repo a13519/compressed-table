@@ -18,6 +18,8 @@ public interface GeneralTable {
 
     Optional<Row> seekByNativeKey(String keyValue);
 
+    Optional<Row> seekByMainKey(KeyValue keyValue);
+
     Optional<Row> seekByKey(KeyValue keyValue);
 
     int size();
@@ -28,13 +30,15 @@ public interface GeneralTable {
 
     KeyHeadersList getKeyHeaderList();
 
-    void removeRowByNativeKey(String key);
+    void removeRowByNativeKey(KeyValue key);
 
     void removeRow(Row row);
 
     void removeRowByKey(KeyValue key);
 
-    void removeRowsByNativeKey(Collection<String> keys);
+    void removeRowByMainKey(KeyValue key);
+
+    void removeRowsByNativeKey(Collection<KeyValue> keys);
 
     void removeRows(Collection<Row> rows);
 

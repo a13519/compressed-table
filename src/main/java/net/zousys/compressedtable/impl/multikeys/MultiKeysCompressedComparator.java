@@ -38,18 +38,18 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
      * main key
      */
     @Builder.Default
-    private Set<String> beforeMissed = new HashSet<>();
+    private Set<KeyValue> beforeMissed = new HashSet<>();
     /**
      * main key
      */
     @Builder.Default
-    private Set<String> afterMissed = new HashSet<>();
+    private Set<KeyValue> afterMissed = new HashSet<>();
     @Builder.Default
     private List<String> beforeMissedHeaders = new ArrayList<>();
     @Builder.Default
     private List<String> afterMissedHeaders = new ArrayList<>();
     @Builder.Default
-    private Set<String> shared = new HashSet<>();
+    private Set<KeyValue> shared = new HashSet<>();
     @Getter
     @Builder.Default
     private Map<String, Integer> markers = new HashMap<>();
@@ -112,10 +112,10 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
         uniteHeaders();
         comparatorListener.updateUnitedHeaders(unitedHeaders);
 
-        ArrayList<String> ml = new ArrayList<>();
+        ArrayList<KeyValue> ml = new ArrayList<>();
         ArrayList<KeyValue> mml = new ArrayList<>();
-        shared.forEach(beforeMainKey -> {
-            Row beforeRow = before.seekByNativeKey(beforeMainKey).get();
+        shared.forEach(beforeNativeKey -> {
+            Row beforeRow = before.seekByNativeKey(beforeNativeKey.getValue()).get();
             Row afterRow = null;
             boolean identical = false;
             boolean matched = false;
@@ -133,18 +133,18 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
                     matched = true;
                     matchedKey = beforeKey;
                     if (matchedKey.getValue()!=null && beforeRow.getContent().hash() == afterRow.getContent().hash()) {
-                        ml.add(beforeMainKey);
+                        ml.add(beforeNativeKey);
                         identical = true;
                         // remove from before and after
 //                        after.removeRowByMainKey(beforekey);
 //                        before.removeRowByMainKey(beforekey);
-                        comparatorListener.handleMatched(beforeMainKey);
+                        comparatorListener.handleMatched(beforeNativeKey);
                         break;
                     }
                 }
             }
             if (!matched || matchedKey.getValue() == null) {
-                System.out.println("not match :" + beforeMainKey);
+                System.out.println("not match :" + beforeNativeKey);
             } else if (!identical) {
                 mml.add(matchedKey);
                 try {
@@ -240,9 +240,12 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
      * @param register
      * @param deregister
      */
-    public static final void contains(CompressedTable a, CompressedTable b, Set<String> register, Set<String> deregister) {
+    public static final void contains(CompressedTable a, CompressedTable b, Set<KeyValue> register, Set<KeyValue> deregister) {
         Set<String> keyMapnameset = a.getKeyedMappingMap().getKeyedMappingMap().keySet();
-        List<Set<String>> keySetMap = new ArrayList<>();
+        /**
+         * list of KeySets for all missed in b from a
+         */
+        List<Set<KeyValue>> keySetMap = new ArrayList<>();
 
         keyMapnameset.forEach(akmv -> {
             try {
@@ -258,8 +261,9 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
         register.addAll(keySetMap.get(0));
         if (deregister != null) {
             for (Row arow : a.getContents()) {
-                if (!keySetMap.get(0).contains(arow.getKey().getMainKeyValue())) {
-                    deregister.add(arow.getKey().getMainKeyValue());
+                KeyValue kv = KeyValue.nativeKey(arow.getKey().getNativeKeyValue());
+                if (!keySetMap.get(0).contains(kv)) {
+                    deregister.add(kv);
                 }
             }
         }
@@ -267,11 +271,12 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
     }
 
     /**
+     * To extract for given keysetname any entries of act missed in bct will be returned as native key
      * @param keyname
      * @param act
      * @param bct
      */
-    public static final Set<String> containsX(String keyname, CompressedTable act, CompressedTable bct) throws MissingKeySetException {
+    public static final Set<KeyValue> containsX(String keyname, CompressedTable act, CompressedTable bct) throws MissingKeySetException {
         Map<String, Row> bkvm = bct.getKeyedMappingMap().get(keyname);
         Map<String, Row> akvm = act.getKeyedMappingMap().get(keyname);
 
@@ -284,7 +289,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
 
         Set<String> a = akvm.keySet();
         Set<String> b = bkvm.keySet();
-        Set<String> r = new HashSet<>();
+        Set<KeyValue> r = new HashSet<>();
 
         a.forEach(key -> {
             if (!b.contains(key)) {
@@ -292,7 +297,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
                 Row ar = akvm.get(key);
                 KeySet ak = ar.getKey();
                 if (ak != null) {
-                    r.add(ak.getMainKeyValue());
+                    r.add(KeyValue.nativeKey(ak.getNativeKeyValue()));
                 }
             }
         });

@@ -11,6 +11,7 @@ import net.zousys.compressedtable.Row;
 import net.zousys.compressedtable.impl.KeyValue;
 
 import java.io.IOException;
+import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,15 +37,15 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
     @Setter
     private boolean trim;
     @Builder.Default
-    private Set<String> beforeMissed = new HashSet<>();
+    private Set<KeyValue> beforeMissed = new HashSet<>();
     @Builder.Default
-    private Set<String> afterMissed = new HashSet<>();
+    private Set<KeyValue> afterMissed = new HashSet<>();
     @Builder.Default
     private List<String> beforeMissedHeaders = new ArrayList<>();
     @Builder.Default
     private List<String> afterMissedHeaders = new ArrayList<>();
     @Builder.Default
-    private Set<String> shared = new HashSet<>();
+    private Set<KeyValue> shared = new HashSet<>();
 
     @Getter
     @Builder.Default
@@ -114,23 +115,22 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
         beforeMissedHeaders = null;
         afterMissedHeaders = null;
 
-        ArrayList<String> ml = new ArrayList<>();
+        ArrayList<KeyValue> ml = new ArrayList<>();
         ArrayList<KeyValue> mml = new ArrayList<>();
         shared.forEach(key -> {
-            if (before.getKeyedMappingMap().getMainKeyedMapping().get(key).getContent().hash() ==
-                    after.getKeyedMappingMap().getMainKeyedMapping().get(key).getContent().hash()) {
+            if (before.getKeyedMappingMap().getMainKeyedMapping().get(key.getValue()).getContent().hash() ==
+                    after.getKeyedMappingMap().getMainKeyedMapping().get(key.getValue()).getContent().hash()) {
                 ml.add(key);
                 comparatorListener.handleMatched(key);
                 // remove from before and after
-//                after.removeRowByKey(key);
+                after.removeRowByNativeKey(key);
                 before.removeRowByNativeKey(key);
             } else {
-                mml.add(KeyValue.builder().value(key).build());
+                mml.add(key);
                 try {
-                    KeyValue thekey = KeyValue.builder().name("--MAIN--").value(key).build();
                     ComparisonResult.RowResult mismatch =
                             compareRow(
-                                    thekey,
+                                    key,
                                     ignoredFields,
                                     before,
                                     after,
@@ -141,8 +141,8 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
                         comparatorListener.handleMisMatched(mismatch);
                     }
                     // remove from before and after
-                    after.removeRowByKey(thekey);
-                    before.removeRowByKey(thekey);
+                    after.removeRowByMainKey(key);
+                    before.removeRowByMainKey(key);
                 } catch (DataFormatException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
@@ -175,8 +175,8 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
             net.zousys.compressedtable.impl.CompressedTable after,
             boolean trim,
             List<String> unitedHeaders) throws DataFormatException, IOException {
-        Row a = before.seekByKey(key).orElseThrow();
-        Row b = after.seekByKey(key).orElseThrow();
+        Row a = before.seekByMainKey(key).orElseThrow();
+        Row b = after.seekByMainKey(key).orElseThrow();
         List<String> fieldsA = a.getContent().form();
         List<String> fieldsB = b.getContent().form();
 
@@ -214,14 +214,14 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
     }
 
 
-    public static final void contains(Set<String> a, Set<String> b, Set<String> register, Set<String> deregister) {
+    public static final void contains(Set<String> a, Set<String> b, Set<KeyValue> register, Set<KeyValue> deregister) {
 
         a.forEach(key -> {
             if (!b.contains(key)) {
-                register.add(key);
+                register.add(KeyValue.mainKey(key));
             } else {
                 if (deregister != null) {
-                    deregister.add(key);
+                    deregister.add(KeyValue.mainKey(key));
                 }
             }
         });
@@ -239,14 +239,14 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
         });
     }
 
-    public static final void contains(String[] as, String[] bs, List<String> register) {
+    public static final void contains(String[] as, String[] bs, List<KeyValue> register) {
         List<String> a = new ArrayList<>();
         List<String> b = new ArrayList<>();
         a.addAll(Arrays.stream(as).collect(Collectors.toSet()));
         b.addAll(Arrays.stream(bs).collect(Collectors.toSet()));
         a.forEach(key -> {
             if (!b.contains(key)) {
-                register.add(key);
+                register.add(KeyValue.mainKey(key));
             }
         });
     }

@@ -18,7 +18,7 @@ import java.util.Map;
 @Getter
 //@Log4j
 public class SingleStringKey implements KeySet {
-    private List<String> keys = new ArrayList<>();
+    private StringBuffer sb = new StringBuffer();
     private String nativeKeyValue;
 
     /**
@@ -39,7 +39,7 @@ public class SingleStringKey implements KeySet {
 
     @Override
     public String toString() {
-        return "{" + keys +
+        return "{" + sb +
                 '}';
     }
 
@@ -81,15 +81,17 @@ public class SingleStringKey implements KeySet {
      */
     public void cast(List<String> fields, Map<String, Integer> map, KeyHeadersList keyHeaderList, String nativeKeyValue) {
         if (keyHeaderList != null && map != null && fields != null && keyHeaderList.getKeyHeadersList().size() == 1) {
-            keys = new ArrayList<>();
             this.nativeKeyValue = nativeKeyValue;
             Arrays.stream(keyHeaderList.getKeyHeadersList().get(0).getKeyHeaders()).forEach(header -> {
                 try {
-                    keys.add(fields.get(map.get(header)));
+                    sb.append(fields.get(map.get(header))+"|");
                 } catch (Exception e) {
                     // ignore
                 }
             });
+            if (sb.length()>0) {
+                sb.delete(sb.length() - 1, sb.length());
+            }
         }
     }
 }

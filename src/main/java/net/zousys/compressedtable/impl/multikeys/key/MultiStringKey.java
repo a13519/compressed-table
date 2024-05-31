@@ -94,10 +94,13 @@ public class MultiStringKey implements KeySet {
                         // ignore
                     }
                 });
+                if (sb.length()>0) {
+                    sb.delete(sb.length()-1, sb.length());
+                }
                 keyValueList.put(headers.getCompositedKey(),
                         KeyValue.builder()
                                 .name(headers.getCompositedKey())
-                                .value(sb.toString()).build());
+                                .value("{"+sb.toString()+"}").build());
             }
         }
     }

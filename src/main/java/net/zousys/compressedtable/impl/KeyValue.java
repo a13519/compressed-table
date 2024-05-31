@@ -11,6 +11,7 @@ import java.util.Objects;
 @ToString
 public class KeyValue {
     public static String MAINAME ="--MAIN--";
+    public static String NATIVENAME ="--NATIVE--";
     private String name;
     private String value;
 
@@ -19,8 +20,17 @@ public class KeyValue {
      * @param value
      * @return
      */
-    public static KeyValue main(String value) {
+    public static KeyValue mainKey(String value) {
         return KeyValue.builder().name(MAINAME).value(value).build();
+    }
+
+    /**
+     *
+     * @param value
+     * @return
+     */
+    public static KeyValue nativeKey(String value) {
+        return KeyValue.builder().name(NATIVENAME).value(value).build();
     }
     @Override
     public boolean equals(Object o) {

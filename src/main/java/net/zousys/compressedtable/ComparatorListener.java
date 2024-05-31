@@ -13,9 +13,9 @@ public interface ComparatorListener {
 
     void handleAfterLoaded(CompressedTable after);
 
-    void handleMissedInBefore(Set<String> entries);
+    void handleMissedInBefore(Set<KeyValue> entries);
 
-    void handleMissedInAfter(Set<String> entries);
+    void handleMissedInAfter(Set<KeyValue> entries);
 
     void handleMissedBeforeHeader(List<String> headers);
 
@@ -23,9 +23,9 @@ public interface ComparatorListener {
 
     void handleMisMatched(ComparisonResult.RowResult mismatch);
 
-    void handleMatched(String key);
+    void handleMatched(KeyValue key);
 
-    void handleMatchedList(List<String> keys);
+    void handleMatchedList(List<KeyValue> keys);
 
     void handleMisMatchedList(List<KeyValue> keys);
 
