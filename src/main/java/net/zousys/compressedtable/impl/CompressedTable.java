@@ -126,8 +126,6 @@ public class CompressedTable implements GeneralTable {
             this.rows.add(compressedRow);
             nativeKeyMap.put(compressedRow.getKey().getNativeKeyValue(), compressedRow);
 
-            System.out.println(compressedRow.getKey().getNativeKeyValue());
-
             if (compressedRow.getKey() != null) {
                 if (mode == CompressedTableFactory.Mode.SINGLE_KEY) {
                     // single key set
