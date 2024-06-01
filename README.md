@@ -32,3 +32,22 @@ The **Bold/KeyHeadersList** represents the KeySets.
 ### Delimeter
 This is for CSV parsing, a delimeter can be specified if it is other than comma
 
+
+
+## Examples
+
+### Parse a table
+```java
+CompressedTable beforetable = CompressedTableFactory
+        .build("csv")
+        .keyHeaderList(
+                new KeyHeadersList()
+                        .addHeaders(new String[]{"Customer Id", "First Name"})
+        )
+        .compressed(false)
+        .ignoredLines(0)
+        .delimeter(',')
+        .parse(Paths.get(Paths.get("customers-1000b.csv")
+                .toAbsolutePath()
+                .toString()).toString());
+```
