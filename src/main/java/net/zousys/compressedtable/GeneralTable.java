@@ -47,4 +47,6 @@ public interface GeneralTable {
     void setHeaderRowNumber(int no);
 
     Map<String, Integer> getHeaderMapping();
+
+    boolean isCompressed();
 }

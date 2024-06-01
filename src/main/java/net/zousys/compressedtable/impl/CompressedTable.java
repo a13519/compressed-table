@@ -42,6 +42,9 @@ public class CompressedTable implements GeneralTable {
     @Getter
     private Map<String, Integer> headerMapping = new HashMap<>();
     private boolean onHeader = true;
+    @Setter
+    @Getter
+    private boolean compressed = true;
     private int headerRowNumber = -1;
     @Getter
     private int physicalLineNumber = 0;

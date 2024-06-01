@@ -29,8 +29,9 @@ public class Main {
         CompressedTable beforetable = CompressedTableFactory
                 .build("csv")
                 .keyHeaderList(new KeyHeadersList()
-                                .addHeaders(new String[]{"Customer Id","First Name"})
-                        )
+                        .addHeaders(new String[]{"Customer Id", "First Name"})
+                )
+                .compressed(false)
                 .ignoredLines(0)
                 .delimeter(',')
                 .parse(Paths.get(Paths.get("customers-1000b.csv")
@@ -42,8 +43,9 @@ public class Main {
         CompressedTable aftertable = CompressedTableFactory
                 .build("csv")
                 .keyHeaderList(new KeyHeadersList()
-                        .addHeaders(new String[]{"Customer Id","First Name"})
+                        .addHeaders(new String[]{"Customer Id", "First Name"})
                 )
+                .compressed(true)
                 .ignoredLines(0)
                 .delimeter(',')
                 .parse(Paths.get(Paths.get("customers-1000a.csv")
@@ -72,8 +74,8 @@ public class Main {
         CompressedTable beforetable = CompressedTableFactory
                 .build("csv")
                 .keyHeaderList(new KeyHeadersList()
-                        .addHeaders(new String[]{"First Name","Last Name"})
-                        .addHeaders(new String[]{"Phone 1","Phone 2","Email"})
+                        .addHeaders(new String[]{"First Name", "Last Name"})
+                        .addHeaders(new String[]{"Phone 1", "Phone 2", "Email"})
                 )
                 .ignoredLines(0)
                 .delimeter(',')
@@ -86,8 +88,8 @@ public class Main {
         CompressedTable aftertable = CompressedTableFactory
                 .build("csv")
                 .keyHeaderList(new KeyHeadersList()
-                        .addHeaders(new String[]{"First Name","Last Name"})
-                        .addHeaders(new String[]{"Phone 1","Phone 2","Email"})
+                        .addHeaders(new String[]{"First Name", "Last Name"})
+                        .addHeaders(new String[]{"Phone 1", "Phone 2", "Email"})
                 )
                 .ignoredLines(0)
                 .delimeter(',')
@@ -101,6 +103,7 @@ public class Main {
                 .before(beforetable)
                 .after(aftertable)
                 .comparatorListener(k)
+                .strictMissed(false)
                 .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
                 .build().create()
                 .compare();

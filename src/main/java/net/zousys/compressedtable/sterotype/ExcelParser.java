@@ -22,6 +22,8 @@ public class ExcelParser {
     private boolean dynamicWidth;
     private int headerPosiction;
     @Builder.Default
+    private boolean compressed = true;
+    @Builder.Default
     private CompressedTableFactory.Mode mode = CompressedTableFactory.Mode.SINGLE_KEY;
 
     /**
@@ -36,6 +38,7 @@ public class ExcelParser {
             int from = sheet.getFirstRowNum();
             int to = sheet.getLastRowNum();
             CompressedTable compressedTable = new CompressedTable(mode);
+            compressedTable.setCompressed(compressed);
             compressedTable.setHeaderRowNumber(headerPosiction);
 
             int columnNo = -1;

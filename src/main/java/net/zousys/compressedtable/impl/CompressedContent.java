@@ -9,39 +9,58 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
+/**
+ *
+ */
 public class CompressedContent extends CompressedByteArray implements Content {
+    private List<String> fields;
+    private boolean compressed = true;
+
     /**
      *
      */
-    private CompressedContent() {
+    private CompressedContent(boolean compressed) {
         super();
+        this.compressed = compressed;
     }
 
     /**
+     *
      * @param fields
+     * @param compressed
      * @return
      * @throws IOException
-     *
-     *
      */
-    public static CompressedContent load(List<String> fields) throws IOException {
-        CompressedContent compressedContent = new CompressedContent();
-        StringWriter bw = new StringWriter();
-        fields.forEach(field -> bw.write(field.trim() + "\n"));
-        compressedContent.loadContent(String.valueOf(bw).getBytes());
+    public static CompressedContent load(List<String> fields, boolean compressed) throws IOException {
+        CompressedContent compressedContent = new CompressedContent(compressed);
+        if (compressed) {
+            StringWriter bw = new StringWriter();
+            fields.forEach(field -> bw.write(field.trim() + "\n"));
+            compressedContent.loadContent(String.valueOf(bw).getBytes());
+        } else {
+            compressedContent.fields = new ArrayList<>();
+            compressedContent.fields.addAll(fields);
+        }
         return compressedContent;
     }
 
     /**
+     *
      * @param fields
+     * @param compressed
      * @return
      * @throws IOException
      */
-    public static CompressedContent load(String[] fields) throws IOException {
-        CompressedContent compressedContent = new CompressedContent();
-        ByteArrayOutputStream bao = new ByteArrayOutputStream();
-        Arrays.stream(fields).parallel().forEach(field -> bao.writeBytes(field.getBytes(StandardCharsets.UTF_8)));
-        compressedContent.loadContent(bao.toByteArray());
+    public static CompressedContent load(String[] fields, boolean compressed) throws IOException {
+        CompressedContent compressedContent = new CompressedContent(compressed);
+        if (compressed) {
+            StringWriter bw = new StringWriter();
+            Arrays.stream(fields).forEach(field -> bw.write(field.trim() + "\n"));
+            compressedContent.loadContent(String.valueOf(bw).getBytes());
+        } else {
+            compressedContent.fields = new ArrayList<>();
+            compressedContent.fields.addAll(Arrays.asList(fields));
+        }
         return compressedContent;
     }
 
@@ -52,14 +71,18 @@ public class CompressedContent extends CompressedByteArray implements Content {
      */
     @Override
     public List<String> form() throws DataFormatException, IOException {
-        ByteArrayInputStream bao = new ByteArrayInputStream(decompress(super.getByteArray(), false));
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(bao));
-        ArrayList<String> r = new ArrayList<>();
-        for (String line; (line = reader.readLine()) != null; ) {
-            r.add(line);
+        if (compressed) {
+            ByteArrayInputStream bao = new ByteArrayInputStream(decompress(super.getByteArray(), false));
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(bao));
+            ArrayList<String> r = new ArrayList<>();
+            for (String line; (line = reader.readLine()) != null; ) {
+                r.add(line);
+            }
+            return r;
+        } else {
+            return fields;
         }
-        return r;
     }
 
     /**

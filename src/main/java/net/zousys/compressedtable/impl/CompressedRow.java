@@ -16,6 +16,8 @@ import java.util.List;
 
 @Builder
 public class CompressedRow implements Row {
+    @Builder.Default
+    private boolean compressed = true;
     private KeySet stringKey;
     private CompressedContent compressedContent;
     private CompressedTable compressedTable;
@@ -35,7 +37,7 @@ public class CompressedRow implements Row {
      */
     public void make(List<String> fields) throws IOException {
         if (compressedTable != null && fields != null) {
-            this.compressedContent = CompressedContent.load(fields);
+            this.compressedContent = CompressedContent.load(fields, compressedTable.isCompressed());
             if (compressedTable.getMode()== CompressedTableFactory.Mode.MULTI_KEYS) {
                 this.stringKey = MultiStringKey.create(compressedTable.getKeyHeaderList(), fields, this);
             } else {

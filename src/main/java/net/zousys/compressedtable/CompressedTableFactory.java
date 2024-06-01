@@ -32,7 +32,7 @@ public class CompressedTableFactory {
      * the header row number, if this is not explictly set then there will be no header at all
      */
     private int headerPosition = -1;
-
+    private boolean compressed = true;
     /**
      *
      * @param type
@@ -66,6 +66,16 @@ public class CompressedTableFactory {
      */
     public CompressedTableFactory ignoredLines(int ignoredLines) {
         this.ignoredLines = ignoredLines;
+        return this;
+    }
+
+    /**
+     *
+     * @param compressed
+     * @return
+     */
+    public CompressedTableFactory compressed(boolean compressed) {
+        this.compressed = compressed;
         return this;
     }
 
@@ -146,11 +156,13 @@ public class CompressedTableFactory {
                         .ignoredLines(ignoredLines)
                         .headerPosiction(headerPosition)
                         .keyHeaderList(keyHeaderList)
+                        .compressed(compressed)
                         .build()
                         .parse(inputSteam);
             }
             case EXCEL: {
                 return ExcelParser.builder()
+                        .compressed(compressed)
                         .headerPosiction(headerPosition)
                         .build().parse(inputSteam);
             }

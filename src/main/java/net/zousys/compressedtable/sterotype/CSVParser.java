@@ -23,6 +23,8 @@ public class CSVParser {
     @Builder.Default
     private char delimeter = ',';
     private int headerPosiction;
+    @Builder.Default
+    private boolean compressed = true;
     private CompressedTableFactory.Mode mode;
 
     /**
@@ -53,6 +55,7 @@ public class CSVParser {
                     keyHeaderList.getKeyHeadersList().size()==1?
                             CompressedTableFactory.Mode.SINGLE_KEY:
                             CompressedTableFactory.Mode.MULTI_KEYS);
+            compressedTable.setCompressed(compressed);
             compressedTable.setHeaderRowNumber(headerPosiction);
             if (keyHeaderList != null) {
                 compressedTable.setKeyHeaderList(keyHeaderList);
