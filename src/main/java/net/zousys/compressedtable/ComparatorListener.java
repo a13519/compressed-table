@@ -1,8 +1,10 @@
 package net.zousys.compressedtable;
 
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.impl.KeyValue;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface ComparatorListener {
@@ -11,9 +13,9 @@ public interface ComparatorListener {
 
     void handleAfterLoaded(CompressedTable after);
 
-    void handleMissedInBefore(Set<String> entries);
+    void handleMissedInBefore(Set<KeyValue> entries);
 
-    void handleMissedInAfter(Set<String> entries);
+    void handleMissedInAfter(Set<KeyValue> entries);
 
     void handleMissedBeforeHeader(List<String> headers);
 
@@ -21,13 +23,19 @@ public interface ComparatorListener {
 
     void handleMisMatched(ComparisonResult.RowResult mismatch);
 
-    void handleMatched(String key);
+    void handleMatched(KeyValue key);
 
-    void handleMatchedList(List<String> keys);
+    void handleMatchedList(List<KeyValue> keys);
 
-    void handleMisMatchedList(List<String> keys);
+    void handleMisMatchedList(List<KeyValue> keys);
 
     void updateUnitedHeaders(List<String> unitedHeaders);
+
+    void handleUnitedHeaderMapping(Map<String, Integer> unitedHeadermapping);
+
+    void handleUnitedHeadrMapping(Map<String, Integer> unitedHeadermapping);
+
+    void handleMarkers(Map<String, Integer> markers);
 
     void handleNotice(String key);
 

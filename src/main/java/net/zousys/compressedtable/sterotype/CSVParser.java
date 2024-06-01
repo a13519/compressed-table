@@ -1,7 +1,10 @@
 package net.zousys.compressedtable.sterotype;
 
 import lombok.Builder;
+import net.zousys.compressedtable.CompressedTableFactory;
+import net.zousys.compressedtable.impl.KeyHeaders;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.impl.KeyHeadersList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -16,10 +19,24 @@ public class CSVParser {
     @Builder.Default
     private int ignoredLines = 0;
     @Builder.Default
-    private String[] keyHeaders = new String[]{};
+    private KeyHeadersList keyHeaderList = new KeyHeadersList();
     @Builder.Default
     private char delimeter = ',';
     private int headerPosiction;
+    @Builder.Default
+    private boolean compressed = true;
+    private CompressedTableFactory.Mode mode;
+
+    /**
+     *
+     * @param headers
+     * @return
+     */
+    public CSVParser addKeyHeaders(KeyHeaders headers) {
+        keyHeaderList.addHeaders(headers);
+        return this;
+    }
+
     /**
      * @param inputStream
      * @return
@@ -34,10 +51,14 @@ public class CSVParser {
                     .setIgnoreSurroundingSpaces(true)
                     .setTrim(true)
                     .build();
-            CompressedTable compressedTable = new CompressedTable();
+            CompressedTable compressedTable = new CompressedTable(
+                    keyHeaderList.getKeyHeadersList().size()==1?
+                            CompressedTableFactory.Mode.SINGLE_KEY:
+                            CompressedTableFactory.Mode.MULTI_KEYS);
+            compressedTable.setCompressed(compressed);
             compressedTable.setHeaderRowNumber(headerPosiction);
-            if (keyHeaders != null) {
-                compressedTable.setKeyHeaders(keyHeaders);
+            if (keyHeaderList != null) {
+                compressedTable.setKeyHeaderList(keyHeaderList);
             }
             format.parse(in).stream().skip(ignoredLines).forEach(re -> {
                 try {

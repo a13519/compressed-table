@@ -1,7 +1,12 @@
 package net.zousys.compressedtable;
 
+import net.zousys.compressedtable.impl.KeyHeaders;
+import net.zousys.compressedtable.impl.KeyHeadersList;
+import net.zousys.compressedtable.impl.KeyValue;
+
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface GeneralTable {
@@ -9,26 +14,39 @@ public interface GeneralTable {
 
     List<String> getHeaders();
 
-    Optional<Row> seekByKey(Key key);
+    int getHeaderRowNumber();
 
-    Optional<Row> seekByKey(String key);
+    Optional<Row> seekByNativeKey(String keyValue);
 
-    Optional<Row> seekByIndex(int index);
+    Optional<Row> seekByMainKey(KeyValue keyValue);
+
+    Optional<Row> seekByKey(KeyValue keyValue);
 
     int size();
 
-    void setKeyHeaders(String[] keys);
+    void addKeyHeaders(KeyHeaders keyHeaders);
 
-    void removeRowByKey(String key);
+    void setKeyHeaderList(KeyHeadersList keyHeaderList);
+
+    KeyHeadersList getKeyHeaderList();
+
+    void removeRowByNativeKey(KeyValue key);
 
     void removeRow(Row row);
 
-    void removeRowsByKey(Collection<String> keys);
+    void removeRowByKey(KeyValue key);
+
+    void removeRowByMainKey(KeyValue key);
+
+    void removeRowsByNativeKey(Collection<KeyValue> keys);
 
     void removeRows(Collection<Row> rows);
 
     void sort(String[] headers);
 
     void setHeaderRowNumber(int no);
-    int getHeaderRowNumber();
+
+    Map<String, Integer> getHeaderMapping();
+
+    boolean isCompressed();
 }

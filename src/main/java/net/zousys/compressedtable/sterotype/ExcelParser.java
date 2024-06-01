@@ -1,6 +1,7 @@
 package net.zousys.compressedtable.sterotype;
 
 import lombok.Builder;
+import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -12,7 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
+
 @Builder
 /**
  * The Excel headers should be unique, the duplicated header will cause header missing
@@ -20,6 +21,10 @@ import java.util.Iterator;
 public class ExcelParser {
     private boolean dynamicWidth;
     private int headerPosiction;
+    @Builder.Default
+    private boolean compressed = true;
+    @Builder.Default
+    private CompressedTableFactory.Mode mode = CompressedTableFactory.Mode.SINGLE_KEY;
 
     /**
      * @param inputStream
@@ -32,7 +37,8 @@ public class ExcelParser {
             XSSFSheet sheet = workbook.getSheetAt(0);
             int from = sheet.getFirstRowNum();
             int to = sheet.getLastRowNum();
-            CompressedTable compressedTable = new CompressedTable();
+            CompressedTable compressedTable = new CompressedTable(mode);
+            compressedTable.setCompressed(compressed);
             compressedTable.setHeaderRowNumber(headerPosiction);
 
             int columnNo = -1;

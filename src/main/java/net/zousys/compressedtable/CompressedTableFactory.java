@@ -2,6 +2,8 @@ package net.zousys.compressedtable;
 
 import lombok.Getter;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.impl.KeyHeaders;
+import net.zousys.compressedtable.impl.KeyHeadersList;
 import net.zousys.compressedtable.sterotype.CSVParser;
 import net.zousys.compressedtable.sterotype.ExcelParser;
 
@@ -17,17 +19,20 @@ public class CompressedTableFactory {
     public static enum Type {
         CSV, EXCEL
     }
+    public static enum Mode {
+        SINGLE_KEY, MULTI_KEYS
+    }
     private int ignoredLines = 0;
-    private String[] keyHeaders = new String[]{};
+    private KeyHeadersList keyHeaderList = new KeyHeadersList();
     private char delimeter = ',';
     @Getter
-    private Type type;
+    private Type type = Type.CSV;
 
     /**
      * the header row number, if this is not explictly set then there will be no header at all
      */
     private int headerPosition = -1;
-
+    private boolean compressed = true;
     /**
      *
      * @param type
@@ -65,11 +70,31 @@ public class CompressedTableFactory {
     }
 
     /**
-     * @param keyHeaders
+     *
+     * @param compressed
      * @return
      */
-    public CompressedTableFactory keyHeaders(String[] keyHeaders) {
-        this.keyHeaders = keyHeaders;
+    public CompressedTableFactory compressed(boolean compressed) {
+        this.compressed = compressed;
+        return this;
+    }
+
+    /**
+     * @param keyHeaderList
+     * @return
+     */
+    public CompressedTableFactory keyHeaderList(KeyHeadersList keyHeaderList) {
+        this.keyHeaderList = keyHeaderList;
+        return this;
+    }
+
+    /**
+     *
+     * @param headers
+     * @return
+     */
+    public CompressedTableFactory addKeyHeaders(KeyHeaders headers) {
+        keyHeaderList.addHeaders(headers);
         return this;
     }
 
@@ -130,11 +155,14 @@ public class CompressedTableFactory {
                         .delimeter(delimeter)
                         .ignoredLines(ignoredLines)
                         .headerPosiction(headerPosition)
-                        .keyHeaders(keyHeaders).build()
+                        .keyHeaderList(keyHeaderList)
+                        .compressed(compressed)
+                        .build()
                         .parse(inputSteam);
             }
             case EXCEL: {
                 return ExcelParser.builder()
+                        .compressed(compressed)
                         .headerPosiction(headerPosition)
                         .build().parse(inputSteam);
             }

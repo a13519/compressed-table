@@ -3,8 +3,9 @@ package net.zousys.compressedtable.impl;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.GeneralTable;
-import net.zousys.compressedtable.Key;
+import net.zousys.compressedtable.KeySet;
 import net.zousys.compressedtable.Row;
 
 import java.io.IOException;
@@ -13,21 +14,45 @@ import java.util.*;
 /**
  * No 'RETURN' or newLine char should be in data
  */
-@NoArgsConstructor
 public class CompressedTable implements GeneralTable {
     @Getter
-    private Map<String, Row> keyedMapping = new HashMap<>();
+    private CompressedTableFactory.Mode mode;
+    @Getter
+    /**
+     * The map of multiple keysets,
+     * if only one key set is specified the mode will tagged as Single Key Set table
+     * if multiple key sets are spcified the mode should be multi-key set table
+     * The only map entry represents the main key if this is single key set
+     */
+    private KeyedMappingMap keyedMappingMap = new KeyedMappingMap();
+    /**
+     * the native key is to identify the entry by system time and hash code of the content
+     */
+    private Map<String, Row> nativeKeyMap = new HashMap<>();
+    /**
+     * The header lists of key sets
+     * for Single Key Set, the only key set should be set that index of 0
+     */
+    private KeyHeadersList keyHeaderList = new KeyHeadersList();
+
     private List<Row> rows = new ArrayList<>();
     @Getter
     private List<String> headers;
     @Setter
     @Getter
     private Map<String, Integer> headerMapping = new HashMap<>();
-    @Getter
-    private String[] headerkeys;
     private boolean onHeader = true;
+    @Setter
+    @Getter
+    private boolean compressed = true;
     private int headerRowNumber = -1;
+    @Getter
     private int physicalLineNumber = 0;
+
+    public CompressedTable(CompressedTableFactory.Mode mode) {
+        this.mode = mode;
+    }
+
     /**
      *
      * @param no
@@ -57,6 +82,12 @@ public class CompressedTable implements GeneralTable {
         }
     }
 
+    /**
+     *
+     * @param fields
+     * @param isIncludeHeader
+     * @throws IOException
+     */
     public void appendRow(List<String> fields, boolean isIncludeHeader) throws IOException {
         if (isIncludeHeader && onHeader) {
             setHeaders(fields.toArray(new String[]{}));
@@ -66,21 +97,52 @@ public class CompressedTable implements GeneralTable {
         }
     }
 
+    /**
+     *
+     * @param fields
+     * @throws IOException
+     */
     public void appendRow(String[] fields) throws IOException {
         appendRow(Arrays.asList(fields));
     }
 
+    /**
+     *
+     * @param fields
+     * @param isIncludeHeader
+     * @throws IOException
+     */
     public void appendRow(String[] fields, boolean isIncludeHeader) throws IOException {
         appendRow(Arrays.asList(fields), isIncludeHeader);
     }
 
+    /**
+     *
+     * @param fields
+     * @throws IOException
+     */
     public void appendRow(List<String> fields) throws IOException {
         if (fields != null) {
             CompressedRow compressedRow = new CompressedRow(this);
             compressedRow.make(fields);
+
             this.rows.add(compressedRow);
+            nativeKeyMap.put(compressedRow.getKey().getNativeKeyValue(), compressedRow);
+
             if (compressedRow.getKey() != null) {
-                keyedMapping.put(compressedRow.getKey().toString(), compressedRow);
+                if (mode == CompressedTableFactory.Mode.SINGLE_KEY) {
+                    // single key set
+                    keyedMappingMap.getMainKeyedMapping().put(compressedRow.getKey().getMainKeyValue(), compressedRow);
+                } else {
+                    for (KeyHeaders akey : keyHeaderList.getKeyHeadersList()) {
+                        Map<String, Row> akmap = keyedMappingMap.get(akey.getCompositedKey());
+                        if (akmap == null) {
+                            akmap = new HashMap<>();
+                            keyedMappingMap.put(akey.getCompositedKey(), akmap);
+                        }
+                        akmap.put(compressedRow.getKey().getKeyValue(akey.getCompositedKey()).getValue(), compressedRow);
+                    }
+                }
             }
         }
     }
@@ -90,20 +152,36 @@ public class CompressedTable implements GeneralTable {
         return rows;
     }
 
-
     @Override
-    public Optional<Row> seekByKey(Key key) {
-        return Optional.of(keyedMapping.get(key));
+    public Optional<Row> seekByNativeKey(String keyValue) {
+        try {
+            Optional<Row> r = Optional.of(
+                    nativeKeyMap.get(keyValue));
+            return r;
+        } catch (Throwable t) {
+            System.out.println("Optional record is null"+keyValue);
+            return null;
+        }
     }
 
     @Override
-    public Optional<Row> seekByKey(String key) {
-        return Optional.of(keyedMapping.get(key));
+    public Optional<Row> seekByKey(KeyValue keyValue) {
+        if (keyHeaderList==null||keyHeaderList.getKeyHeadersList().size()==0) {
+            return Optional.of(null);
+        } else {
+            Optional<Row> r = Optional.of(keyedMappingMap.get(keyValue.getName()).get(keyValue.getValue()));
+            return r;
+        }
     }
 
     @Override
-    public Optional<Row> seekByIndex(int index) {
-        return Optional.of(rows.get(index));
+    public Optional<Row> seekByMainKey(KeyValue keyValue) {
+        if (keyHeaderList==null||keyHeaderList.getKeyHeadersList().size()==0) {
+            return Optional.of(null);
+        } else {
+            Optional<Row> r = Optional.of(keyedMappingMap.getMainKeyedMapping().get(keyValue.getValue()));
+            return r;
+        }
     }
 
     @Override
@@ -112,16 +190,46 @@ public class CompressedTable implements GeneralTable {
     }
 
     @Override
-    public void setKeyHeaders(String[] keys) {
-        this.headerkeys = keys;
+    public void addKeyHeaders(KeyHeaders keyHeaders) {
+        keyHeaderList.getKeyHeadersList().add(keyHeaders);
     }
 
     @Override
-    public void removeRowByKey(String key) {
-        if (key != null) {
-            Row row = keyedMapping.remove(key);
+    public void setKeyHeaderList(KeyHeadersList keyHeaderList) {
+        this.keyHeaderList = keyHeaderList;
+    }
+
+    @Override
+    public KeyHeadersList getKeyHeaderList() {
+        return keyHeaderList;
+    }
+
+    @Override
+    public void removeRowByNativeKey(KeyValue mainKey) {
+        if (mainKey != null) {
+            Row row = nativeKeyMap.get(mainKey.getValue());
             if (row != null) {
-                rows.remove(row);
+                removeRow(row);
+            }
+        }
+    }
+
+    @Override
+    public void removeRowByKey(KeyValue key) {
+        if (key != null) {
+            Row row = this.keyedMappingMap.get(key.getName()).get(key.getValue());
+            if (row != null) {
+                removeRow(row);
+            }
+        }
+    }
+
+    @Override
+    public void removeRowByMainKey(KeyValue key) {
+        if (key != null) {
+            Row row = this.keyedMappingMap.getMainKeyedMapping().get(key.getValue());
+            if (row != null) {
+                removeRow(row);
             }
         }
     }
@@ -131,14 +239,23 @@ public class CompressedTable implements GeneralTable {
         if (row != null) {
             rows.remove(row);
             if (row.getKey() != null) {
-                keyedMapping.remove(row.getKey());
+                nativeKeyMap.remove(row.getKey().getNativeKeyValue());
+
+                if (mode == CompressedTableFactory.Mode.SINGLE_KEY) {
+                    keyedMappingMap.getMainKeyedMapping().remove(row.getKey().getMainKeyValue());
+                } else {
+                    for (KeyHeaders akh : keyHeaderList.getKeyHeadersList()){
+                        String kv = akh.getCompositedKey();
+                        keyedMappingMap.get(kv).remove(row.getKey().getKeyValue(kv));
+                    }
+                }
             }
         }
     }
 
     @Override
-    public void removeRowsByKey(Collection<String> keys) {
-        keys.forEach(this::removeRowByKey);
+    public void removeRowsByNativeKey(Collection<KeyValue> keys) {
+        keys.forEach(this::removeRowByNativeKey);
     }
 
     @Override

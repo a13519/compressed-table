@@ -4,37 +4,50 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.zousys.compressedtable.Content;
-import net.zousys.compressedtable.GeneralTable;
-import net.zousys.compressedtable.Key;
-import net.zousys.compressedtable.Row;
+import net.zousys.compressedtable.*;
+import net.zousys.compressedtable.impl.multikeys.key.MultiStringKey;
+import net.zousys.compressedtable.impl.singlekey.key.SingleStringKey;
 
 import java.io.IOException;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
+
 @Builder
 public class CompressedRow implements Row {
-    private StringKey stringKey;
+    @Builder.Default
+    private boolean compressed = true;
+    private KeySet stringKey;
     private CompressedContent compressedContent;
     private CompressedTable compressedTable;
 
+    /**
+     *
+     * @param compressedTable
+     */
     public CompressedRow(CompressedTable compressedTable) {
         this.compressedTable = compressedTable;
     }
 
+    /**
+     *
+     * @param fields
+     * @throws IOException
+     */
     public void make(List<String> fields) throws IOException {
         if (compressedTable != null && fields != null) {
-            this.stringKey = new StringKey();
-            this.stringKey.setKey(compressedTable.getHeaderkeys(), compressedTable.getHeaderMapping(), fields);
-            this.compressedContent = CompressedContent.load(fields);
+            this.compressedContent = CompressedContent.load(fields, compressedTable.isCompressed());
+            if (compressedTable.getMode()== CompressedTableFactory.Mode.MULTI_KEYS) {
+                this.stringKey = MultiStringKey.create(compressedTable.getKeyHeaderList(), fields, this);
+            } else {
+                this.stringKey = SingleStringKey.create(compressedTable.getKeyHeaderList(), fields, this);
+            }
         }
     }
 
     @Override
-    public Key getKey() {
+    public KeySet getKey() {
         return stringKey;
     }
 
