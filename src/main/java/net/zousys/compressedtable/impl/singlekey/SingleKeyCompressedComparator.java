@@ -34,8 +34,7 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
     private List<String> unitedHeaders;
     @Setter
     private Map<String, Integer> unitedHeaderMapping;
-    @Setter
-    private boolean trim;
+
     @Builder.Default
     private Set<KeyValue> beforeMissed = new HashSet<>();
     @Builder.Default
@@ -46,6 +45,9 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
     private List<String> afterMissedHeaders = new ArrayList<>();
     @Builder.Default
     private Set<KeyValue> shared = new HashSet<>();
+    @Setter
+    private boolean trim;
+    private boolean strictMissed;
 
     @Getter
     @Builder.Default
@@ -112,9 +114,6 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
         uniteHeaders();
         comparatorListener.updateUnitedHeaders(unitedHeaders);
 
-        beforeMissedHeaders = null;
-        afterMissedHeaders = null;
-
         ArrayList<KeyValue> ml = new ArrayList<>();
         ArrayList<KeyValue> mml = new ArrayList<>();
         shared.forEach(key -> {
@@ -123,22 +122,24 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
                 ml.add(key);
                 comparatorListener.handleMatched(key);
                 // remove from before and after
-                after.removeRowByNativeKey(key);
-                before.removeRowByNativeKey(key);
+//                after.removeRowByMainKey(key);
+//                before.removeRowByMainKey(key);
             } else {
-                mml.add(key);
                 try {
-                    ComparisonResult.RowResult mismatch =
-                            compareRow(
-                                    key,
-                                    ignoredFields,
-                                    before,
-                                    after,
-                                    trim,
-                                    unitedHeaders);
+                    ComparisonResult.RowResult mismatch = compareRow(key);
                     if (mismatch.getMissMatchNumber() > 0) {
+                        mml.add(key);
                         addMarker(mismatch);
                         comparatorListener.handleMisMatched(mismatch);
+                    } else {
+                        // this is still matched if no fields are mismatch
+                        // this could be the trimming or the strictColumn indicator is false
+                        // and no column field is different but the missing columns or headers
+                        ml.add(key);
+                        comparatorListener.handleMatched(key);
+                        // remove from before and after
+//                        after.removeRowByMainKey(key);
+//                        before.removeRowByMainKey(key);
                     }
                     // remove from before and after
                     after.removeRowByMainKey(key);
@@ -159,22 +160,11 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
 
     /**
      * @param key
-     * @param ignoredFields
-     * @param before
-     * @param after
-     * @param trim
-     * @param unitedHeaders
      * @return
      * @throws DataFormatException
      * @throws IOException
      */
-    private static final ComparisonResult.RowResult compareRow(
-            KeyValue key,
-            Set<String> ignoredFields,
-            net.zousys.compressedtable.impl.CompressedTable before,
-            net.zousys.compressedtable.impl.CompressedTable after,
-            boolean trim,
-            List<String> unitedHeaders) throws DataFormatException, IOException {
+    private final ComparisonResult.RowResult compareRow(KeyValue key) throws DataFormatException, IOException {
         Row a = before.seekByMainKey(key).orElseThrow();
         Row b = after.seekByMainKey(key).orElseThrow();
         List<String> fieldsA = a.getContent().form();
@@ -195,12 +185,18 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
                     .afterField(trim && fvafter != null ? fvafter.trim() : fvafter)
                     .build();
 
-
-            if (ignoredFields != null && ignoredFields.contains(headerA)) {
+            if (!strictMissed &&
+                    (afterMissedHeaders.contains(headerA) || beforeMissedHeaders.contains(headerA))) {
+                rf.setStrictMissed(false);
+                rf.setMissmatched(false);
+                rf.setIgnored(false);
+            } else if (ignoredFields != null && ignoredFields.contains(headerA)) {
                 rf.setIgnored(true);
                 rf.setMissmatched(false);
+                rf.setStrictMissed(false);
             } else {
                 rf.setIgnored(false);
+                rf.setStrictMissed(true);
                 if ((rf.getBeforeField() == null || rf.getAfterField() == null)
                         || !rf.getBeforeField().equals(rf.getAfterField())) {
                     rf.setMissmatched(true);

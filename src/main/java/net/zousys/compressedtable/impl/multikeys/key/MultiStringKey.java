@@ -88,8 +88,13 @@ public class MultiStringKey implements KeySet {
                 StringBuffer sb = new StringBuffer();
                 Arrays.stream(headers.getKeyHeaders()).forEach(header -> {
                     try {
-                        sb.append(fields.get(headerMapping.get(header)));
-                        sb.append("|");
+                        Integer index = headerMapping.get(header);
+                        if (index!=null && index.intValue()<fields.size() && index.intValue()>=0) {
+                            sb.append(fields.get(index));
+                            sb.append("|");
+                        } else {
+                            sb.append("(null)|");
+                        }
                     } catch (Exception e) {
                         // ignore
                     }

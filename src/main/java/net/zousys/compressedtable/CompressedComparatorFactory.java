@@ -32,6 +32,12 @@ public class CompressedComparatorFactory {
     private Map<String, Integer> unitedHeaderMapping;
     @Setter
     private boolean trim;
+    @Setter
+    /**
+     * this is the switch in case the columns are missed in before or after to enable the comparison this column
+     * if it is true, then any rows in the tables will be mismatch if there are any missed columns in tables
+     */
+    private boolean strictMissed;
     /**
      *
      * @return
@@ -47,6 +53,7 @@ public class CompressedComparatorFactory {
                     .unitedHeaders(unitedHeaders)
                     .unitedHeaderMapping(unitedHeaderMapping)
                     .trim(trim)
+                    .strictMissed(strictMissed)
                     .build();
         } else if (before.getMode() == CompressedTableFactory.Mode.SINGLE_KEY &&
                 after.getMode() == CompressedTableFactory.Mode.SINGLE_KEY) {
@@ -58,6 +65,7 @@ public class CompressedComparatorFactory {
                     .unitedHeaders(unitedHeaders)
                     .unitedHeaderMapping(unitedHeaderMapping)
                     .trim(trim)
+                    .strictMissed(strictMissed)
                     .build();
         } else {
             log.error("the before and after table has different mode");

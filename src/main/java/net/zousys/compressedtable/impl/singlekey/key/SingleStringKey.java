@@ -84,7 +84,12 @@ public class SingleStringKey implements KeySet {
             this.nativeKeyValue = nativeKeyValue;
             Arrays.stream(keyHeaderList.getKeyHeadersList().get(0).getKeyHeaders()).forEach(header -> {
                 try {
-                    sb.append(fields.get(map.get(header))+"|");
+                    Integer index = map.get(header);
+                    if (index!=null && index.intValue()<fields.size() && index.intValue()>=0) {
+                        sb.append(fields.get(index) + "|");
+                    } else {
+                        sb.append("(null)|");
+                    }
                 } catch (Exception e) {
                     // ignore
                 }

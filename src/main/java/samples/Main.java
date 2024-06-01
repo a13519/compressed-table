@@ -37,7 +37,7 @@ public class Main {
                         .toAbsolutePath()
                         .toString()).toString());
         k.handleBeforeLoaded(beforetable);
-        log.info("Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders());
+        log.info("Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
 
         CompressedTable aftertable = CompressedTableFactory
                 .build("csv")
@@ -50,13 +50,14 @@ public class Main {
                         .toAbsolutePath()
                         .toString()).toString());
         k.handleAfterLoaded(aftertable);
-        log.info("After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders());
+        log.info("After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders() + " Mode: " + beforetable.getMode());
 
         CompressedComparatorFactory.builder()
                 .before(beforetable)
                 .after(aftertable)
                 .comparatorListener(k)
                 .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
+                .strictMissed(true)
                 .build().create()
                 .compare();
 

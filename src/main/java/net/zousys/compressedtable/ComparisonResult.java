@@ -71,6 +71,7 @@ public class ComparisonResult {
         private String afterField;
         private boolean missmatched;
         private boolean ignored;
+        private boolean strictMissed;
     }
 
 }

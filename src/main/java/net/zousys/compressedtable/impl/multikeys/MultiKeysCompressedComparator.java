@@ -34,6 +34,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
     private Map<String, Integer> unitedHeaderMapping;
     @Setter
     private boolean trim;
+    private boolean strictMissed;
     /**
      * main key
      */
@@ -144,19 +145,12 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
                 }
             }
             if (!matched || matchedKey.getValue() == null) {
-                System.out.println("not match :" + beforeNativeKey);
+                log.info("not match before native key:" + beforeNativeKey);
             } else if (!identical) {
-                mml.add(matchedKey);
                 try {
-                    ComparisonResult.RowResult mismatch =
-                            compareRow(
-                                    matchedKey,
-                                    ignoredFields,
-                                    before,
-                                    after,
-                                    trim,
-                                    unitedHeaders);
+                    ComparisonResult.RowResult mismatch = compareRow(matchedKey);
                     if (mismatch.getMissMatchNumber() > 0) {
+                        mml.add(matchedKey);
                         addMarker(mismatch);
                         comparatorListener.handleMisMatched(mismatch);
                     }
@@ -178,22 +172,11 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
 
     /**
      * @param key
-     * @param ignoredFields
-     * @param before
-     * @param after
-     * @param trim
-     * @param unitedHeaders
      * @return
      * @throws DataFormatException
      * @throws IOException
      */
-    private static final ComparisonResult.RowResult compareRow(
-            KeyValue key,
-            Set<String> ignoredFields,
-            CompressedTable before,
-            CompressedTable after,
-            boolean trim,
-            List<String> unitedHeaders) throws DataFormatException, IOException {
+    private final ComparisonResult.RowResult compareRow(KeyValue key) throws DataFormatException, IOException {
         Row a = before.seekByKey(key).orElseThrow();
         Row b = after.seekByKey(key).orElseThrow();
         List<String> fieldsA = a.getContent().form();
@@ -214,11 +197,18 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
                     .afterField(trim && fvafter != null ? fvafter.trim() : fvafter)
                     .build();
 
-
-            if (ignoredFields != null && ignoredFields.contains(headerA)) {
+            if (!strictMissed &&
+                    (afterMissedHeaders.contains(headerA) || beforeMissedHeaders.contains(headerA))) {
+                rf.setStrictMissed(false);
+                rf.setMissmatched(false);
+                rf.setIgnored(false);
+            } else if (ignoredFields != null && ignoredFields.contains(headerA)) {
                 rf.setIgnored(true);
                 rf.setMissmatched(false);
+                rf.setStrictMissed(false);
             } else {
+                rf.setIgnored(false);
+                rf.setStrictMissed(true);
                 if ((rf.getBeforeField() == null || rf.getAfterField() == null)
                         || !rf.getBeforeField().equals(rf.getAfterField())) {
                     rf.setMissmatched(true);
