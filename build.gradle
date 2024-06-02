@@ -15,14 +15,17 @@ publishing {
         }
     }
     publications {
-        gpr(MavenPublication) {
-            from(components.java)
+        register("jar", MavenPublication) {
+            from(components["java"])
+            pom {
+                url.set("https://github.com/<OWNER>/<REPO>.git")
+            }
         }
     }
 }
 
 group = 'net.zousys'
-version = '0.9.10'
+version = '1.0.1'
 
 java {
     sourceCompatibility = '11'

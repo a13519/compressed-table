@@ -12,6 +12,20 @@ A handy tool named **Bold/CompressedComparator** can compare two tables to figur
 * which mismatched record has how many fields mismatched
 * which column/header has how many records mismatched
 
+## To Use compressed-table
+Maven
+```maven
+<dependency>
+  <groupId>net.zousys</groupId>
+  <artifactId>compressed-table</artifactId>
+  <version>1.0.1</version>
+</dependency>
+```
+Gradle:
+```gradle
+implementation 'net.zousys:compressed-table:1.0.1'
+```
+
 ## Concept 
 
 ### Headers
@@ -109,4 +123,12 @@ CompressedTable beforetable = CompressedTableFactory
                 .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
                 .build().create()
                 .compare();
+```
+
+### Executable examples 
+There are couple executable examples in the code:
+```java
+samples.ParseSingleKeySet.java
+samples.ParseMultipleKeySets.java.java
+samples.CompareTwoTables.java
 ```
