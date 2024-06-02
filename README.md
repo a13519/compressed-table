@@ -26,7 +26,9 @@ One **Bold/KeySet** contains:
 
 You could set one KeySet or mulitple KeySet:
 * SINGLE_KEY (one KeySet)
+  In this mode, the key set is called **Bold/Main Key**
 * MULTI_KEYS (multiple KeySets)
+  In this mode, A key set is automatically generated called **Bold/Native Key**, it's unique. Also one or a serial KeySets are attached in you favior.
 The **Bold/KeyHeadersList** represents the KeySets.
 
 ### Delimeter
@@ -44,10 +46,10 @@ CompressedTable beforetable = CompressedTableFactory
                 new KeyHeadersList()
                         .addHeaders(new String[]{"Customer Id", "First Name"})
         )
-        .compressed(false)
-        .ignoredLines(0)
+        .compressed(false)  // the content is not compressed
+        .ignoredLines(0)    // ignore the first number of lines
         .delimeter(',')
-        .parse(Paths.get(Paths.get("customers-1000b.csv")
+        .parse(Paths.get("customers-1000b.csv")
                 .toAbsolutePath()
-                .toString()).toString());
+                .toString());
 ```

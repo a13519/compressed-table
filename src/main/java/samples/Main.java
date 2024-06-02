@@ -34,9 +34,9 @@ public class Main {
                 .compressed(false)
                 .ignoredLines(0)
                 .delimeter(',')
-                .parse(Paths.get(Paths.get("customers-1000b.csv")
+                .parse(Paths.get("customers-1000b.csv")
                         .toAbsolutePath()
-                        .toString()).toString());
+                        .toString());
         k.handleBeforeLoaded(beforetable);
         log.info("Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
 
@@ -48,9 +48,9 @@ public class Main {
                 .compressed(true)
                 .ignoredLines(0)
                 .delimeter(',')
-                .parse(Paths.get(Paths.get("customers-1000a.csv")
+                .parse(Paths.get("customers-1000a.csv")
                         .toAbsolutePath()
-                        .toString()).toString());
+                        .toString());
         k.handleAfterLoaded(aftertable);
         log.info("After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders() + " Mode: " + beforetable.getMode());
 
