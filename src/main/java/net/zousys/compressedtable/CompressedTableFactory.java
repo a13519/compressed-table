@@ -30,6 +30,7 @@ public class CompressedTableFactory {
 
     /**
      * the header row number, if this is not explictly set then there will be no header at all
+     * the first row of source file is starts from 0
      */
     private int headerPosition = -1;
     private boolean compressed = true;
@@ -127,7 +128,7 @@ public class CompressedTableFactory {
         if (filename != null) {
             return parse(new File(filename));
         } else {
-            return null;
+            throw new IOException("file is not exist");
         }
     }
 
@@ -140,7 +141,7 @@ public class CompressedTableFactory {
         if (file != null && file.exists()) {
             return parse(new FileInputStream(file));
         } else {
-            return null;
+            throw new IOException("file is not exist");
         }
     }
 
@@ -154,7 +155,7 @@ public class CompressedTableFactory {
                 return CSVParser.builder()
                         .delimeter(delimeter)
                         .ignoredLines(ignoredLines)
-                        .headerPosiction(headerPosition)
+                        .headerPosition(headerPosition)
                         .keyHeaderList(keyHeaderList)
                         .compressed(compressed)
                         .build()
@@ -162,9 +163,12 @@ public class CompressedTableFactory {
             }
             case EXCEL: {
                 return ExcelParser.builder()
+                        .ignoredLines(ignoredLines)
+                        .headerPosition(headerPosition)
+                        .keyHeaderList(keyHeaderList)
                         .compressed(compressed)
-                        .headerPosiction(headerPosition)
-                        .build().parse(inputSteam);
+                        .build()
+                        .parse(inputSteam);
             }
         }
         return null;

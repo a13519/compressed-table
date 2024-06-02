@@ -129,6 +129,6 @@ CompressedTable beforetable = CompressedTableFactory
 There are couple executable examples in the code:
 ```java
 samples.ParseSingleKeySet.java
-samples.ParseMultipleKeySets.java.java
+samples.ParseMultipleKeySets.java
 samples.CompareTwoTables.java
 ```

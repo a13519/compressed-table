@@ -3,6 +3,7 @@ package net.zousys.compressedtable.sterotype;
 import lombok.Builder;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.impl.KeyHeadersList;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -20,11 +21,13 @@ import java.util.ArrayList;
  */
 public class ExcelParser {
     private boolean dynamicWidth;
-    private int headerPosiction;
+    private int headerPosition;
+    @Builder.Default
+    private int ignoredLines = 0;
+    @Builder.Default
+    private KeyHeadersList keyHeaderList = new KeyHeadersList();
     @Builder.Default
     private boolean compressed = true;
-    @Builder.Default
-    private CompressedTableFactory.Mode mode = CompressedTableFactory.Mode.SINGLE_KEY;
 
     /**
      * @param inputStream
@@ -37,9 +40,16 @@ public class ExcelParser {
             XSSFSheet sheet = workbook.getSheetAt(0);
             int from = sheet.getFirstRowNum();
             int to = sheet.getLastRowNum();
-            CompressedTable compressedTable = new CompressedTable(mode);
+
+            CompressedTable compressedTable = new CompressedTable(
+                    keyHeaderList.getKeyHeadersList().size()>1?
+                            CompressedTableFactory.Mode.MULTI_KEYS:
+                            CompressedTableFactory.Mode.SINGLE_KEY);
             compressedTable.setCompressed(compressed);
-            compressedTable.setHeaderRowNumber(headerPosiction);
+            compressedTable.setHeaderRowNumber(headerPosition);
+            if (keyHeaderList != null) {
+                compressedTable.setKeyHeaderList(keyHeaderList);
+            }
 
             int columnNo = -1;
 
@@ -53,7 +63,7 @@ public class ExcelParser {
                         arowarray.add(stringvalue(row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)));
                     }
 
-                    if (headerPosiction == i) {
+                    if (headerPosition == i) {
                         columnNo = cn;
                         compressedTable.setHeaders(arowarray.toArray(new String[0]));
                     }
