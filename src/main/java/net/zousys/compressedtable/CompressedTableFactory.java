@@ -128,7 +128,7 @@ public class CompressedTableFactory {
         if (filename != null) {
             return parse(new File(filename));
         } else {
-            return null;
+            throw new IOException("file is not exist");
         }
     }
 
@@ -141,7 +141,7 @@ public class CompressedTableFactory {
         if (file != null && file.exists()) {
             return parse(new FileInputStream(file));
         } else {
-            return null;
+            throw new IOException("file is not exist");
         }
     }
 
