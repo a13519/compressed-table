@@ -30,12 +30,13 @@ public class ParseSingleKeySet {
                 )
                 .compressed(false)
                 .ignoredLines(0)
+                .headerPosition(0)
                 .delimeter(',')
                 .parse(Paths.get("customers-1000b.csv")
                         .toAbsolutePath()
                         .toString());
         listener.handleBeforeLoaded(beforetable);
-        log.info("Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
+        log.info("Table size: " + beforetable.getContents().size() + " Headers: " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
 
     }
 }

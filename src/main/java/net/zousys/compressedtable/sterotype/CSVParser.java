@@ -22,10 +22,9 @@ public class CSVParser {
     private KeyHeadersList keyHeaderList = new KeyHeadersList();
     @Builder.Default
     private char delimeter = ',';
-    private int headerPosiction;
+    private int headerPosition;
     @Builder.Default
     private boolean compressed = true;
-    private CompressedTableFactory.Mode mode;
 
     /**
      *
@@ -56,13 +55,14 @@ public class CSVParser {
                             CompressedTableFactory.Mode.SINGLE_KEY:
                             CompressedTableFactory.Mode.MULTI_KEYS);
             compressedTable.setCompressed(compressed);
-            compressedTable.setHeaderRowNumber(headerPosiction);
+            compressedTable.setHeaderRowNumber(headerPosition);
             if (keyHeaderList != null) {
                 compressedTable.setKeyHeaderList(keyHeaderList);
             }
             format.parse(in).stream().skip(ignoredLines).forEach(re -> {
                 try {
-                    compressedTable.appendRow(re.values(), true);
+                    compressedTable.appendRow(re.values(),
+                            compressedTable.getContents().size()==headerPosition);
                 } catch (IOException e) {
                     //
                 }
