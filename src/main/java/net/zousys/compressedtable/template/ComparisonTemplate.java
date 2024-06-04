@@ -1,7 +1,9 @@
 package net.zousys.compressedtable.template;
 
 import lombok.Data;
+import lombok.Setter;
 import net.zousys.compressedtable.ComparisonResult;
+import net.zousys.compressedtable.impl.CompressedTable;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -10,18 +12,40 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class ComparisonTemplate {
+
     private String resultfile;
-    private XSSFSheet spreadsheet;
+
+    private XSSFSheet mismatchshit;
+    private XSSFSheet bmissedshit;
+    private XSSFSheet amissedshit;
+    private XSSFSheet matchedshit;
     private XSSFWorkbook book;
+
     private int ignrn = 0;
     private int rowid = 0;
     private int coln = 0;
+    @Setter
+    private int details =2;
+
+    private CompressedTable beforetable;
+    private CompressedTable aftertable;
+    @Setter
+    private Set<String> beforemissed;
+    @Setter
+    private Set<String> aftermissed;
+    @Setter
+    private List<String> unitedHeaders;
+    private List<String> matchedKeys = new ArrayList<>();
+    private Map<String, Integer> markers = new HashMap<>();
+    private Map<String, Integer> unitedHeaderMapping;
+    private boolean headered = false;
+
     private ComparisonResult comparisonResult;
     /**
      * nullafter
@@ -34,12 +58,13 @@ public class ComparisonTemplate {
     private Map<String, XSSFCellStyle> styles;
     private static int cellid = 0;
 
-    public ComparisonTemplate(ComparisonResult comparisonResult, String sheet, String resultfile) {
+    public ComparisonTemplate(ComparisonResult comparisonResult,
+                              CompressedTable tbeforetable,
+                              CompressedTable taftertable) throws FileNotFoundException {
         this.comparisonResult = comparisonResult;
-        this.resultfile = resultfile;
-        book = new XSSFWorkbook();
-        spreadsheet = book.createSheet(sheet == null ? "Data" : sheet);
-        DataFormat format = book.createDataFormat();
+        beforetable = tbeforetable;
+        aftertable = taftertable;
+
         populate();
     }
 
@@ -54,15 +79,14 @@ public class ComparisonTemplate {
     }
 
     private void populate() {
-        XSSFRow row = spreadsheet.createRow(rowid++);
-        cellid = 0;
-        Cell keyCell = row.createCell(cellid++);
-        keyCell.setCellValue("KeySet");
-        comparisonResult.getUnitedHeaders().stream().forEach(a -> {
-            Cell cell = row.createCell(cellid++);
-            cell.setCellValue(a);
-            cell.setCellStyle(styles.get("header"));
-        });
+        book = new XSSFWorkbook();
+        mismatchshit = book.createSheet("Mismatched");
+        amissedshit = book.createSheet("After Missed");
+        bmissedshit = book.createSheet("Before Missed");
+        if (details==3){
+            matchedshit = book.createSheet("Matched");
+        }
+        Sytles.init(book);
     }
 
     /**
