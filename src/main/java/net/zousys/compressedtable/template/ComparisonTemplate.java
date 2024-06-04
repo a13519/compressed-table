@@ -96,7 +96,7 @@ public class ComparisonTemplate {
      * @throws Exception
      */
     private void append(ComparisonResult.RowResult rowResult, ComparisonResult comparisonResult) throws Exception {
-        XSSFRow row = spreadsheet.createRow(rowid++);
+        XSSFRow row = mismatchshit.createRow(rowid++);
         cellid = 0;
         Cell keyCell = row.createCell(cellid++);
         keyCell.setCellValue(rowResult.getMatchedKey().getValue());
@@ -118,7 +118,7 @@ public class ComparisonTemplate {
                 }
             }
         }
-        row = spreadsheet.createRow(rowid++);
+        row = mismatchshit.createRow(rowid++);
         cellid = 0;
         keyCell = row.createCell(cellid++);
         keyCell.setCellValue("");
@@ -139,13 +139,6 @@ public class ComparisonTemplate {
         }
     }
 
-    public void removeRows(int a) {
-        if (a > 0) {
-            spreadsheet.removeRow(spreadsheet.getRow(a));
-        } else {
-            int b = spreadsheet.getLastRowNum() + a + 1;
-            spreadsheet.removeRow(spreadsheet.getRow(b));
-        }
-    }
+
 }
 
