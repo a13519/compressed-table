@@ -47,12 +47,25 @@ public class CompressedTable implements GeneralTable {
     private boolean compressed = true;
     private int headerRowNumber = -1;
     @Getter
+    @Setter
     private int physicalLineNumber = 0;
 
+    /**
+     *
+     * @param mode
+     */
     public CompressedTable(CompressedTableFactory.Mode mode) {
         this.mode = mode;
     }
 
+    /**
+     *
+     * @return
+     */
+    public int increasePhysicalLineNumber() {
+        physicalLineNumber++;
+        return physicalLineNumber;
+    }
     /**
      *
      * @param no
@@ -127,6 +140,7 @@ public class CompressedTable implements GeneralTable {
             compressedRow.make(fields);
 
             this.rows.add(compressedRow);
+            increasePhysicalLineNumber();
             nativeKeyMap.put(compressedRow.getKey().getNativeKeyValue(), compressedRow);
 
             if (compressedRow.getKey() != null) {

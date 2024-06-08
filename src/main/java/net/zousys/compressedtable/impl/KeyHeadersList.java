@@ -14,6 +14,13 @@ public class KeyHeadersList {
 
     /**
      *
+     * @return
+     */
+    public static KeyHeadersList KeyHeadersList() {
+        return new KeyHeadersList();
+    }
+    /**
+     *
      * @param headers
      * @return
      */

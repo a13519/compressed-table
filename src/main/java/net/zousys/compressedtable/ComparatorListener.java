@@ -33,8 +33,6 @@ public interface ComparatorListener {
 
     void handleUnitedHeaderMapping(Map<String, Integer> unitedHeadermapping);
 
-    void handleUnitedHeadrMapping(Map<String, Integer> unitedHeadermapping);
-
     void handleMarkers(Map<String, Integer> markers);
 
     void handleNotice(String key);

@@ -23,7 +23,7 @@ public class ExcelParser {
     private boolean dynamicWidth;
     private int headerPosition;
     @Builder.Default
-    private int ignoredLines = 0;
+    private int ignoredTailLines = 0;
     @Builder.Default
     private KeyHeadersList keyHeaderList = new KeyHeadersList();
     @Builder.Default

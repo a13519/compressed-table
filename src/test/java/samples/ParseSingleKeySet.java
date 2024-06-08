@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Stack;
 import java.util.zip.DataFormatException;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,6 +24,15 @@ public class ParseSingleKeySet {
     @Test
     public void parseSingleKeySet() throws IOException, DataFormatException {
         CompareListener listener = new CompareListener();
+
+        Stack s = new Stack();
+        s.push("1");
+        s.push("2");
+
+        System.out.println(s.firstElement());
+s.remove(0);
+        System.out.println(s.firstElement());
+        s.remove(0);
 
         CompressedTable beforetable = CompressedTableFactory
                 .build("csv")

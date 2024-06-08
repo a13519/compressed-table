@@ -37,13 +37,27 @@ public class CompressedContent extends CompressedByteArray implements Content {
             StringWriter bw = new StringWriter();
             fields.forEach(field -> bw.write(field.trim() + "\n"));
             compressedContent.loadContent(String.valueOf(bw).getBytes());
+            compressedContent.hashIt();
         } else {
+            StringWriter bw = new StringWriter();
+            fields.forEach(field -> bw.write(field.trim() + "\n"));
+            compressedContent.loadContent(String.valueOf(bw).getBytes());
+            compressedContent.hashIt();
+            compressedContent.clean();
             compressedContent.fields = new ArrayList<>();
             compressedContent.fields.addAll(fields);
         }
         return compressedContent;
     }
 
+    @Override
+    protected void hashIt() {
+        if (compressed){
+            super.hashIt();
+        } else {
+            hash = java.util.Arrays.hashCode(fields.toString().getBytes(StandardCharsets.UTF_8));
+        }
+    }
     /**
      *
      * @param fields
@@ -57,7 +71,13 @@ public class CompressedContent extends CompressedByteArray implements Content {
             StringWriter bw = new StringWriter();
             Arrays.stream(fields).forEach(field -> bw.write(field.trim() + "\n"));
             compressedContent.loadContent(String.valueOf(bw).getBytes());
+            compressedContent.hashIt();
         } else {
+            StringWriter bw = new StringWriter();
+            Arrays.stream(fields).forEach(field -> bw.write(field.trim() + "\n"));
+            compressedContent.loadContent(String.valueOf(bw).getBytes());
+            compressedContent.hashIt();
+            compressedContent.clean();
             compressedContent.fields = new ArrayList<>();
             compressedContent.fields.addAll(Arrays.asList(fields));
         }

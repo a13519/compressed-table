@@ -8,6 +8,7 @@ import net.zousys.compressedtable.impl.multikeys.MultiKeysCompressedComparator;
 import net.zousys.compressedtable.impl.singlekey.SingleKeyCompressedComparator;
 import org.apache.commons.math3.analysis.function.Sin;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +22,8 @@ public class CompressedComparatorFactory {
     @Setter
     private ComparatorListener comparatorListener;
     @Setter
-    private Set<String> ignoredFields;
+    @Builder.Default
+    private Set<String> ignoredFields= new HashSet<>();
     @Setter
     private CompressedTable before;
     @Setter
