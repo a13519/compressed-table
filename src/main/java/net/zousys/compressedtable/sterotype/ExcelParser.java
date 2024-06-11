@@ -66,9 +66,9 @@ public class ExcelParser {
                     if (headerPosition == i) {
                         columnNo = cn;
                         compressedTable.setHeaders(arowarray.toArray(new String[0]));
+                    } else {
+                        compressedTable.appendRow(arowarray);
                     }
-
-                    compressedTable.appendRow(arowarray);
                 } else {
                     // empty row
                 }
@@ -101,6 +101,8 @@ public class ExcelParser {
             return cell.getCellFormula();
         } else if (type == CellType.STRING) {
             return cell.getStringCellValue();
+        } else if (type == CellType.BOOLEAN) {
+            return ""+cell.getBooleanCellValue();
         } else {
             return cell.getStringCellValue();
         }

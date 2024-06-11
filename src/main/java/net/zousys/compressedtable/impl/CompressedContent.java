@@ -95,14 +95,21 @@ public class CompressedContent extends CompressedByteArray implements Content {
             ByteArrayInputStream bao = new ByteArrayInputStream(decompress(super.getByteArray(), false));
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(bao));
-            ArrayList<String> r = new ArrayList<>();
+            fields = new ArrayList<>();
             for (String line; (line = reader.readLine()) != null; ) {
-                r.add(line);
+                fields.add(line);
             }
-            return r;
-        } else {
-            return fields;
         }
+        return fields;
+    }
+
+    public String getField(int index) throws IOException, DataFormatException {
+        if (compressed){
+            if (fields == null) {
+                fields = form();
+            }
+        }
+        return fields.get(index);
     }
 
     /**
