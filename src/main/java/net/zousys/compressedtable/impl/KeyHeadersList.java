@@ -29,6 +29,11 @@ public class KeyHeadersList {
         return this;
     }
 
+    public KeyHeadersList addHeaders(List<String> headerList) {
+        list.add(new KeyHeaders(headerList.toArray(new String[]{})));
+        return this;
+    }
+
     public KeyHeadersList addHeaders(KeyHeaders keyheaders) {
         list.add(keyheaders);
         return this;
