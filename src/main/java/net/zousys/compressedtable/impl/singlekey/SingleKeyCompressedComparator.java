@@ -131,9 +131,10 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
                         mml.add(key);
                         addMarker(mismatch);
                         comparatorListener.handleMisMatched(mismatch);
-                    // remove from before and after
-                    after.removeRowByMainKey(key);
-                    before.removeRowByMainKey(key);
+                        // remove from before and after
+                        after.removeRowByMainKey(key);
+                        before.removeRowByMainKey(key);
+
                     } else {
                         // this is still matched if no fields are mismatch
                         // this could be the trimming or the strictColumn indicator is false
@@ -144,7 +145,6 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
 //                        after.removeRowByMainKey(key);
 //                        before.removeRowByMainKey(key);
                     }
-
                 } catch (DataFormatException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {

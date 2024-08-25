@@ -4,10 +4,12 @@ import lombok.Builder;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.impl.DummyListener;
 import net.zousys.compressedtable.impl.multikeys.MultiKeysCompressedComparator;
 import net.zousys.compressedtable.impl.singlekey.SingleKeyCompressedComparator;
 import org.apache.commons.math3.analysis.function.Sin;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,9 +21,11 @@ import java.util.Set;
 @Builder
 public class CompressedComparatorFactory {
     @Setter
-    private ComparatorListener comparatorListener;
+    @Builder.Default
+    private ComparatorListener comparatorListener = new DummyListener();
     @Setter
-    private Set<String> ignoredFields;
+    @Builder.Default
+    private Set<String> ignoredFields= new HashSet<>();
     @Setter
     private CompressedTable before;
     @Setter

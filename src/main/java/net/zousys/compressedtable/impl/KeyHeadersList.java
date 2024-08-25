@@ -14,11 +14,23 @@ public class KeyHeadersList {
 
     /**
      *
+     * @return
+     */
+    public static KeyHeadersList KeyHeadersList() {
+        return new KeyHeadersList();
+    }
+    /**
+     *
      * @param headers
      * @return
      */
     public KeyHeadersList addHeaders(String[] headers) {
         list.add(new KeyHeaders(headers));
+        return this;
+    }
+
+    public KeyHeadersList addHeaders(List<String> headerList) {
+        list.add(new KeyHeaders(headerList.toArray(new String[]{})));
         return this;
     }
 

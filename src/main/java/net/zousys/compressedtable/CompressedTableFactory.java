@@ -22,7 +22,7 @@ public class CompressedTableFactory {
     public static enum Mode {
         SINGLE_KEY, MULTI_KEYS
     }
-    private int ignoredLines = 0;
+    private int ignoredTailLines = 0;
     private KeyHeadersList keyHeaderList = new KeyHeadersList();
     private char delimeter = ',';
     @Getter
@@ -66,7 +66,7 @@ public class CompressedTableFactory {
      * @return
      */
     public CompressedTableFactory ignoredLines(int ignoredLines) {
-        this.ignoredLines = ignoredLines;
+        this.ignoredTailLines = ignoredLines;
         return this;
     }
 
@@ -154,19 +154,21 @@ public class CompressedTableFactory {
             case CSV: {
                 return CSVParser.builder()
                         .delimeter(delimeter)
-                        .ignoredLines(ignoredLines)
+                        .ignoredTailLines(ignoredTailLines)
                         .headerPosition(headerPosition)
                         .keyHeaderList(keyHeaderList)
                         .compressed(compressed)
+                        .ignoredTailLines(ignoredTailLines)
                         .build()
                         .parse(inputSteam);
             }
             case EXCEL: {
                 return ExcelParser.builder()
-                        .ignoredLines(ignoredLines)
+                        .ignoredTailLines(ignoredTailLines)
                         .headerPosition(headerPosition)
                         .keyHeaderList(keyHeaderList)
                         .compressed(compressed)
+                        .ignoredTailLines(ignoredTailLines)
                         .build()
                         .parse(inputSteam);
             }

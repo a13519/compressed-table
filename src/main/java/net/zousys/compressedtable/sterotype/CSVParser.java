@@ -10,6 +10,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.io.*;
+import java.util.List;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Builder
 /**
@@ -17,7 +20,7 @@ import java.io.*;
  */
 public class CSVParser {
     @Builder.Default
-    private int ignoredLines = 0;
+    private int ignoredTailLines = 0;
     @Builder.Default
     private KeyHeadersList keyHeaderList = new KeyHeadersList();
     @Builder.Default
@@ -25,6 +28,7 @@ public class CSVParser {
     private int headerPosition;
     @Builder.Default
     private boolean compressed = true;
+
 
     /**
      *
@@ -59,13 +63,21 @@ public class CSVParser {
             if (keyHeaderList != null) {
                 compressedTable.setKeyHeaderList(keyHeaderList);
             }
-            format.parse(in).stream().skip(ignoredLines).forEach(re -> {
+            Cache cache = new Cache(ignoredTailLines);
+
+            AtomicInteger n = new AtomicInteger();
+            format.parse(in).stream().forEach(re -> {
                 try {
-                    compressedTable.appendRow(re.values(),
-                            compressedTable.getContents().size()==headerPosition);
+                    if (n.get() >= headerPosition) {
+                        String[] fields = cache.append(re.values());
+                        if (fields != null) {
+                            compressedTable.appendRow(fields, n.get() == headerPosition);
+                        }
+                    }
                 } catch (IOException e) {
                     //
                 }
+                n.getAndIncrement();
             });
 
             return compressedTable;

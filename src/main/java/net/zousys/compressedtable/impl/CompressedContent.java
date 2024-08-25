@@ -37,13 +37,28 @@ public class CompressedContent extends CompressedByteArray implements Content {
             StringWriter bw = new StringWriter();
             fields.forEach(field -> bw.write(field.trim() + "\n"));
             compressedContent.loadContent(String.valueOf(bw).getBytes());
+            compressedContent.hashIt();
         } else {
+            StringWriter bw = new StringWriter();
+            fields.forEach(field -> bw.write(field.trim() + "\n"));
+//            compressedContent.loadContent(String.valueOf(bw).getBytes());
+
             compressedContent.fields = new ArrayList<>();
             compressedContent.fields.addAll(fields);
+            compressedContent.hashIt();
+            compressedContent.clean();
         }
         return compressedContent;
     }
 
+    @Override
+    protected void hashIt() {
+        if (compressed){
+            super.hashIt();
+        } else {
+            hash = java.util.Arrays.hashCode(fields.toString().getBytes(StandardCharsets.UTF_8));
+        }
+    }
     /**
      *
      * @param fields
@@ -57,7 +72,13 @@ public class CompressedContent extends CompressedByteArray implements Content {
             StringWriter bw = new StringWriter();
             Arrays.stream(fields).forEach(field -> bw.write(field.trim() + "\n"));
             compressedContent.loadContent(String.valueOf(bw).getBytes());
+            compressedContent.hashIt();
         } else {
+            StringWriter bw = new StringWriter();
+            Arrays.stream(fields).forEach(field -> bw.write(field.trim() + "\n"));
+            compressedContent.loadContent(String.valueOf(bw).getBytes());
+            compressedContent.hashIt();
+            compressedContent.clean();
             compressedContent.fields = new ArrayList<>();
             compressedContent.fields.addAll(Arrays.asList(fields));
         }
@@ -75,14 +96,21 @@ public class CompressedContent extends CompressedByteArray implements Content {
             ByteArrayInputStream bao = new ByteArrayInputStream(decompress(super.getByteArray(), false));
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(bao));
-            ArrayList<String> r = new ArrayList<>();
+            fields = new ArrayList<>();
             for (String line; (line = reader.readLine()) != null; ) {
-                r.add(line);
+                fields.add(line);
             }
-            return r;
-        } else {
-            return fields;
         }
+        return fields;
+    }
+
+    public String getField(int index) throws IOException, DataFormatException {
+        if (compressed){
+            if (fields == null) {
+                fields = form();
+            }
+        }
+        return fields.get(index);
     }
 
     /**

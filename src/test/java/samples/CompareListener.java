@@ -62,10 +62,6 @@ public class CompareListener implements ComparatorListener {
 
     }
 
-    @Override
-    public void handleUnitedHeadrMapping(Map<String, Integer> unitedHeadermapping) {
-
-    }
 
     @Override
     public void handleMarkers(Map<String, Integer> markers) {

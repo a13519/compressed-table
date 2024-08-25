@@ -2,6 +2,7 @@ package net.zousys.compressedtable.impl;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,7 +17,8 @@ public class CompressedByteArray {
     private long beforesize;
     private long aftersize;
     @Getter
-    private long hash;
+    @Setter
+    protected long hash;
 
     public void loadContent(byte[] bytearray) throws IOException {
         compress(bytearray);
@@ -26,6 +28,10 @@ public class CompressedByteArray {
         compress(string.getBytes(StandardCharsets.UTF_8));
     }
 
+    protected void hashIt() {
+        this.hash = java.util.Arrays.hashCode(bytearray);
+    }
+
     private void compress(byte[] bytearray) throws IOException {
         if (bytearray == null) {
             return;
@@ -33,7 +39,12 @@ public class CompressedByteArray {
         this.beforesize = bytearray.length;
         this.bytearray = compress(bytearray, Deflater.BEST_COMPRESSION, false);
         this.aftersize = this.bytearray.length;
-        this.hash = java.util.Arrays.hashCode(bytearray);
+    }
+
+    protected void clean() {
+        this.beforesize = 0;
+        this.aftersize = 0;
+        this.bytearray = null;
     }
 
     public byte[] formBytes() throws DataFormatException, IOException {

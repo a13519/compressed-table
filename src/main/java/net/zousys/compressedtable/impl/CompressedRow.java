@@ -10,6 +10,7 @@ import net.zousys.compressedtable.impl.singlekey.key.SingleStringKey;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -59,6 +60,28 @@ public class CompressedRow implements Row {
     @Override
     public Content getContent() {
         return compressedContent;
+    }
+
+    @Override
+    public String getField(int index) throws DataFormatException, IOException {
+        if (compressed){
+            compressedContent.form();
+        }
+        return compressedContent.getField(index);
+    }
+
+    @Override
+    public String getField(String header) throws IOException, DataFormatException {
+        if (compressed){
+            compressedContent.form();
+        }
+        if (header != null) {
+            Integer ii = this.compressedTable.getHeaderMapping().get(header);
+            if (ii!=null) {
+                return compressedContent.getField(ii.intValue());
+            }
+        }
+        return null;
     }
 
     @Override
