@@ -41,11 +41,12 @@ public class CompressedContent extends CompressedByteArray implements Content {
         } else {
             StringWriter bw = new StringWriter();
             fields.forEach(field -> bw.write(field.trim() + "\n"));
-            compressedContent.loadContent(String.valueOf(bw).getBytes());
-            compressedContent.hashIt();
-            compressedContent.clean();
+//            compressedContent.loadContent(String.valueOf(bw).getBytes());
+
             compressedContent.fields = new ArrayList<>();
             compressedContent.fields.addAll(fields);
+            compressedContent.hashIt();
+            compressedContent.clean();
         }
         return compressedContent;
     }
