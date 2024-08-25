@@ -134,6 +134,7 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
                         // remove from before and after
                         after.removeRowByMainKey(key);
                         before.removeRowByMainKey(key);
+
                     } else {
                         // this is still matched if no fields are mismatch
                         // this could be the trimming or the strictColumn indicator is false
