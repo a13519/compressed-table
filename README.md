@@ -16,13 +16,13 @@ A handy tool named **Bold/CompressedComparator** can compare two tables to figur
 Use Jitpack to connect to GitHub repository:
 put the following into settings.gradle
 ```
-	dependencyResolutionManagement {
-		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-		repositories {
-			mavenCentral()
-			maven { url 'https://jitpack.io' }
-		}
+dependencyResolutionManagement {
+	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+	repositories {
+		mavenCentral()
+		maven { url 'https://jitpack.io' }
 	}
+}
 ``` 
 add dependency in build.gradle:
 ```gradle
