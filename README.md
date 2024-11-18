@@ -13,17 +13,20 @@ A handy tool named **Bold/CompressedComparator** can compare two tables to figur
 * which column/header has how many records mismatched
 
 ## To Use compressed-table
-Maven
-```maven
-<dependency>
-  <groupId>net.zousys</groupId>
-  <artifactId>compressed-table</artifactId>
-  <version>1.0.1</version>
-</dependency>
+Use Jitpack to connect to GitHub repository:
+put the following into settings.gradle
 ```
-Gradle:
+	dependencyResolutionManagement {
+		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+		repositories {
+			mavenCentral()
+			maven { url 'https://jitpack.io' }
+		}
+	}
+``` 
+add dependency in build.gradle:
 ```gradle
-implementation 'net.zousys:compressed-table:1.0.1'
+implementation 'com.github.a13519:compressed-table:1.0.3'
 ```
 
 ## Concept 
