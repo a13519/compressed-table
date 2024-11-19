@@ -10,6 +10,7 @@ import net.zousys.compressedtable.Row;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * No 'RETURN' or newLine char should be in data
@@ -88,7 +89,7 @@ public class CompressedTable implements GeneralTable {
      * @param headers
      */
     public void setHeaders(String[] headers) {
-        this.headers = List.of(headers);
+        this.headers = Arrays.stream(headers).map(String::trim).collect(Collectors.toList());
         int ind = 0;
         for (String header : headers) {
             headerMapping.put(header, ind++);
@@ -116,7 +117,7 @@ public class CompressedTable implements GeneralTable {
      * @throws IOException
      */
     public void appendRow(String[] fields) throws IOException {
-        appendRow(Arrays.asList(fields));
+        appendRow(Arrays.stream(fields).map(String::trim).collect(Collectors.toList()));
     }
 
     /**
@@ -126,7 +127,7 @@ public class CompressedTable implements GeneralTable {
      * @throws IOException
      */
     public void appendRow(String[] fields, boolean isIncludeHeader) throws IOException {
-        appendRow(Arrays.asList(fields), isIncludeHeader);
+        appendRow(Arrays.stream(fields).map(String::trim).collect(Collectors.toList()), isIncludeHeader);
     }
 
     /**
@@ -137,7 +138,7 @@ public class CompressedTable implements GeneralTable {
     public void appendRow(List<String> fields) throws IOException {
         if (fields != null) {
             CompressedRow compressedRow = new CompressedRow(this);
-            compressedRow.make(fields);
+            compressedRow.make(fields.stream().map(String::trim).collect(Collectors.toList()));
 
             this.rows.add(compressedRow);
             increasePhysicalLineNumber();
