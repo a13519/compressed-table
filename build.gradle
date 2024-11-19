@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'java-gradle-plugin'
     id "maven-publish"
 }
 
@@ -26,6 +27,10 @@ publishing {
 
 group = 'net.zousys'
 version = '1.0.3'
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 
 java {
     sourceCompatibility = '17'

@@ -63,15 +63,15 @@ public class CSVParser {
             if (keyHeaderList != null) {
                 compressedTable.setKeyHeaderList(keyHeaderList);
             }
-            Cache cache = new Cache(ignoredTailLines);
+//            Cache cache = new Cache(ignoredTailLines);
 
             AtomicInteger n = new AtomicInteger();
             format.parse(in).stream().forEach(re -> {
                 try {
                     if (n.get() >= headerPosition) {
-                        String[] fields = cache.append(re.values());
-                        if (fields != null) {
-                            compressedTable.appendRow(fields, n.get() == headerPosition);
+//                        String[] fields = cache.append(re.values());
+                        if (re.values() != null) {
+                            compressedTable.appendRow(re.values(), n.get() == headerPosition);
                         }
                     }
                 } catch (IOException e) {
