@@ -65,9 +65,13 @@ public class ExcelParser {
 
                     if (headerPosition == i) {
                         columnNo = cn;
-                        compressedTable.setHeaders(arowarray.toArray(new String[0]));
+                        compressedTable.setHeaders(arowarray.stream()
+                                .map(String::trim)
+                                .toArray(String[]::new));
                     } else {
-                        compressedTable.appendRow(arowarray);
+                        compressedTable.appendRow(arowarray.stream()
+                                .map(String::trim)
+                                .toArray(String[]::new));
                     }
                 } else {
                     // empty row
