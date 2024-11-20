@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,15 +64,15 @@ public class CSVParser {
             if (keyHeaderList != null) {
                 compressedTable.setKeyHeaderList(keyHeaderList);
             }
-            Cache cache = new Cache(ignoredTailLines);
-
             AtomicInteger n = new AtomicInteger();
             format.parse(in).stream().forEach(re -> {
                 try {
                     if (n.get() >= headerPosition) {
-                        String[] fields = cache.append(re.values());
-                        if (fields != null) {
-                            compressedTable.appendRow(fields, n.get() == headerPosition);
+                        if (re.values() != null) {
+                            String[] fields = re.values();
+                            compressedTable.appendRow(
+                                    fields,
+                                    n.get() == headerPosition);
                         }
                     }
                 } catch (IOException e) {

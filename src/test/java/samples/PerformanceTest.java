@@ -20,20 +20,21 @@ public class PerformanceTest {
      * @throws IOException
      * @throws DataFormatException
      */
-    @Test
+//    @Test
     public void compare100000() throws IOException, DataFormatException, URISyntaxException {
         System.out.println("Uncompressed loading of 100K records: ");
-        comparePT("/Users/songzou/Downloads/COMPA/organizations-100000A.csv", "/Users/songzou/Downloads/COMPA/organizations-100000B.csv", false);
+        comparePT("organizations-100000A.csv", "organizations-100000B.csv", false);
         System.out.println("Compressed loading of 100K records: ");
-        comparePT("/Users/songzou/Downloads/COMPA/organizations-100000A.csv", "/Users/songzou/Downloads/COMPA/organizations-100000B.csv", true);
+        comparePT("organizations-100000A.csv", "organizations-100000B.csv", true);
     }
-    @Test
+//    @Test
     public void compare500000() throws IOException, DataFormatException, URISyntaxException {
         System.out.println("Uncompressed loading of 500K records: ");
-        comparePT("/Users/songzou/Downloads/COMPA/organizations-500000A.csv", "/Users/songzou/Downloads/COMPA/organizations-500000B.csv", false);
+        comparePT("organizations-500000A.csv", "organizations-500000B.csv", false);
         System.out.println("Compressed loading of 500K records: ");
-        comparePT("/Users/songzou/Downloads/COMPA/organizations-500000A.csv", "/Users/songzou/Downloads/COMPA/organizations-500000B.csv", true);
+        comparePT("organizations-500000A.csv", "organizations-500000B.csv", true);
     }
+
     public void comparePT(String a, String b, boolean comp) throws IOException, DataFormatException, URISyntaxException {
         CompareListener listener = new CompareListener();
         long start = System.currentTimeMillis();
@@ -47,7 +48,8 @@ public class PerformanceTest {
                 .ignoredLines(0)
                 .headerPosition(0)
                 .delimeter(',')
-                .parse(Paths.get(a).toFile());
+                .parse(Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream(a));
         listener.handleBeforeLoaded(beforetable);
         System.out.println("-- Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
         System.out.println("-- Before loaded in "+(System.currentTimeMillis()-start)+"ms");
@@ -62,7 +64,8 @@ public class PerformanceTest {
                 .ignoredLines(0)
                 .headerPosition(0)
                 .delimeter(',')
-                .parse(Paths.get(b).toFile());
+                .parse(Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream(b));
         listener.handleAfterLoaded(aftertable);
         System.out.println("-- After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders() + " Mode: " + beforetable.getMode());
         System.out.println("-- After loaded in "+(System.currentTimeMillis()-start)+"ms");

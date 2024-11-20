@@ -14,6 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Builder
 /**
@@ -60,12 +61,12 @@ public class ExcelParser {
                     int cn = row.getPhysicalNumberOfCells();
 
                     for (int j = 0; j < (columnNo == -1 ? cn : columnNo); j++) {
-                        arowarray.add(stringvalue(row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+                        arowarray.add(stringvalue(row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)).trim());
                     }
 
                     if (headerPosition == i) {
                         columnNo = cn;
-                        compressedTable.setHeaders(arowarray.toArray(new String[0]));
+                        compressedTable.setHeaders(arowarray);
                     } else {
                         compressedTable.appendRow(arowarray);
                     }
