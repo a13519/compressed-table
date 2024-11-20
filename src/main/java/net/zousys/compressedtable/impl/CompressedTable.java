@@ -86,10 +86,10 @@ public class CompressedTable implements GeneralTable {
 
     /**
      *
-     * @param headers
+     * @param fields
      */
-    public void setHeaders(String[] headers) {
-        this.headers = Arrays.stream(headers).map(String::trim).collect(Collectors.toList());
+    public void setHeaders(List<String> fields) {
+        headers = fields.stream().map(a->a.replaceAll("[\uFEFF-\uFEFF]", "")).collect(Collectors.toList());
         int ind = 0;
         for (String header : headers) {
             headerMapping.put(header, ind++);
@@ -104,7 +104,7 @@ public class CompressedTable implements GeneralTable {
      */
     public void appendRow(List<String> fields, boolean isIncludeHeader) throws IOException {
         if (isIncludeHeader && onHeader) {
-            setHeaders(fields.toArray(new String[]{}));
+            setHeaders(fields);
             onHeader = false;
         } else {
             appendRow(fields);
@@ -136,7 +136,7 @@ public class CompressedTable implements GeneralTable {
      * @throws IOException
      */
     public void appendRow(List<String> fields) throws IOException {
-        fields = fields.stream().map(String::trim).collect(Collectors.toList());
+        fields = fields.stream().map(a->a.replaceAll("[\uFEFF-\uFEFF]", "")).collect(Collectors.toList());
         if (fields != null) {
             CompressedRow compressedRow = new CompressedRow(this);
             compressedRow.make(fields);
