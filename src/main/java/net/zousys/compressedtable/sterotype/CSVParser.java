@@ -70,9 +70,8 @@ public class CSVParser {
                     if (n.get() >= headerPosition) {
                         if (re.values() != null) {
                             String[] fields = re.values();
-
                             compressedTable.appendRow(
-                                    Arrays.stream(fields).map(String::trim).toArray(String[]::new),
+                                    fields,
                                     n.get() == headerPosition);
                         }
                     }

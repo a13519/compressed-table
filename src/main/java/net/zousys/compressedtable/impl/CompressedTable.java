@@ -117,7 +117,7 @@ public class CompressedTable implements GeneralTable {
      * @throws IOException
      */
     public void appendRow(String[] fields) throws IOException {
-        appendRow(fields);
+        appendRow(Arrays.asList(fields));
     }
 
     /**
@@ -127,7 +127,7 @@ public class CompressedTable implements GeneralTable {
      * @throws IOException
      */
     public void appendRow(String[] fields, boolean isIncludeHeader) throws IOException {
-        appendRow(fields, isIncludeHeader);
+        appendRow(Arrays.asList(fields), isIncludeHeader);
     }
 
     /**
@@ -136,6 +136,7 @@ public class CompressedTable implements GeneralTable {
      * @throws IOException
      */
     public void appendRow(List<String> fields) throws IOException {
+        fields = fields.stream().map(String::trim).collect(Collectors.toList());
         if (fields != null) {
             CompressedRow compressedRow = new CompressedRow(this);
             compressedRow.make(fields);
