@@ -26,7 +26,7 @@ publishing {
 }
 
 group = 'net.zousys'
-version = '1.0.4'
+version = '1.0.5'
 java {
     withJavadocJar()
     withSourcesJar()
