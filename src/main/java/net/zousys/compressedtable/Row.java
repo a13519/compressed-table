@@ -14,5 +14,7 @@ public interface Row {
 
     String getField(String header) throws IOException, DataFormatException ;
 
+    int length();
+
     long hash();
 }
