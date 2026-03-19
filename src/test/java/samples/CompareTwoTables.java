@@ -20,7 +20,7 @@ public class CompareTwoTables {
      * @throws DataFormatException
      */
     @Test
-    public void compare() throws IOException, DataFormatException {
+    public void compareMultipleKeys() throws IOException, DataFormatException {
         CompareListener listener = new CompareListener();
 
         CompressedTable beforetable = CompressedTableFactory
@@ -61,5 +61,49 @@ public class CompareTwoTables {
                 .compare();
 
     }
+
+    @Test
+    public void compareSingleKey() throws IOException, DataFormatException {
+        CompareListener listener = new CompareListener();
+
+        CompressedTable beforetable = CompressedTableFactory
+                .build("csv")
+                .keyHeaderList(new KeyHeadersList()
+                        .addHeaders(new String[]{"Customer Id"})
+                )
+                .compressed(true)
+                .ignoredLines(0)
+                .headerPosition(0)
+                .delimeter(',')
+                .parse(Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream("customers-1000b.csv"));
+        listener.handleBeforeLoaded(beforetable);
+        System.out.println("Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
+
+        CompressedTable aftertable = CompressedTableFactory
+                .build("csv")
+                .keyHeaderList(new KeyHeadersList()
+                        .addHeaders(new String[]{"Customer Id"})
+                )
+                .compressed(true)
+                .ignoredLines(0)
+                .headerPosition(0)
+                .delimeter(',')
+                .parse(Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream("customers-1000a.csv"));
+        listener.handleAfterLoaded(aftertable);
+        System.out.println("After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders() + " Mode: " + beforetable.getMode());
+
+        CompressedComparatorFactory.builder()
+                .before(beforetable)
+                .after(aftertable)
+                .comparatorListener(listener)
+                .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
+                .strictMissed(true)
+                .build().create()
+                .compare();
+
+    }
+
 
 }

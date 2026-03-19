@@ -85,6 +85,11 @@ public class CompressedRow implements Row {
     }
 
     @Override
+    public int length() {
+        return compressedContent.length();
+    }
+
+    @Override
     public long hash() {
         return compressedContent.getHash();
     }

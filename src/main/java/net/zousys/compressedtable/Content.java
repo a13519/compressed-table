@@ -7,6 +7,8 @@ import java.util.zip.DataFormatException;
 public interface Content {
     List<String> form() throws DataFormatException, IOException;
 
+    int length();
+
     byte[] getByteArray();
 
     float getCompressionRatio();

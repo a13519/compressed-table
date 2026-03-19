@@ -104,6 +104,18 @@ public class CompressedContent extends CompressedByteArray implements Content {
         return fields;
     }
 
+    @Override
+    public int length() {
+        return fields.size();
+    }
+
+    /**
+     *
+     * @param index
+     * @return
+     * @throws IOException
+     * @throws DataFormatException
+     */
     public String getField(int index) throws IOException, DataFormatException {
         if (compressed){
             if (fields == null) {
@@ -121,4 +133,21 @@ public class CompressedContent extends CompressedByteArray implements Content {
         return getHash();
     }
 
+    @Override
+    public String toString(){
+        List<String> values;
+        if (compressed){
+            if (fields == null) {
+                try {
+                    values = form();
+                } catch (DataFormatException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        values = fields;
+        return values.toString();
+    }
 }

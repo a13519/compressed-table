@@ -65,6 +65,7 @@ public class ComparisonResult {
     @Builder
     @Getter
     @Setter
+    @ToString
     public static class ResultField {
         private String name;
         private String beforeField;

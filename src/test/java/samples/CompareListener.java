@@ -49,7 +49,7 @@ public class CompareListener implements ComparatorListener {
 
     @Override
     public void handleMisMatched(ComparisonResult.RowResult mismatch) {
-        System.out.println("Mismatched: "+mismatch.getMatchedKey());
+        System.out.println("Mismatched: "+ mismatch.getMatchedKey()+" > "+ mismatch.getFields().toString());
     }
 
     @Override
