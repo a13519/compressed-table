@@ -42,10 +42,6 @@ public class BucketComparator {
 
         if (beforeMap.isEmpty() && afterMap.isEmpty()) return;
 
-        String[] headers2 = getHeaders(
-                comparatorContext.getBeforeSource().getBucketFile(bucket),
-                comparatorContext.getAfterSource().getBucketFile(bucket));
-
         Set<String> keysBefore = beforeMap.keySet();
         Set<String> keysAfter  = afterMap.keySet();
 
@@ -62,11 +58,13 @@ public class BucketComparator {
 
         // Mismatches
         keysBefore.stream()
-                .filter(keysAfter::contains)
+//                .filter(keysAfter::contains)
                 .forEach(key -> {
                     String[] b = beforeMap.get(key);
                     String[] a = afterMap.get(key);
-
+if (key.equals("[3b3Aa4aCc68f3Be|]")){
+    int s = 9;
+}
                     for (int commonColNo = 0; commonColNo < comparatorContext.getColumnStructure().getCommonComparableColumnNumber(); commonColNo++) {
                         int beforeindex = comparatorContext.getColumnStructure().getBeforeCommonComparableColumnIndexes().get(commonColNo);
                         int afterindex = comparatorContext.getColumnStructure().getAfterCommonComparableColumnIndexes().get(commonColNo);

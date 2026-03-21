@@ -24,8 +24,8 @@ public class Comparator {
             System.out.println(config);
 
             new Comparator(config,
-                    "/Users/songzou/Documents/IdeaProjects/compressed-table/src/test/resources/customers-2000000b.csv",
-                    "/Users/songzou/Documents/IdeaProjects/compressed-table/src/test/resources/customers-2000000a.csv");
+                    "/Users/songzou/Documents/IdeaProjects/compressed-table/src/test/resources/customers-1000b.csv",
+                    "/Users/songzou/Documents/IdeaProjects/compressed-table/src/test/resources/customers-1000a.csv");
         }
     }
 
