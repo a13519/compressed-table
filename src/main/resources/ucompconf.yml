@@ -1,0 +1,11 @@
+bucketNumber: 100
+delimeter: ','
+#quote: "
+#escape: //
+skipEmptyLines: true
+extractHeader: true
+bucket: bucket
+keys:
+  - Customer Id
+ignoredHeaders:
+  - City
