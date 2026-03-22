@@ -71,32 +71,33 @@ public class BucketComparator {
         keysBefore.stream()
                 .filter(keysAfter::contains)
                 .forEach(key -> {
-                    String[] b = beforeMap.get(key);
-                    String[] a = afterMap.get(key);
                     boolean mm = false;
+                    ComparedRow comparedRow = ComparedRow.builder()
+                            .beforeRowFields(beforeMap.get(key))
+                            .afterRowFields(afterMap.get(key))
+                            .key(key)
+                            .build();
 
                     for (int commonColNo = 0; commonColNo < comparatorContext.getColumnStructure().getCommonComparableColumnNumber(); commonColNo++) {
                         int beforeindex = comparatorContext.getColumnStructure().getBeforeCommonComparableColumnIndexes().get(commonColNo);
                         int afterindex = comparatorContext.getColumnStructure().getAfterCommonComparableColumnIndexes().get(commonColNo);
 
-                        if (!Objects.equals(b[beforeindex], a[afterindex])) {
-                            comparatorContext.getListener().handleMisMatched(key, FieldResult.builder()
-                                    .beforeField(b[beforeindex])
-                                    .afterField(a[afterindex])
-                                    .beforeColumnIndex(beforeindex)
-                                    .afterColumnIndex(afterindex)
-                                    .name(comparatorContext.getBeforeSource().getHeader(beforeindex))
-                                    .missmatched(true)
-                                    .ignored(false)
-                                    .build());
+                        if (!Objects.equals(
+                                comparedRow.getBeforeRowFields()[beforeindex],
+                                comparedRow.getAfterRowFields()[afterindex])) {
+                            comparedRow.getMismatchIndices().add(
+                                    ComparedRow.PairIndices.builder()
+                                            .beforeColumnIndex(beforeindex)
+                                            .afterColumnIndex(afterindex).build());
                             mm = true;
-                        } else {
-                            comparatorContext.getListener().handleMatched(key, b);
                         }
                     }
                     if (mm) {
+                        comparedRow.setMissmatched(true);
+                        comparatorContext.getListener().handleMisMatched(key, comparedRow);
                         mmcount.getAndIncrement();
                     } else {
+                        comparatorContext.getListener().handleMatched(key, comparedRow);
                         mcount.getAndIncrement();
                     }
                 });
