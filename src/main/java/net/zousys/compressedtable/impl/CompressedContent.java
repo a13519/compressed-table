@@ -25,7 +25,6 @@ public class CompressedContent extends CompressedByteArray implements Content {
     }
 
     /**
-     *
      * @param fields
      * @param compressed
      * @return
@@ -53,14 +52,14 @@ public class CompressedContent extends CompressedByteArray implements Content {
 
     @Override
     protected void hashIt() {
-        if (compressed){
+        if (compressed) {
             super.hashIt();
         } else {
             hash = java.util.Arrays.hashCode(fields.toString().getBytes(StandardCharsets.UTF_8));
         }
     }
+
     /**
-     *
      * @param fields
      * @param compressed
      * @return
@@ -110,14 +109,13 @@ public class CompressedContent extends CompressedByteArray implements Content {
     }
 
     /**
-     *
      * @param index
      * @return
      * @throws IOException
      * @throws DataFormatException
      */
     public String getField(int index) throws IOException, DataFormatException {
-        if (compressed){
+        if (compressed) {
             if (fields == null) {
                 fields = form();
             }
@@ -134,9 +132,9 @@ public class CompressedContent extends CompressedByteArray implements Content {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         List<String> values;
-        if (compressed){
+        if (compressed) {
             if (fields == null) {
                 try {
                     values = form();

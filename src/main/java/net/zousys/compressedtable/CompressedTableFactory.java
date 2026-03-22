@@ -19,9 +19,11 @@ public class CompressedTableFactory {
     public static enum Type {
         CSV, EXCEL
     }
+
     public static enum Mode {
         SINGLE_KEY, MULTI_KEYS
     }
+
     private int ignoredTailLines = 0;
     private KeyHeadersList keyHeaderList = new KeyHeadersList();
     private char delimeter = ',';
@@ -34,8 +36,8 @@ public class CompressedTableFactory {
      */
     private int headerPosition = -1;
     private boolean compressed = true;
+
     /**
-     *
      * @param type
      */
     private CompressedTableFactory(Type type) {
@@ -43,7 +45,6 @@ public class CompressedTableFactory {
     }
 
     /**
-     *
      * @param headerPosition
      * @return
      */
@@ -71,7 +72,6 @@ public class CompressedTableFactory {
     }
 
     /**
-     *
      * @param compressed
      * @return
      */
@@ -90,7 +90,6 @@ public class CompressedTableFactory {
     }
 
     /**
-     *
      * @param headers
      * @return
      */

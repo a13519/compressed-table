@@ -24,7 +24,6 @@ public class ColumnStructure {
     private CompConfig config;
 
     /**
-     *
      * @param beforeSource
      * @param afterSource
      */
@@ -36,13 +35,12 @@ public class ColumnStructure {
     }
 
     /**
-     *
      * @param listener
      */
     private void analyst(ComparatorListener listener) {
         beforeSource.getColumn2indexMap().keySet().forEach(key -> {
-           if (afterSource.getColumn2indexMap().containsKey(key)) {
-               commonColumns.add(key);
+            if (afterSource.getColumn2indexMap().containsKey(key)) {
+                commonColumns.add(key);
                 if (!config.getIgnoredHeaders().contains(key)) {
                     beforeCommonComparableColumnIndexes.add(beforeSource.getColumn2indexMap().get(key));
                     afterCommonComparableColumnIndexes.add(afterSource.getColumn2indexMap().get(key));
@@ -50,14 +48,14 @@ public class ColumnStructure {
                     commonComparableColumnNumber++;
                 }
 
-           } else {
-               afterMissedColumns.add(key);
-           }
+            } else {
+                afterMissedColumns.add(key);
+            }
         });
         afterSource.getColumn2indexMap().keySet().forEach(key -> {
-           if (!beforeSource.getColumn2indexMap().containsKey(key)) {
-               beforeMissedColumns.add(key);
-           }
+            if (!beforeSource.getColumn2indexMap().containsKey(key)) {
+                beforeMissedColumns.add(key);
+            }
         });
 
         log.info("Before headers: " + String.join(", ", beforeSource.getHeaders()));

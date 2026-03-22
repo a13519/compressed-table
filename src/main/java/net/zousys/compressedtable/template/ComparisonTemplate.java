@@ -5,7 +5,6 @@ import lombok.Setter;
 import net.zousys.compressedtable.ComparisonResult;
 import net.zousys.compressedtable.impl.CompressedTable;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -31,7 +30,7 @@ public class ComparisonTemplate {
     private int rowid = 0;
     private int coln = 0;
     @Setter
-    private int details =2;
+    private int details = 2;
 
     private CompressedTable beforetable;
     private CompressedTable aftertable;
@@ -83,14 +82,13 @@ public class ComparisonTemplate {
         mismatchshit = book.createSheet("Mismatched");
         amissedshit = book.createSheet("After Missed");
         bmissedshit = book.createSheet("Before Missed");
-        if (details==3){
+        if (details == 3) {
             matchedshit = book.createSheet("Matched");
         }
         Sytles.init(book);
     }
 
     /**
-     *
      * @param rowResult
      * @param comparisonResult
      * @throws Exception

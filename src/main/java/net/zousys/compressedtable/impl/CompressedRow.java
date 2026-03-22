@@ -2,7 +2,6 @@ package net.zousys.compressedtable.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.zousys.compressedtable.*;
 import net.zousys.compressedtable.impl.multikeys.key.MultiStringKey;
@@ -24,7 +23,6 @@ public class CompressedRow implements Row {
     private CompressedTable compressedTable;
 
     /**
-     *
      * @param compressedTable
      */
     public CompressedRow(CompressedTable compressedTable) {
@@ -32,14 +30,13 @@ public class CompressedRow implements Row {
     }
 
     /**
-     *
      * @param fields
      * @throws IOException
      */
     public void make(List<String> fields) throws IOException {
         if (compressedTable != null && fields != null) {
             this.compressedContent = CompressedContent.load(fields, compressedTable.isCompressed());
-            if (compressedTable.getMode()== CompressedTableFactory.Mode.MULTI_KEYS) {
+            if (compressedTable.getMode() == CompressedTableFactory.Mode.MULTI_KEYS) {
                 this.stringKey = MultiStringKey.create(compressedTable.getKeyHeaderList(), fields, this);
             } else {
                 this.stringKey = SingleStringKey.create(compressedTable.getKeyHeaderList(), fields, this);
@@ -64,7 +61,7 @@ public class CompressedRow implements Row {
 
     @Override
     public String getField(int index) throws DataFormatException, IOException {
-        if (compressed){
+        if (compressed) {
             compressedContent.form();
         }
         return compressedContent.getField(index);
@@ -72,12 +69,12 @@ public class CompressedRow implements Row {
 
     @Override
     public String getField(String header) throws IOException, DataFormatException {
-        if (compressed){
+        if (compressed) {
             compressedContent.form();
         }
         if (header != null) {
             Integer ii = this.compressedTable.getHeaderMapping().get(header);
-            if (ii!=null) {
+            if (ii != null) {
                 return compressedContent.getField(ii.intValue());
             }
         }

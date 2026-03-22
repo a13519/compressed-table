@@ -1,6 +1,6 @@
 package net.zousys.compressedtable;
 
-public class MissingKeySetException extends Exception{
+public class MissingKeySetException extends Exception {
     public MissingKeySetException() {
     }
 

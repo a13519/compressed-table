@@ -2,17 +2,14 @@ package net.zousys.compressedtable.sterotype;
 
 import lombok.Builder;
 import net.zousys.compressedtable.CompressedTableFactory;
-import net.zousys.compressedtable.impl.KeyHeaders;
 import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.impl.KeyHeaders;
 import net.zousys.compressedtable.impl.KeyHeadersList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Builder
@@ -32,7 +29,6 @@ public class CSVParser {
 
 
     /**
-     *
      * @param headers
      * @return
      */
@@ -56,8 +52,8 @@ public class CSVParser {
                     .setTrim(true)
                     .build();
             CompressedTable compressedTable = new CompressedTable(
-                    keyHeaderList.getKeyHeadersList().size()==1?
-                            CompressedTableFactory.Mode.SINGLE_KEY:
+                    keyHeaderList.getKeyHeadersList().size() == 1 ?
+                            CompressedTableFactory.Mode.SINGLE_KEY :
                             CompressedTableFactory.Mode.MULTI_KEYS);
             compressedTable.setCompressed(compressed);
             compressedTable.setHeaderRowNumber(headerPosition);

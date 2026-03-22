@@ -1,11 +1,11 @@
-bucketNumber: 2
+bucketNumber: 2   # the bucket numbers
 delimeter: ','
 #quote: "
 #escape: //
 skipEmptyLines: true
-extractHeader: true
-bucket: bucket
-keys:
+headerLine: 1     # the line no of headers, this is for the csv has leading lines before header
+bucket: bucket    # bucket directory path
+keys:             # supports multiple keys
   - Customer Id
-ignoredHeaders:
+ignoredHeaders:   # ignored column header names
   - City

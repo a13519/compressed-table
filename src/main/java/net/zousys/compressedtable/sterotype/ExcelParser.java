@@ -14,7 +14,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 @Builder
 /**
@@ -43,8 +42,8 @@ public class ExcelParser {
             int to = sheet.getLastRowNum();
 
             CompressedTable compressedTable = new CompressedTable(
-                    keyHeaderList.getKeyHeadersList().size()>1?
-                            CompressedTableFactory.Mode.MULTI_KEYS:
+                    keyHeaderList.getKeyHeadersList().size() > 1 ?
+                            CompressedTableFactory.Mode.MULTI_KEYS :
                             CompressedTableFactory.Mode.SINGLE_KEY);
             compressedTable.setCompressed(compressed);
             compressedTable.setHeaderRowNumber(headerPosition);
@@ -57,7 +56,7 @@ public class ExcelParser {
             for (int i = from; i <= to; i++) {
                 ArrayList<String> arowarray = new ArrayList<>();
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
-                if (row!=null) {
+                if (row != null) {
                     int cn = row.getPhysicalNumberOfCells();
 
                     for (int j = 0; j < (columnNo == -1 ? cn : columnNo); j++) {
@@ -84,7 +83,7 @@ public class ExcelParser {
      * @return
      */
     private String stringvalue(Cell cell) {
-        if (cell==null) {
+        if (cell == null) {
             return "";
         }
         CellType type = cell.getCellType();
@@ -95,7 +94,7 @@ public class ExcelParser {
             return "" + cell.getNumericCellValue();
         } else if (type == CellType.FORMULA) {
             if (cell.getCachedFormulaResultType() == CellType.NUMERIC) {
-                return ""+cell.getNumericCellValue();
+                return "" + cell.getNumericCellValue();
             } else if (cell.getCachedFormulaResultType() == CellType.STRING) {
                 return cell.getRichStringCellValue().getString();
             }
@@ -103,7 +102,7 @@ public class ExcelParser {
         } else if (type == CellType.STRING) {
             return cell.getStringCellValue();
         } else if (type == CellType.BOOLEAN) {
-            return ""+cell.getBooleanCellValue();
+            return "" + cell.getBooleanCellValue();
         } else {
             return cell.getStringCellValue();
         }

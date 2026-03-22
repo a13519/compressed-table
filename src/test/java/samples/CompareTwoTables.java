@@ -1,6 +1,5 @@
 package samples;
 
-import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.CompressedComparatorFactory;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
@@ -8,14 +7,12 @@ import net.zousys.compressedtable.impl.KeyHeadersList;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.zip.DataFormatException;
 
 public class CompareTwoTables {
     /**
-     *
      * @throws IOException
      * @throws DataFormatException
      */

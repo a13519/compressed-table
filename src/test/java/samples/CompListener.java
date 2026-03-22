@@ -1,4 +1,4 @@
-package net.zousys.bucketcomp;
+package samples;
 
 import lombok.extern.log4j.Log4j2;
 import net.zousys.bucketcomp.comparability.ComparatorListener;
@@ -9,6 +9,7 @@ import java.util.Map;
 
 @Log4j2
 public class CompListener implements ComparatorListener {
+
     @Override
     public void handleMissedInBefore(String key) {
         log.error("Missed in before key: " + key);
@@ -31,12 +32,11 @@ public class CompListener implements ComparatorListener {
 
     @Override
     public void handleMisMatched(String key, FieldResult fieldresults) {
-        log.error("Mismatched by key: "+key+" - "+fieldresults.toString());
+        log.error("Mismatched by key: " + key + " - " + fieldresults.toString());
     }
 
     @Override
     public void handleMatched(String key, String[] fields) {
-
     }
 
     @Override

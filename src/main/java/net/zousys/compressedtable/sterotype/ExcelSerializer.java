@@ -5,14 +5,15 @@ import net.zousys.compressedtable.GeneralTable;
 import net.zousys.compressedtable.Row;
 import net.zousys.compressedtable.TableSerialier;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.DataFormatException;
 
 /**
@@ -25,6 +26,7 @@ public class ExcelSerializer implements TableSerialier {
     @Setter
     private HeaderStyler headerStyle;
     private CellStyle cellStyle;
+
     /**
      *
      */
@@ -33,7 +35,6 @@ public class ExcelSerializer implements TableSerialier {
     }
 
     /**
-     *
      * @param name
      * @param table
      */
@@ -43,21 +44,19 @@ public class ExcelSerializer implements TableSerialier {
     }
 
     /**
-     *
      * @return
      */
     private void serialize(String name, GeneralTable table) throws DataFormatException, IOException {
         XSSFSheet sheet = workbook.createSheet(name);
         List<Row> rows = table.getContents();
 
-        for (int no = 0 ; no < rows.size() ; no ++) {
+        for (int no = 0; no < rows.size(); no++) {
             writeRow(sheet, no, rows.get(no), table.getHeaderRowNumber());
         }
 
     }
 
     /**
-     *
      * @param sheet
      * @param no
      * @param row
@@ -67,25 +66,24 @@ public class ExcelSerializer implements TableSerialier {
     private void writeRow(Sheet sheet, int no, Row row, int headerRowNumber) throws DataFormatException, IOException {
         org.apache.poi.ss.usermodel.Row arow = sheet.createRow(no);
         List<String> cells = row.getContent().form();
-        for (int i = 0 ; i < cells.size() ; i ++) {
+        for (int i = 0; i < cells.size(); i++) {
             Cell cell = arow.createCell(i);
             cell.setCellValue(cells.get(i));
-            if (no== headerRowNumber && cellStyle!=null) {
+            if (no == headerRowNumber && cellStyle != null) {
                 cell.setCellStyle(cellStyle);
             }
         }
     }
 
     /**
-     *
      * @param outputStream
      */
     @Override
-    public void serialize(OutputStream outputStream) throws DataFormatException, IOException{
-        if (headerStyle!=null){
+    public void serialize(OutputStream outputStream) throws DataFormatException, IOException {
+        if (headerStyle != null) {
             cellStyle = headerStyle.createStyler(workbook);
         }
-        for (int i = 0 ; i < names.size() ; i ++ ){
+        for (int i = 0; i < names.size(); i++) {
             serialize(names.get(i), tables.get(i));
         }
         workbook.write(outputStream);

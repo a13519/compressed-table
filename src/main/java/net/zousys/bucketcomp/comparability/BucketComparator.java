@@ -13,14 +13,15 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
  */
+@Log4j2
 public class BucketComparator {
 
     /**
-     *
      * @param bucket
      * @param comparatorContext
      * @throws Exception
@@ -35,7 +36,7 @@ public class BucketComparator {
                 comparatorContext.getBeforeSource().getBucketFile(bucket),
                 comparatorContext.getBeforeSource().getKeyColumnIndices(),
                 comparatorContext.getConfig());
-        Map<String, String[]> afterMap  = loadBucket(
+        Map<String, String[]> afterMap = loadBucket(
                 comparatorContext.getAfterSource().getBucketFile(bucket),
                 comparatorContext.getAfterSource().getKeyColumnIndices(),
                 comparatorContext.getConfig());
@@ -43,18 +44,28 @@ public class BucketComparator {
         if (beforeMap.isEmpty() && afterMap.isEmpty()) return;
 
         Set<String> keysBefore = beforeMap.keySet();
-        Set<String> keysAfter  = afterMap.keySet();
+        Set<String> keysAfter = afterMap.keySet();
+
+        AtomicInteger mmcount = new AtomicInteger();
+        AtomicInteger mcount = new AtomicInteger();
+        AtomicInteger bmisscount = new AtomicInteger();
+        AtomicInteger amisscount = new AtomicInteger();
 
         // Deleted
         keysBefore.stream()
                 .filter(k -> !keysAfter.contains(k))
-                .forEach(k -> comparatorContext.getListener().handleMissedInAfter(k)
-                );
+                .forEach(k -> {
+                    comparatorContext.getListener().handleMissedInAfter(k);
+                    amisscount.incrementAndGet();
+                });
 
         // Added
         keysAfter.stream()
                 .filter(k -> !keysBefore.contains(k))
-                .forEach(k -> comparatorContext.getListener().handleMissedInBefore(k));
+                .forEach(k -> {
+                    comparatorContext.getListener().handleMissedInBefore(k);
+                    bmisscount.incrementAndGet();
+                });
 
         // Mismatches
         keysBefore.stream()
@@ -62,12 +73,11 @@ public class BucketComparator {
                 .forEach(key -> {
                     String[] b = beforeMap.get(key);
                     String[] a = afterMap.get(key);
+                    boolean mm = false;
 
                     for (int commonColNo = 0; commonColNo < comparatorContext.getColumnStructure().getCommonComparableColumnNumber(); commonColNo++) {
                         int beforeindex = comparatorContext.getColumnStructure().getBeforeCommonComparableColumnIndexes().get(commonColNo);
                         int afterindex = comparatorContext.getColumnStructure().getAfterCommonComparableColumnIndexes().get(commonColNo);
-                        String af = a[afterindex];
-                        String bf = b[beforeindex];
 
                         if (!Objects.equals(b[beforeindex], a[afterindex])) {
                             comparatorContext.getListener().handleMisMatched(key, FieldResult.builder()
@@ -79,20 +89,28 @@ public class BucketComparator {
                                     .missmatched(true)
                                     .ignored(false)
                                     .build());
+                            mm = true;
                         } else {
                             comparatorContext.getListener().handleMatched(key, b);
                         }
                     }
-
+                    if (mm) {
+                        mmcount.getAndIncrement();
+                    } else {
+                        mcount.getAndIncrement();
+                    }
                 });
+        log.info("bucket " + bucket + " bmisscount: " + bmisscount.get());
+        log.info("bucket " + bucket + " amisscount: " + amisscount.get());
+        log.info("bucket " + bucket + " mmcount: " + mmcount.get());
+        log.info("bucket " + bucket + " mcount: " + mcount.get());
     }
 
     /**
-     *
      * @param path
      * @param keyColumnIndices
      * @param config
-     * @return  combined key to fields value
+     * @return combined key to fields value
      * @throws Exception
      */
     private final static Map<String, String[]> loadBucket(String path, int[] keyColumnIndices, CompConfig config) throws Exception {
@@ -108,7 +126,7 @@ public class BucketComparator {
         if (config.getEscape() != 0) {
             settings.getFormat().setQuoteEscape(config.getEscape());
         }
-        settings.setHeaderExtractionEnabled(config.isExtractHeader());
+        settings.setHeaderExtractionEnabled(false); // no header after bucketlizing
         settings.setSkipEmptyLines(config.isSkipEmptyLines());
 
         settings.setProcessor(new RowProcessor() {
@@ -122,9 +140,12 @@ public class BucketComparator {
             }
 
             @Override
-            public void processStarted(ParsingContext context) {}
+            public void processStarted(ParsingContext context) {
+            }
+
             @Override
-            public void processEnded(ParsingContext context) {}
+            public void processEnded(ParsingContext context) {
+            }
         });
 
         CsvParser parser = new CsvParser(settings);
@@ -133,40 +154,6 @@ public class BucketComparator {
         }
 
         return map;
-    }
-
-    /**
-     *
-     * @param paths
-     * @return
-     * @throws Exception
-     */
-    private final static String[] getHeaders(String... paths) throws Exception {
-        for (String path : paths) {
-            if (!Files.exists(Paths.get(path))) continue;
-
-            CsvParserSettings settings = new CsvParserSettings();
-            settings.getFormat().setDelimiter(',');
-            settings.getFormat().setQuote('"');
-            settings.getFormat().setQuoteEscape('"');
-            settings.setHeaderExtractionEnabled(true);
-            settings.setSkipEmptyLines(true);
-
-            RowListProcessor processor = new RowListProcessor();
-            settings.setProcessor(processor);
-
-            CsvParser parser = new CsvParser(settings);
-
-            try (Reader reader = new BufferedReader(new FileReader(path))) {
-                parser.parse(reader);  // parses the entire file, but for small bucket files it's fine
-            }
-
-            String[] headers = processor.getHeaders();
-            if (headers != null && headers.length > 0) {
-                return headers;
-            }
-        }
-        return new String[0];  // fallback
     }
 
 }

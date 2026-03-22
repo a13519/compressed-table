@@ -8,7 +8,6 @@ import net.zousys.compressedtable.impl.CompressedRow;
 import net.zousys.compressedtable.impl.KeyHeadersList;
 import net.zousys.compressedtable.impl.KeyValue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ public class SingleStringKey implements KeySet {
     private String nativeKeyValue;
 
     /**
-     *
      * @param keyHeaderList
      * @param fields
      * @param row
@@ -33,7 +31,7 @@ public class SingleStringKey implements KeySet {
         sk.cast(fields,
                 row.getTable().getHeaderMapping(),
                 keyHeaderList,
-                System.currentTimeMillis()+"."+row.getContent().hash());
+                System.currentTimeMillis() + "." + row.getContent().hash());
         return sk;
     }
 
@@ -75,6 +73,7 @@ public class SingleStringKey implements KeySet {
 
     /**
      * for single key
+     *
      * @param fields
      * @param map
      * @param keyHeaderList
@@ -85,7 +84,7 @@ public class SingleStringKey implements KeySet {
             Arrays.stream(keyHeaderList.getKeyHeadersList().get(0).getKeyHeaders()).forEach(header -> {
                 try {
                     Integer index = map.get(header);
-                    if (index!=null && index.intValue()<fields.size() && index.intValue()>=0) {
+                    if (index != null && index.intValue() < fields.size() && index.intValue() >= 0) {
                         sb.append(fields.get(index) + "|");
                     } else {
                         sb.append("(null)|");
@@ -94,7 +93,7 @@ public class SingleStringKey implements KeySet {
                     // ignore
                 }
             });
-            if (sb.length()>0) {
+            if (sb.length() > 0) {
                 sb.delete(sb.length() - 1, sb.length());
             }
         }

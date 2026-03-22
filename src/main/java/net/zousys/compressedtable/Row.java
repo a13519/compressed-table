@@ -12,7 +12,7 @@ public interface Row {
 
     String getField(int index) throws DataFormatException, IOException;
 
-    String getField(String header) throws IOException, DataFormatException ;
+    String getField(String header) throws IOException, DataFormatException;
 
     int length();
 

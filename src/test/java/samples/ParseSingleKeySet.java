@@ -1,13 +1,11 @@
 package samples;
 
-import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyHeadersList;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Stack;
 import java.util.zip.DataFormatException;
 
@@ -30,7 +28,7 @@ public class ParseSingleKeySet {
         s.push("2");
 
         System.out.println(s.firstElement());
-s.remove(0);
+        s.remove(0);
         System.out.println(s.firstElement());
         s.remove(0);
 
@@ -48,8 +46,8 @@ s.remove(0);
         listener.handleBeforeLoaded(beforetable);
         System.out.println("Table size: " + beforetable.getContents().size() + " Headers: " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
 
-        assertTrue(beforetable.getContents().size()==987);
-        assertTrue(beforetable.getMode()== CompressedTableFactory.Mode.SINGLE_KEY);
+        assertTrue(beforetable.getContents().size() == 987);
+        assertTrue(beforetable.getMode() == CompressedTableFactory.Mode.SINGLE_KEY);
         assertFalse(beforetable.isCompressed());
     }
 }

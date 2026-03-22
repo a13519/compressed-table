@@ -12,10 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -24,29 +21,30 @@ import java.util.Map;
 @Log4j2
 public class Source {
 
+    private String side;
     private CompConfig config;
     private BufferedReader bufferedReader;
-    private String side;
     private Map<String, Integer> column2indexMap = new HashMap<>();
     private Map<Integer, String> index2columnMap = new HashMap<>();
     private String[] headers;
     private int[] keyColumnIndices;
+
     /**
-     *
      * @param side
      * @param config
-     * @param bufferedReader
+     * @param inputStream
+     * @throws IOException
      */
-    public Source(String side, CompConfig config, BufferedReader bufferedReader) throws IOException {
+    public Source(String side, CompConfig config, InputStream inputStream) throws IOException {
         this.config = config;
         this.side = side;
-        this.bufferedReader = bufferedReader;
-        log.info("Bucketing "+side+" file...");
+        this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+        log.info("Bucketing " + side + " file...");
         bucketize();
     }
 
     /**
-     *
      * @throws IOException
      */
     public void bucketize() throws IOException {
@@ -60,37 +58,53 @@ public class Source {
         if (config.getEscape() != 0) {
             settings.getFormat().setQuoteEscape(config.getEscape());
         }
-        settings.setHeaderExtractionEnabled(config.isExtractHeader());
+        settings.setHeaderExtractionEnabled(false);     // parsing header is manual
         settings.setSkipEmptyLines(config.isSkipEmptyLines());
 
         CsvWriterSettings writerSettings = new CsvWriterSettings();
         writerSettings.getFormat().setDelimiter(config.getDelimeter());
-        writerSettings.getFormat().setQuote(config.getQuote());
-        writerSettings.getFormat().setQuoteEscape(config.getEscape());
+        if (config.getQuote() != 0) {
+            writerSettings.getFormat().setQuote(config.getQuote());
+        }
+        if (config.getEscape() != 0) {
+            writerSettings.getFormat().setQuoteEscape(config.getEscape());
+        }
         writerSettings.setHeaderWritingEnabled(config.isExtractHeader());
 
         Map<Integer, CsvWriter> writers = new HashMap<>();
 
-        analyzeKeys();
-
         settings.setProcessor(new RowProcessor() {
+            private int rowcount = 0;
+
             @Override
             public void rowProcessed(String[] row, ParsingContext context) {
-                if (row == null || row.length == 0) return;
+                if (row == null || row.length == 0) {
+                    return;
+                }
 
-                String key = produceKeys(row, keyColumnIndices);
-
-                int bucket = Math.abs(key.hashCode()) % config.getBucketNumber();
-
-                CsvWriter writer = writers.computeIfAbsent(bucket, b -> {
+                rowcount++;
+                if (rowcount == config.getHeaderLine()) {
                     try {
-                        return new CsvWriter(new FileWriter(getBucketFile(b)), writerSettings);
+                        analyzeKeys(row);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                });
+                } else {
 
-                writer.writeRow(row);
+                    String key = produceKeys(row, keyColumnIndices);
+
+                    int bucket = Math.abs(key.hashCode()) % config.getBucketNumber();
+
+                    CsvWriter writer = writers.computeIfAbsent(bucket, b -> {
+                        try {
+                            return new CsvWriter(new FileWriter(getBucketFile(b)), writerSettings);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+                    writer.writeRow(row);
+                }
             }
 
             @Override
@@ -114,30 +128,17 @@ public class Source {
     }
 
     /**
-     * @param bufferedReader
-     * @param delimeterre
-     * @return
      * @throws IOException
      */
-    private final static String[] getHeaders(BufferedReader bufferedReader, String delimeterre) throws IOException {
-        String line = bufferedReader.readLine();           // returns null if file is empty
-        String[] tokens = line.split(delimeterre);
-        return tokens;
-    }
-
-    /**
-     *
-     * @throws IOException
-     */
-    private void analyzeKeys() throws IOException {
-        headers = getHeaders(bufferedReader, ""+config.getDelimeter());
+    private void analyzeKeys(String[] fields) throws IOException {
+        headers = fields;
 
         List<Integer> indices = new ArrayList<>();
         int index = 0;
         for (String header : headers) {
             column2indexMap.put(header.trim(), index);
             index2columnMap.put(index, header.trim());
-            index ++;
+            index++;
         }
 
         if (config.getKeys() != null && config.getKeys().size() > 0) {
@@ -152,7 +153,6 @@ public class Source {
     }
 
     /**
-     *
      * @param fields
      * @param keyColumnIndices
      * @return
@@ -169,15 +169,13 @@ public class Source {
     }
 
     /**
-     *
      * @return
      */
     public final String getBucketDir() {
-        return config.getBucket() + "/"+getSide()+"/";
+        return config.getBucket() + "/" + getSide() + "/";
     }
 
     /**
-     *
      * @param bucket
      * @return
      */
@@ -186,7 +184,6 @@ public class Source {
     }
 
     /**
-     *
      * @param index
      * @return
      */

@@ -4,19 +4,15 @@ import net.zousys.compressedtable.CompressedComparatorFactory;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyHeadersList;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.zip.DataFormatException;
 
 public class PerformanceTest {
     /**
-     *
      * @throws IOException
      * @throws DataFormatException
      */
@@ -27,7 +23,8 @@ public class PerformanceTest {
         System.out.println("Compressed loading of 100K records: ");
         comparePT("organizations-100000A.csv", "organizations-100000B.csv", true);
     }
-//    @Test
+
+    //    @Test
     public void compare500000() throws IOException, DataFormatException, URISyntaxException {
         System.out.println("Uncompressed loading of 500K records: ");
         comparePT("organizations-500000A.csv", "organizations-500000B.csv", false);
@@ -52,7 +49,7 @@ public class PerformanceTest {
                         .getResourceAsStream(a));
         listener.handleBeforeLoaded(beforetable);
         System.out.println("-- Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
-        System.out.println("-- Before loaded in "+(System.currentTimeMillis()-start)+"ms");
+        System.out.println("-- Before loaded in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         CompressedTable aftertable = CompressedTableFactory
@@ -68,7 +65,7 @@ public class PerformanceTest {
                         .getResourceAsStream(b));
         listener.handleAfterLoaded(aftertable);
         System.out.println("-- After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders() + " Mode: " + beforetable.getMode());
-        System.out.println("-- After loaded in "+(System.currentTimeMillis()-start)+"ms");
+        System.out.println("-- After loaded in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         CompressedComparatorFactory.builder()
@@ -79,6 +76,6 @@ public class PerformanceTest {
                 .strictMissed(true)
                 .build().create()
                 .compare();
-        System.out.println("-- Compared in "+(System.currentTimeMillis()-start)+"ms");
+        System.out.println("-- Compared in " + (System.currentTimeMillis() - start) + "ms");
     }
 }
