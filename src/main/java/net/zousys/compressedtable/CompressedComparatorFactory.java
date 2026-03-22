@@ -7,7 +7,6 @@ import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.DummyListener;
 import net.zousys.compressedtable.impl.multikeys.MultiKeysCompressedComparator;
 import net.zousys.compressedtable.impl.singlekey.SingleKeyCompressedComparator;
-import org.apache.commons.math3.analysis.function.Sin;
 
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +24,7 @@ public class CompressedComparatorFactory {
     private ComparatorListener comparatorListener = new DummyListener();
     @Setter
     @Builder.Default
-    private Set<String> ignoredFields= new HashSet<>();
+    private Set<String> ignoredFields = new HashSet<>();
     @Setter
     private CompressedTable before;
     @Setter
@@ -42,8 +41,8 @@ public class CompressedComparatorFactory {
      * if it is true, then any rows in the tables will be mismatch if there are any missed columns in tables
      */
     private boolean strictMissed;
+
     /**
-     *
      * @return
      */
     public CompressedComparator create() {

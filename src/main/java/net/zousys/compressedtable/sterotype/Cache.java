@@ -2,7 +2,6 @@ package net.zousys.compressedtable.sterotype;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -12,7 +11,6 @@ public class Cache {
     private int number = 0;
 
     /**
-     *
      * @param number
      */
     public Cache(int number) {
@@ -20,7 +18,6 @@ public class Cache {
     }
 
     /**
-     *
      * @param fields
      * @return
      */
@@ -29,8 +26,8 @@ public class Cache {
             return fields;
         }
         stack.add(fields);
-        if (stack.size()>number) {
-            String[] r = (String[])stack.get(0);
+        if (stack.size() > number) {
+            String[] r = (String[]) stack.get(0);
             stack.remove(0);
             return r;
         } else {
@@ -39,7 +36,6 @@ public class Cache {
     }
 
     /**
-     *
      * @return
      */
     public List<String[]> remaining() {

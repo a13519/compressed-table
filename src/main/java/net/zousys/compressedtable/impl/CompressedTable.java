@@ -1,11 +1,9 @@
 package net.zousys.compressedtable.impl;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.GeneralTable;
-import net.zousys.compressedtable.KeySet;
 import net.zousys.compressedtable.Row;
 
 import java.io.IOException;
@@ -52,7 +50,6 @@ public class CompressedTable implements GeneralTable {
     private int physicalLineNumber = 0;
 
     /**
-     *
      * @param mode
      */
     public CompressedTable(CompressedTableFactory.Mode mode) {
@@ -60,23 +57,21 @@ public class CompressedTable implements GeneralTable {
     }
 
     /**
-     *
      * @return
      */
     public int increasePhysicalLineNumber() {
         physicalLineNumber++;
         return physicalLineNumber;
     }
+
     /**
-     *
      * @param no
      */
-    public void setHeaderRowNumber(int no){
+    public void setHeaderRowNumber(int no) {
         this.headerRowNumber = no;
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -85,11 +80,10 @@ public class CompressedTable implements GeneralTable {
     }
 
     /**
-     *
      * @param fields
      */
     public void setHeaders(List<String> fields) {
-        headers = fields.stream().map(a->a.replaceAll("[\uFEFF-\uFEFF]", "")).collect(Collectors.toList());
+        headers = fields.stream().map(a -> a.replaceAll("[\uFEFF-\uFEFF]", "")).collect(Collectors.toList());
         int ind = 0;
         for (String header : headers) {
             headerMapping.put(header, ind++);
@@ -97,7 +91,6 @@ public class CompressedTable implements GeneralTable {
     }
 
     /**
-     *
      * @param fields
      * @param isIncludeHeader
      * @throws IOException
@@ -112,7 +105,6 @@ public class CompressedTable implements GeneralTable {
     }
 
     /**
-     *
      * @param fields
      * @throws IOException
      */
@@ -121,7 +113,6 @@ public class CompressedTable implements GeneralTable {
     }
 
     /**
-     *
      * @param fields
      * @param isIncludeHeader
      * @throws IOException
@@ -131,12 +122,11 @@ public class CompressedTable implements GeneralTable {
     }
 
     /**
-     *
      * @param fields
      * @throws IOException
      */
     public void appendRow(List<String> fields) throws IOException {
-        fields = fields.stream().map(a->a.replaceAll("[\uFEFF-\uFEFF]", "")).collect(Collectors.toList());
+        fields = fields.stream().map(a -> a.replaceAll("[\uFEFF-\uFEFF]", "")).collect(Collectors.toList());
         if (fields != null) {
             CompressedRow compressedRow = new CompressedRow(this);
             compressedRow.make(fields);
@@ -175,14 +165,14 @@ public class CompressedTable implements GeneralTable {
                     nativeKeyMap.get(keyValue));
             return r;
         } catch (Throwable t) {
-            System.out.println("Optional record is null"+keyValue);
+            System.out.println("Optional record is null" + keyValue);
             return null;
         }
     }
 
     @Override
     public Optional<Row> seekByKey(KeyValue keyValue) {
-        if (keyHeaderList==null||keyHeaderList.getKeyHeadersList().size()==0) {
+        if (keyHeaderList == null || keyHeaderList.getKeyHeadersList().size() == 0) {
             return Optional.of(null);
         } else {
             Optional<Row> r = Optional.of(keyedMappingMap.get(keyValue.getName()).get(keyValue.getValue()));
@@ -192,7 +182,7 @@ public class CompressedTable implements GeneralTable {
 
     @Override
     public Optional<Row> seekByMainKey(KeyValue keyValue) {
-        if (keyHeaderList==null||keyHeaderList.getKeyHeadersList().size()==0) {
+        if (keyHeaderList == null || keyHeaderList.getKeyHeadersList().size() == 0) {
             return Optional.of(null);
         } else {
             Optional<Row> r = Optional.of(keyedMappingMap.getMainKeyedMapping().get(keyValue.getValue()));
@@ -260,7 +250,7 @@ public class CompressedTable implements GeneralTable {
                 if (mode == CompressedTableFactory.Mode.SINGLE_KEY) {
                     keyedMappingMap.getMainKeyedMapping().remove(row.getKey().getMainKeyValue());
                 } else {
-                    for (KeyHeaders akh : keyHeaderList.getKeyHeadersList()){
+                    for (KeyHeaders akh : keyHeaderList.getKeyHeadersList()) {
                         String kv = akh.getCompositedKey();
                         keyedMappingMap.get(kv).remove(row.getKey().getKeyValue(kv));
                     }

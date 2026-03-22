@@ -1,14 +1,16 @@
 package net.zousys.compressedtable.impl.multikeys.key;
 
 import lombok.Data;
-import lombok.Getter;
 import net.zousys.compressedtable.KeySet;
+import net.zousys.compressedtable.impl.CompressedRow;
 import net.zousys.compressedtable.impl.KeyHeaders;
 import net.zousys.compressedtable.impl.KeyHeadersList;
 import net.zousys.compressedtable.impl.KeyValue;
-import net.zousys.compressedtable.impl.CompressedRow;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 //@Log4j
@@ -24,7 +26,6 @@ public class MultiStringKey implements KeySet {
     private String nativeKeyValue;
 
     /**
-     *
      * @param row
      */
     private MultiStringKey(CompressedRow row) {
@@ -32,7 +33,6 @@ public class MultiStringKey implements KeySet {
     }
 
     /**
-     *
      * @param row
      */
     private MultiStringKey(KeyHeadersList keyHeaderList, CompressedRow row) {
@@ -41,7 +41,6 @@ public class MultiStringKey implements KeySet {
     }
 
     /**
-     *
      * @param keyHeaderList
      * @param fields
      * @param row
@@ -51,7 +50,7 @@ public class MultiStringKey implements KeySet {
         MultiStringKey sk = new MultiStringKey(keyHeaderList, row);
         sk.cast(fields,
                 row.getTable().getHeaderMapping(),
-                System.currentTimeMillis()+"."+row.getContent().hash());
+                System.currentTimeMillis() + "." + row.getContent().hash());
         return sk;
     }
 
@@ -89,7 +88,7 @@ public class MultiStringKey implements KeySet {
                 Arrays.stream(headers.getKeyHeaders()).forEach(header -> {
                     try {
                         Integer index = headerMapping.get(header);
-                        if (index!=null && index.intValue()<fields.size() && index.intValue()>=0) {
+                        if (index != null && index.intValue() < fields.size() && index.intValue() >= 0) {
                             sb.append(fields.get(index));
                             sb.append("|");
                         } else {
@@ -99,13 +98,13 @@ public class MultiStringKey implements KeySet {
                         // ignore
                     }
                 });
-                if (sb.length()>0) {
-                    sb.delete(sb.length()-1, sb.length());
+                if (sb.length() > 0) {
+                    sb.delete(sb.length() - 1, sb.length());
                 }
                 keyValueList.put(headers.getCompositedKey(),
                         KeyValue.builder()
                                 .name(headers.getCompositedKey())
-                                .value("{"+sb.toString()+"}").build());
+                                .value("{" + sb.toString() + "}").build());
             }
         }
     }

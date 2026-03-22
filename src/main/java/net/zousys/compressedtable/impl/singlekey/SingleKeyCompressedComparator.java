@@ -11,7 +11,6 @@ import net.zousys.compressedtable.Row;
 import net.zousys.compressedtable.impl.KeyValue;
 
 import java.io.IOException;
-import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,6 +67,7 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
 
     /**
      * This is to count mismatched column time, later after the result spread sheet / csv generated, the header will mark the times of discrenpancies
+     *
      * @param mismatch
      */
     public void addMarker(ComparisonResult.RowResult mismatch) {
@@ -82,9 +82,9 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
             }
         }
     }
+
     /**
      * This is to compare two tables
-     *
      */
     public SingleKeyCompressedComparator compare() {
         // missed in before

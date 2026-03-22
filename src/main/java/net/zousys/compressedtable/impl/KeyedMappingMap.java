@@ -3,6 +3,7 @@ package net.zousys.compressedtable.impl;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.zousys.compressedtable.Row;
+
 import java.util.HashMap;
 import java.util.Map;
 

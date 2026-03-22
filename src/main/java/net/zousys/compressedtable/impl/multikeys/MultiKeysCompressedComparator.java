@@ -133,7 +133,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
                 if (afterRow != null) {
                     matched = true;
                     matchedKey = beforeKey;
-                    if (matchedKey.getValue()!=null && beforeRow.getContent().hash() == afterRow.getContent().hash()) {
+                    if (matchedKey.getValue() != null && beforeRow.getContent().hash() == afterRow.getContent().hash()) {
                         ml.add(beforeNativeKey);
                         identical = true;
                         // remove from before and after
@@ -262,6 +262,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
 
     /**
      * To extract for given keysetname any entries of act missed in bct will be returned as native key
+     *
      * @param keyname
      * @param act
      * @param bct

@@ -6,11 +6,10 @@ import java.util.Arrays;
 
 public class KeyHeaders {
     @Getter
-    private String [] keyHeaders;
+    private String[] keyHeaders;
     private String value;
 
     /**
-     *
      * @param keyHeaders
      */
     public KeyHeaders(String[] keyHeaders) {
@@ -19,7 +18,6 @@ public class KeyHeaders {
     }
 
     /**
-     *
      * @return
      */
     public String getCompositedKey() {

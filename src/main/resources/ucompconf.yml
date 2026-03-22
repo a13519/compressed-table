@@ -1,0 +1,11 @@
+bucketNumber: 2   # the bucket numbers
+delimeter: ','
+#quote: "
+#escape: //
+skipEmptyLines: true
+headerLine: 1     # the line no of headers, this is for the csv has leading lines before header
+bucket: bucket    # bucket directory path
+keys:             # supports multiple keys
+  - Customer Id
+ignoredHeaders:   # ignored column header names
+  - City

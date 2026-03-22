@@ -13,14 +13,13 @@ public class KeyHeadersList {
     private List<KeyHeaders> list = new ArrayList<>();
 
     /**
-     *
      * @return
      */
     public static KeyHeadersList KeyHeadersList() {
         return new KeyHeadersList();
     }
+
     /**
-     *
      * @param headers
      * @return
      */
@@ -42,8 +41,8 @@ public class KeyHeadersList {
     public int size() {
         return list.size();
     }
+
     /**
-     *
      * @return
      */
     public List<KeyHeaders> getKeyHeadersList() {

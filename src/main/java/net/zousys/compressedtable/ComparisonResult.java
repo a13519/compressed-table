@@ -26,7 +26,6 @@ public class ComparisonResult {
     private List<String> unitedHeaders;
 
     /**
-     *
      * @param before
      * @param after
      */
@@ -52,11 +51,12 @@ public class ComparisonResult {
 
         /**
          * add field result to row result
+         *
          * @param resultField
          */
         public void addFieldResult(ResultField resultField) {
             fields.add(resultField);
-            if (resultField.isMissmatched()&&!resultField.isIgnored()){
+            if (resultField.isMissmatched() && !resultField.isIgnored()) {
                 missMatchNumber++;
             }
         }
