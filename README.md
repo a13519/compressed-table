@@ -233,12 +233,12 @@ public class CompListener implements ComparatorListener {
     }
 
     @Override
-    public void handleMisMatched(String key, FieldResult fieldresults) {
-        log.error("Mismatched by key: " + key + " - " + fieldresults.toString());
+    public void handleMisMatched(String key, ComparedRow comparedRow) {
+        log.error("Mismatched by key: " + key + " - " + comparedRow);
     }
 
     @Override
-    public void handleMatched(String key, String[] fields) {
+    public void handleMatched(String key, ComparedRow comparedRow) {
     }
 
     @Override
@@ -266,5 +266,4 @@ public class CompListener implements ComparatorListener {
 
     }
 }
-
 ```

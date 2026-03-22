@@ -13,9 +13,9 @@ public interface ComparatorListener {
 
     void handleMissedAfterHeader(List<String> headers);
 
-    void handleMisMatched(String key, FieldResult fieldresult);
+    void handleMisMatched(String key, ComparedRow comparedRow);
 
-    void handleMatched(String key, String[] fields);
+    void handleMatched(String key, ComparedRow comparedRow);
 
     void updateUnitedHeaders(List<String> unitedHeaders);
 
