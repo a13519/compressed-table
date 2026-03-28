@@ -120,7 +120,7 @@ public class BucketComparator {
         Map<String, String[]> map = new HashMap<>();
 
         CsvParserSettings settings = new CsvParserSettings();
-        settings.getFormat().setDelimiter(config.getDelimeter());
+        settings.getFormat().setDelimiter(config.getDelimiter());
         if (config.getQuote() != 0) {
             settings.getFormat().setQuote(config.getQuote());
         }

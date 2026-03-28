@@ -1,5 +1,5 @@
 bucketNumber: 2   # the bucket numbers
-delimeter: ','
+delimiter: ','
 #quote: "
 #escape: //
 skipEmptyLines: true

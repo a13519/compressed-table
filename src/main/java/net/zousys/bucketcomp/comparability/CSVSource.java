@@ -52,7 +52,7 @@ public class CSVSource implements Source {
         Files.createDirectories(Paths.get(getBucketDir()));
 
         CsvParserSettings settings = new CsvParserSettings();
-        settings.getFormat().setDelimiter(config.getDelimeter());
+        settings.getFormat().setDelimiter(config.getDelimiter());
         if (config.getQuote() != 0) {
             settings.getFormat().setQuote(config.getQuote());
         }
@@ -63,7 +63,7 @@ public class CSVSource implements Source {
         settings.setSkipEmptyLines(config.isSkipEmptyLines());
 
         CsvWriterSettings writerSettings = new CsvWriterSettings();
-        writerSettings.getFormat().setDelimiter(config.getDelimeter());
+        writerSettings.getFormat().setDelimiter(config.getDelimiter());
         if (config.getQuote() != 0) {
             writerSettings.getFormat().setQuote(config.getQuote());
         }
