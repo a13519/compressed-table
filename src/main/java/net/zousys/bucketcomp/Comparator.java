@@ -21,13 +21,15 @@ public class Comparator {
     private ComparatorContext comparatorContext;
 
     /**
+     *
      * @param configFile
-     * @param beforeFile
-     * @param afterFile
+     * @param beforeSource
+     * @param afterSource
+     * @param listener
      * @throws IOException
      */
-    public Comparator(String configFile, String beforeFile, String afterFile, ComparatorListener listener) throws IOException {
-        this(new FileInputStream(configFile), new FileInputStream(beforeFile), new FileInputStream(afterFile), listener);
+    public Comparator(String configFile, Source beforeSource, Source afterSource, ComparatorListener listener) throws IOException {
+        this(new FileInputStream(configFile), beforeSource, afterSource, listener);
     }
 
     /**
@@ -39,17 +41,36 @@ public class Comparator {
     }
 
     /**
-     * @param configIS
-     * @param beforeIS
-     * @param afterIS
+     *
+     * @param config
+     * @param beforeSource
+     * @param afterSource
+     * @param listener
+     * @throws IOException
      */
-    public Comparator(InputStream configIS, InputStream beforeIS, InputStream afterIS, ComparatorListener listener) throws IOException {
-        Yaml yaml = new Yaml(new Constructor(CompConfig.class, new LoaderOptions()));
-
-        CompConfig config = yaml.load(configIS);
+    public Comparator(CompConfig config, Source beforeSource, Source afterSource, ComparatorListener listener) throws IOException {
         FileUtils.deleteQuietly(new File(config.getBucket()));
-        Source beforeSource = new Source("before", config, beforeIS);
-        Source afterSource = new Source("after", config, afterIS);
+
+        comparatorContext = ComparatorContext.builder()
+                .beforeSource(beforeSource)
+                .afterSource(afterSource)
+                .config(config)
+                .listener(listener).build();
+        comparatorContext.init();
+    }
+    /**
+     *
+     * @param configIS
+     * @param beforeSource
+     * @param afterSource
+     * @param listener
+     * @throws IOException
+     */
+    public Comparator(InputStream configIS, Source beforeSource, Source afterSource, ComparatorListener listener) throws IOException {
+        Yaml yaml = new Yaml(new Constructor(CompConfig.class, new LoaderOptions()));
+        CompConfig config = yaml.load(configIS);
+
+        FileUtils.deleteQuietly(new File(config.getBucket()));
 
         comparatorContext = ComparatorContext.builder()
                 .beforeSource(beforeSource)

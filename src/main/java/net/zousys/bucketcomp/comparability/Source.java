@@ -17,147 +17,60 @@ import java.util.*;
 /**
  *
  */
-@Getter
-@Log4j2
-public class Source {
-
-    private String side;
-    private CompConfig config;
-    private BufferedReader bufferedReader;
-    private Map<String, Integer> column2indexMap = new HashMap<>();
-    private Map<Integer, String> index2columnMap = new HashMap<>();
-    private String[] headers;
-    private int[] keyColumnIndices;
-
-    /**
-     * @param side
-     * @param config
-     * @param inputStream
-     * @throws IOException
-     */
-    public Source(String side, CompConfig config, InputStream inputStream) throws IOException {
-        this.config = config;
-        this.side = side;
-        this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-        log.info("Bucketing " + side + " file...");
-        bucketize();
-    }
+public interface Source {
 
     /**
      * @throws IOException
      */
-    public void bucketize() throws IOException {
-        Files.createDirectories(Paths.get(getBucketDir()));
-
-        CsvParserSettings settings = new CsvParserSettings();
-        settings.getFormat().setDelimiter(config.getDelimeter());
-        if (config.getQuote() != 0) {
-            settings.getFormat().setQuote(config.getQuote());
-        }
-        if (config.getEscape() != 0) {
-            settings.getFormat().setQuoteEscape(config.getEscape());
-        }
-        settings.setHeaderExtractionEnabled(false);     // parsing header is manual
-        settings.setSkipEmptyLines(config.isSkipEmptyLines());
-
-        CsvWriterSettings writerSettings = new CsvWriterSettings();
-        writerSettings.getFormat().setDelimiter(config.getDelimeter());
-        if (config.getQuote() != 0) {
-            writerSettings.getFormat().setQuote(config.getQuote());
-        }
-        if (config.getEscape() != 0) {
-            writerSettings.getFormat().setQuoteEscape(config.getEscape());
-        }
-        writerSettings.setHeaderWritingEnabled(config.isExtractHeader());
-
-        Map<Integer, CsvWriter> writers = new HashMap<>();
-
-        settings.setProcessor(new RowProcessor() {
-            private int rowcount = 0;
-
-            @Override
-            public void rowProcessed(String[] row, ParsingContext context) {
-                if (row == null || row.length == 0) {
-                    return;
-                }
-
-                rowcount++;
-                if (rowcount == config.getHeaderLine()) {
-                    try {
-                        analyzeKeys(row);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-
-                    String key = produceKeys(row, keyColumnIndices);
-
-                    int bucket = Math.abs(key.hashCode()) % config.getBucketNumber();
-
-                    CsvWriter writer = writers.computeIfAbsent(bucket, b -> {
-                        try {
-                            return new CsvWriter(new FileWriter(getBucketFile(b)), writerSettings);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-
-                    writer.writeRow(row);
-                }
-            }
-
-            @Override
-            public void processStarted(ParsingContext context) {
-            }
-
-            @Override
-            public void processEnded(ParsingContext context) {
-                for (CsvWriter w : writers.values()) {
-                    try {
-                        w.flush();
-                        w.close();
-                    } catch (Exception ignored) {
-                    }
-                }
-            }
-        });
-
-        CsvParser parser = new CsvParser(settings);
-        parser.parse(bufferedReader);
-    }
+    public void bucketize() throws IOException ;
 
     /**
-     * @throws IOException
+     *
+     * @return
      */
-    private void analyzeKeys(String[] fields) throws IOException {
-        headers = fields;
+    public int[] getKeyColumnIndices();
 
-        List<Integer> indices = new ArrayList<>();
-        int index = 0;
-        for (String header : headers) {
-            column2indexMap.put(header.trim(), index);
-            index2columnMap.put(index, header.trim());
-            index++;
-        }
+    /**
+     *
+     * @return
+     */
+    public Map<Integer, String> getIndex2columnMap();
 
-        if (config.getKeys() != null && config.getKeys().size() > 0) {
-            for (String key : config.getKeys()) {
-                Integer idx = column2indexMap.get(key.trim());
-                if (idx != null) {
-                    indices.add(idx);
-                }
-            }
-            keyColumnIndices = indices.stream().mapToInt(i -> i).toArray();
-        }
-    }
+    /**
+     *
+     * @return
+     */
+    public Map<String, Integer> getColumn2indexMap();
+
+    /**
+     * @return
+     */
+    public String getBucketDir() ;
+
+    /**
+     * @param bucket
+     * @return
+     */
+    public String getBucketFile(int bucket) ;
+
+    /**
+     * @param index
+     * @return
+     */
+    public String getHeader(int index) ;
+
+    /**
+     *
+     * @return
+     */
+    public String getSide();
 
     /**
      * @param fields
      * @param keyColumnIndices
      * @return
      */
-    public final static String produceKeys(String[] fields, int[] keyColumnIndices) {
+    public static String produceKeys(String[] fields, int[] keyColumnIndices) {
         StringBuilder key = new StringBuilder("[");
         for (int idx : keyColumnIndices) {
             if (idx < fields.length && fields[idx] != null) {
@@ -168,26 +81,4 @@ public class Source {
         return key.toString();
     }
 
-    /**
-     * @return
-     */
-    public final String getBucketDir() {
-        return config.getBucket() + "/" + getSide() + "/";
-    }
-
-    /**
-     * @param bucket
-     * @return
-     */
-    public final String getBucketFile(int bucket) {
-        return getBucketDir() + bucket + ".csv";
-    }
-
-    /**
-     * @param index
-     * @return
-     */
-    public final String getHeader(int index) {
-        return index2columnMap.get(index);
-    }
 }
