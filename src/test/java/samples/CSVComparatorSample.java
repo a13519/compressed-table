@@ -1,6 +1,6 @@
 package samples;
 
-import net.zousys.bucketcomp.CSVComparator;
+import net.zousys.bucketcomp.Comparator;
 import net.zousys.bucketcomp.comparability.CSVSource;
 import net.zousys.bucketcomp.comparability.CompConfig;
 import net.zousys.bucketcomp.comparability.Source;
@@ -28,7 +28,7 @@ public class CSVComparatorSample {
         FileUtils.deleteQuietly(new File(config.getBucket()));
         Source beforeSource = new CSVSource("before", config, new FileInputStream("beforeIS"));
         Source afterSource = new CSVSource("after", config, new FileInputStream("afterIS"));
-        CSVComparator csvComparator = new CSVComparator(config, beforeSource, afterSource, listener);
+        Comparator csvComparator = new Comparator(config, beforeSource, afterSource, listener);
         csvComparator.compare();
     }
 }

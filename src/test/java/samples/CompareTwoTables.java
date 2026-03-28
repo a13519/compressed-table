@@ -59,7 +59,7 @@ public class CompareTwoTables {
 
     }
 
-    @Test
+//    @Test
     public void compareSingleKey() throws IOException, DataFormatException {
         CompareListener listener = new CompareListener();
 

@@ -199,13 +199,11 @@ public class CSVSource implements Source {
         return getBucketDir() + bucket + ".csv";
     }
 
-    /**
-     * @param index
-     * @return
-     */
-    public final String getHeader(int index) {
-        return index2columnMap.get(index);
+    @Override
+    public String[] getHeaders() {
+        return headers;
     }
+
 
     @Override
     public String getSide() {

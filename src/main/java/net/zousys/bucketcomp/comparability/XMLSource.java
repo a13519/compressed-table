@@ -38,8 +38,8 @@ public class XMLSource implements Source{
     }
 
     @Override
-    public String getHeader(int index) {
-        return "";
+    public String[] getHeaders() {
+        return new String[0];
     }
 
     @Override

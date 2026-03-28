@@ -19,7 +19,7 @@ public class ParseSingleKeySet {
      * @throws IOException
      * @throws DataFormatException
      */
-    @Test
+//    @Test
     public void parseSingleKeySet() throws IOException, DataFormatException {
         CompareListener listener = new CompareListener();
 

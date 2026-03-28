@@ -54,10 +54,10 @@ public interface Source {
     public String getBucketFile(int bucket) ;
 
     /**
-     * @param index
+     *
      * @return
      */
-    public String getHeader(int index) ;
+    public String[] getHeaders() ;
 
     /**
      *
