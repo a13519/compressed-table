@@ -11,6 +11,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ComparisonResult {
     @NonNull
     private CompressedTable before;
@@ -29,12 +30,10 @@ public class ComparisonResult {
      * @param before
      * @param after
      */
-    public ComparisonResult(@NonNull CompressedTable before, @NonNull CompressedTable after) {
+    public ComparisonResult(CompressedTable before, CompressedTable after) {
         this.before = before;
         this.after = after;
-
     }
-
 
     @NoArgsConstructor
     public static class RowResult {

@@ -167,6 +167,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
 
         comparatorListener.handleMatchedList(ml);
         comparatorListener.handleMisMatchedList(mml);
+        comparatorListener.finished();
         return this;
     }
 

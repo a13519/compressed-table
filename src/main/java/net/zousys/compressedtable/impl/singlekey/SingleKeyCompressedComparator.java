@@ -156,6 +156,7 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
         comparatorListener.handleMarkers(markers);
         comparatorListener.handleMatchedList(ml);
         comparatorListener.handleMisMatchedList(mml);
+        comparatorListener.finished();
         return this;
     }
 

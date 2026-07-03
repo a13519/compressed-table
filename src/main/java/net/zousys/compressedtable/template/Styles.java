@@ -5,13 +5,17 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class Sytles {
+import java.util.HashMap;
+import java.util.Map;
+
+public class Styles {
     public static XSSFCellStyle redStyle;
     public static XSSFCellStyle red2Style;
     public static XSSFCellStyle lightStyle;
     public static XSSFCellStyle headerStyle;
     public static XSSFCellStyle headerStyle2;
     public static XSSFCellStyle grayStyle;
+    public static Map<String, XSSFCellStyle> styles = new HashMap<>();
 
     public static void init(XSSFWorkbook book) {
         headerStyle = book.createCellStyle();
@@ -33,5 +37,10 @@ public class Sytles {
         grayStyle.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
         grayStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
+        styles.put("before", headerStyle);
+        styles.put("nullbefore", headerStyle2);
+        styles.put("missmatchbefore", redStyle);
+        styles.put("nullafter", headerStyle2);
+        styles.put("missmatchafter", red2Style);
     }
 }

@@ -91,4 +91,9 @@ public class CompareListener implements ComparatorListener {
     public void appendInformation() {
 
     }
+
+    @Override
+    public void finished() {
+
+    }
 }

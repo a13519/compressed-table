@@ -10,15 +10,17 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.*;
 
+/**
+ *
+ */
 @Data
 public class ComparisonTemplate {
 
-    private String resultfile;
+    private OutputStream outputStream;
 
     private XSSFSheet mismatchshit;
     private XSSFSheet bmissedshit;
@@ -57,26 +59,32 @@ public class ComparisonTemplate {
     private Map<String, XSSFCellStyle> styles;
     private static int cellid = 0;
 
-    public ComparisonTemplate(ComparisonResult comparisonResult,
-                              CompressedTable tbeforetable,
-                              CompressedTable taftertable) throws FileNotFoundException {
+    /**
+     *
+     * @param comparisonResult
+     * @throws FileNotFoundException
+     */
+    public ComparisonTemplate(ComparisonResult comparisonResult) throws FileNotFoundException {
         this.comparisonResult = comparisonResult;
-        beforetable = tbeforetable;
-        aftertable = taftertable;
-
         populate();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     public void save() throws Exception {
         List<ComparisonResult.RowResult> rows = comparisonResult.getMismatches();
         for (ComparisonResult.RowResult rowResult : rows) {
             append(rowResult, comparisonResult);
         }
-        FileOutputStream out = new FileOutputStream(new File(resultfile));
-        book.write(out);
-        out.close();
+        book.write(outputStream);
+        outputStream.close();
     }
 
+    /**
+     *
+     */
     private void populate() {
         book = new XSSFWorkbook();
         mismatchshit = book.createSheet("Mismatched");
@@ -85,7 +93,7 @@ public class ComparisonTemplate {
         if (details == 3) {
             matchedshit = book.createSheet("Matched");
         }
-        Sytles.init(book);
+        Styles.init(book);
     }
 
     /**
@@ -118,6 +126,7 @@ public class ComparisonTemplate {
         }
         row = mismatchshit.createRow(rowid++);
         cellid = 0;
+        x=0;
         keyCell = row.createCell(cellid++);
         keyCell.setCellValue("");
 

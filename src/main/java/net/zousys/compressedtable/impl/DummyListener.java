@@ -82,4 +82,9 @@ public class DummyListener implements ComparatorListener {
     public void appendInformation() {
 
     }
+
+    @Override
+    public void finished() {
+
+    }
 }
