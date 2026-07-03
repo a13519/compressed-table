@@ -28,6 +28,7 @@ public class ExcelParser {
     private KeyHeadersList keyHeaderList = new KeyHeadersList();
     @Builder.Default
     private boolean compressed = true;
+    private String tabname;
 
     /**
      * @param inputStream
@@ -37,7 +38,9 @@ public class ExcelParser {
     public CompressedTable parse(InputStream inputStream) throws IOException {
         if (inputStream != null) {
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-            XSSFSheet sheet = workbook.getSheetAt(0);
+            XSSFSheet sheet = tabname==null
+                    ?workbook.getSheetAt(0):
+                    workbook.getSheet(tabname);
             int from = sheet.getFirstRowNum();
             int to = sheet.getLastRowNum();
 
