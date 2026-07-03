@@ -36,7 +36,8 @@ public class CompressedTableFactory {
      */
     private int headerPosition = -1;
     private boolean compressed = true;
-
+    private String tabname;
+    
     /**
      * @param type
      */
@@ -95,6 +96,15 @@ public class CompressedTableFactory {
      */
     public CompressedTableFactory addKeyHeaders(KeyHeaders headers) {
         keyHeaderList.addHeaders(headers);
+        return this;
+    }
+
+    /**
+     * @param tabname
+     * @return
+     */
+    public CompressedTableFactory tabname(String tabname) {
+        this.tabname = tabname;
         return this;
     }
 
