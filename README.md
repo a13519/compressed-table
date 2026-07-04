@@ -267,3 +267,18 @@ public class CompListener implements ComparatorListener {
     }
 }
 ```
+
+Listener to generate Excel Result:
+```adlanguage
+        CompareListenerInExcel listener = new CompareListenerInExcel(comparisonResult,"ExcelsingleKey.xlsx");
+    ... ...
+        CompressedComparatorFactory.builder()
+                .before(beforetable)
+                .after(aftertable)
+                .comparatorListener(listener)
+                .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
+                .strictMissed(true)
+                .build().create()
+                .compare();
+```
+The example locates example.CompareTwoTables2Excel in test
