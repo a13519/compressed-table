@@ -1,4 +1,4 @@
-package samples;
+package net.zousys.compressedtable.template;
 
 import net.zousys.compressedtable.ComparatorListener;
 import net.zousys.compressedtable.ComparisonResult;

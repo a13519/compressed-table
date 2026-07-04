@@ -1,33 +1,28 @@
-package samples;
+package net.zousys.compressedtable.template;
 
 import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.ComparatorListener;
 import net.zousys.compressedtable.ComparisonResult;
-import net.zousys.compressedtable.impl.CompressedRow;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyValue;
-import net.zousys.compressedtable.template.ComparisonTemplate;
-import net.zousys.compressedtable.template.Styles;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @Log4j2
 public class CompareListenerInExcel implements ComparatorListener {
-    ArrayList<CompressedRow> beforemissed = new ArrayList<CompressedRow>();
-    ArrayList<CompressedRow> aftermissed = new ArrayList<CompressedRow>();
 
     private ComparisonResult comparisonResult;
-
+    private String fileName;
     /**
      *
      */
-    public CompareListenerInExcel(ComparisonResult comparisonResult) {
+    public CompareListenerInExcel(ComparisonResult comparisonResult, String filename) {
         this.comparisonResult = comparisonResult;
+        this.fileName = filename;
     }
 
     @Override
@@ -122,7 +117,7 @@ public class CompareListenerInExcel implements ComparatorListener {
 
         try {
             ComparisonTemplate template = new ComparisonTemplate(comparisonResult);
-            template.setOutputStream(new FileOutputStream("/Users/songzou/Documents/IdeaProjects/compressed-table/build/xxx.xlsx"));
+            template.setOutputStream(new FileOutputStream(fileName));
             template.setStyles(Styles.styles);
             template.save();
         } catch (FileNotFoundException e) {

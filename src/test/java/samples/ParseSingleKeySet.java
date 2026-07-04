@@ -3,6 +3,7 @@ package samples;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyHeadersList;
+import net.zousys.compressedtable.template.CompareListener;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

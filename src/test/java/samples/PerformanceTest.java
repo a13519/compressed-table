@@ -4,6 +4,7 @@ import net.zousys.compressedtable.CompressedComparatorFactory;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyHeadersList;
+import net.zousys.compressedtable.template.CompareListener;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
