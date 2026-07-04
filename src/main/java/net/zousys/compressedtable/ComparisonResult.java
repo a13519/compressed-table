@@ -4,13 +4,11 @@ import lombok.*;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyValue;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ComparisonResult {
     @NonNull
     private CompressedTable before;
@@ -24,17 +22,16 @@ public class ComparisonResult {
     private List<String> matched = new ArrayList<>();
     private List<RowResult> mismatches = new ArrayList<>();
     private List<String> unitedHeaders;
+    private Map<String, Integer> markers;
 
     /**
      * @param before
      * @param after
      */
-    public ComparisonResult(@NonNull CompressedTable before, @NonNull CompressedTable after) {
+    public ComparisonResult(CompressedTable before, CompressedTable after) {
         this.before = before;
         this.after = after;
-
     }
-
 
     @NoArgsConstructor
     public static class RowResult {
@@ -42,7 +39,7 @@ public class ComparisonResult {
         @Getter
         KeyValue matchedKey;
         @Getter
-        List<ResultField> fields = new ArrayList<>();
+        Map<String, ResultField> fields = new HashMap<>();
         @Getter
         /**
          * the mismatched row discrepancy counts
@@ -55,7 +52,7 @@ public class ComparisonResult {
          * @param resultField
          */
         public void addFieldResult(ResultField resultField) {
-            fields.add(resultField);
+            fields.put(resultField.getName(), resultField);
             if (resultField.isMissmatched() && !resultField.isIgnored()) {
                 missMatchNumber++;
             }

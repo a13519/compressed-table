@@ -38,4 +38,6 @@ public interface ComparatorListener {
     void handleNotice(String key);
 
     void appendInformation();
+
+    void finished();
 }

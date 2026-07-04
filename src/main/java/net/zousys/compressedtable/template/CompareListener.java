@@ -1,4 +1,4 @@
-package samples;
+package net.zousys.compressedtable.template;
 
 import net.zousys.compressedtable.ComparatorListener;
 import net.zousys.compressedtable.ComparisonResult;
@@ -89,6 +89,11 @@ public class CompareListener implements ComparatorListener {
 
     @Override
     public void appendInformation() {
+
+    }
+
+    @Override
+    public void finished() {
 
     }
 }

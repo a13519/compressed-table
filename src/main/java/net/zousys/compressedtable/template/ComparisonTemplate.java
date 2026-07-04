@@ -3,27 +3,27 @@ package net.zousys.compressedtable.template;
 import lombok.Data;
 import lombok.Setter;
 import net.zousys.compressedtable.ComparisonResult;
-import net.zousys.compressedtable.impl.CompressedTable;
+import net.zousys.compressedtable.Row;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.*;
 
+import static net.zousys.compressedtable.template.Styles.*;
+
+/**
+ *
+ */
 @Data
 public class ComparisonTemplate {
+    private OutputStream outputStream;
 
-    private String resultfile;
-
-    private XSSFSheet mismatchshit;
-    private XSSFSheet bmissedshit;
-    private XSSFSheet amissedshit;
-    private XSSFSheet matchedshit;
     private XSSFWorkbook book;
 
     private int ignrn = 0;
@@ -32,8 +32,6 @@ public class ComparisonTemplate {
     @Setter
     private int details = 2;
 
-    private CompressedTable beforetable;
-    private CompressedTable aftertable;
     @Setter
     private Set<String> beforemissed;
     @Setter
@@ -57,35 +55,214 @@ public class ComparisonTemplate {
     private Map<String, XSSFCellStyle> styles;
     private static int cellid = 0;
 
-    public ComparisonTemplate(ComparisonResult comparisonResult,
-                              CompressedTable tbeforetable,
-                              CompressedTable taftertable) throws FileNotFoundException {
+    /**
+     *
+     * @param comparisonResult
+     * @throws FileNotFoundException
+     */
+    public ComparisonTemplate(ComparisonResult comparisonResult) throws Exception {
         this.comparisonResult = comparisonResult;
-        beforetable = tbeforetable;
-        aftertable = taftertable;
-
-        populate();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     public void save() throws Exception {
+        populate();
+        book.write(outputStream);
+        outputStream.close();
+    }
+
+    /**
+     *
+     */
+    public void populate() throws Exception {
+        book = new XSSFWorkbook();
+        Styles.init(book);
+
+        populateMisMatched(book.createSheet("Mismatched"));
+        populateAfterMissed(book.createSheet("After Missed"));
+        populateBeforeMissed(book.createSheet("Before Missed"));
+        if (details == 3) {
+//            matchedshit = book.createSheet("Matched");
+        }
+
+    }
+
+    /**
+     *
+     * @param xssfSheet
+     * @throws Exception
+     */
+    private void populateAfterMissed(XSSFSheet xssfSheet) throws Exception {
+        rowid = 0;
+        // Headers
+        XSSFRow row = xssfSheet.createRow(rowid++);
+        cellid = 0;
+        Cell keyCell = row.createCell(cellid++);
+        keyCell.setCellValue("KeyValue");
+        keyCell.setCellStyle(styles.get(HEADERS));
+
+        int x = 0;
+        for (String header : comparisonResult.getBefore().getHeaders()) {
+            Cell cell = row.createCell(cellid++);
+            cell.setCellValue(header);
+            cell.setCellStyle(styles.get(HEADERS));
+        }
+
+        // Markers
+        row = xssfSheet.createRow(rowid++);
+        cellid = 0;
+        keyCell = row.createCell(cellid++);
+        int cint = comparisonResult.getAfterMissed().size();
+        if (cint == 0) {
+            keyCell.setCellValue("");
+            keyCell.setCellStyle(styles.get(HEADERS));
+        } else {
+            keyCell.setCellValue(""+cint);
+            keyCell.setCellStyle(styles.get(MARKER));
+        }
+
+        Map<String, Row> trows = comparisonResult.getBefore().getKeyedMappingMap().getMainKeyedMapping();
+
+        for (String akey : comparisonResult.getAfterMissed()) {
+            Row arow = trows.get(akey);
+            row = xssfSheet.createRow(rowid++);
+            cellid = 0;
+            Cell cell = row.createCell(cellid++);
+            cell.setCellValue(akey);
+            cell.setCellStyle(styles.get(BEFORE));
+            for (String header : comparisonResult.getBefore().getHeaders()) {
+                cell = row.createCell(cellid++);
+                cell.setCellValue(arow.getField(header));
+                cell.setCellStyle(styles.get(BEFORE));
+            }
+        }
+        autoColumnWidth(xssfSheet);
+    }
+
+    /**
+     *
+     * @param xssfSheet
+     * @throws Exception
+     */
+    private void populateBeforeMissed(XSSFSheet xssfSheet) throws Exception {
+        rowid = 0;
+        // Headers
+        XSSFRow row = xssfSheet.createRow(rowid++);
+        cellid = 0;
+        Cell keyCell = row.createCell(cellid++);
+        keyCell.setCellValue("KeyValue");
+        keyCell.setCellStyle(styles.get(HEADERS));
+
+        // Headers
+        int x = 0;
+        for (String header : comparisonResult.getAfter().getHeaders()) {
+            Cell cell = row.createCell(cellid++);
+            cell.setCellValue(header);
+            cell.setCellStyle(styles.get(HEADERS));
+        }
+
+        // Markers
+        row = xssfSheet.createRow(rowid++);
+        cellid = 0;
+        keyCell = row.createCell(cellid++);
+        int cint = comparisonResult.getBeforeMissed().size();
+        if (cint == 0) {
+            keyCell.setCellValue("");
+            keyCell.setCellStyle(styles.get(HEADERS));
+        } else {
+            keyCell.setCellValue(""+cint);
+            keyCell.setCellStyle(styles.get(MARKER));
+        }
+
+        Map<String, Row> trows = comparisonResult.getAfter().getKeyedMappingMap().getMainKeyedMapping();
+
+        for (String akey : comparisonResult.getBeforeMissed()) {
+            Row arow = trows.get(akey);
+            row = xssfSheet.createRow(rowid++);
+            cellid = 0;
+            Cell cell = row.createCell(cellid++);
+            cell.setCellValue(akey);
+            cell.setCellStyle(styles.get(AFTER));
+            for (String header : comparisonResult.getAfter().getHeaders()) {
+                cell = row.createCell(cellid++);
+                cell.setCellValue(arow.getField(header));
+                cell.setCellStyle(styles.get(AFTER));
+            }
+        }
+        autoColumnWidth(xssfSheet);
+    }
+
+
+    /**
+     *
+     * @param xssfSheet
+     * @throws Exception
+     */
+    private void populateMisMatched(XSSFSheet xssfSheet) throws Exception {
+        rowid = 0;
+        populateHeaders(xssfSheet);
         List<ComparisonResult.RowResult> rows = comparisonResult.getMismatches();
         for (ComparisonResult.RowResult rowResult : rows) {
-            append(rowResult, comparisonResult);
+            appendMismatch(xssfSheet, rowResult, comparisonResult);
         }
-        FileOutputStream out = new FileOutputStream(new File(resultfile));
-        book.write(out);
-        out.close();
+        autoColumnWidth(xssfSheet);
     }
 
-    private void populate() {
-        book = new XSSFWorkbook();
-        mismatchshit = book.createSheet("Mismatched");
-        amissedshit = book.createSheet("After Missed");
-        bmissedshit = book.createSheet("Before Missed");
-        if (details == 3) {
-            matchedshit = book.createSheet("Matched");
+    /**
+     *
+     * @param xssfSheet
+     */
+    private void populateHeaders(XSSFSheet xssfSheet) {
+        // Headers
+        XSSFRow row = xssfSheet.createRow(rowid++);
+        cellid = 0;
+        Cell keyCell = row.createCell(cellid++);
+        keyCell.setCellValue("KeyValue");
+        keyCell.setCellStyle(styles.get(HEADERS));
+
+        for (String header : comparisonResult.getUnitedHeaders()) {
+            Cell cell = row.createCell(cellid++);
+            Integer bheaderInd = comparisonResult.getBefore().getHeaderMapping().get(header);
+            Integer aheaderInd = comparisonResult.getAfter().getHeaderMapping().get(header);
+            if (bheaderInd == null) {
+                cell.setCellValue(header);
+                cell.setCellStyle(styles.get(HEADERSAONLY));
+            } else if (aheaderInd == null) {
+                cell.setCellValue(header);
+                cell.setCellStyle(styles.get(HEADERSBONLY));
+            } else {
+                cell.setCellValue(header);
+                cell.setCellStyle(styles.get(HEADERS));
+            }
         }
-        Sytles.init(book);
+
+        // Marker
+        row = xssfSheet.createRow(rowid++);
+        cellid = 0;
+        keyCell = row.createCell(cellid++);
+        int tint = comparisonResult.getMismatches().size();
+        if ( tint == 0) {
+            keyCell.setCellValue("");
+//            keyCell.setCellStyle(styles.get(HEADERS));
+        } else {
+            keyCell.setCellValue(""+tint);
+            keyCell.setCellStyle(styles.get(MARKER));
+        }
+
+        for (String header : comparisonResult.getUnitedHeaders()) {
+            Cell cell = row.createCell(cellid++);
+            Integer cint = comparisonResult.getMarkers().get(header);
+            if (cint == null) {
+                cell.setCellValue("");
+//                cell.setCellStyle(styles.get(HEADERS));
+            } else {
+                cell.setCellValue(cint.toString());
+                cell.setCellStyle(styles.get(MARKER));
+            }
+        }
     }
 
     /**
@@ -93,50 +270,71 @@ public class ComparisonTemplate {
      * @param comparisonResult
      * @throws Exception
      */
-    private void append(ComparisonResult.RowResult rowResult, ComparisonResult comparisonResult) throws Exception {
-        XSSFRow row = mismatchshit.createRow(rowid++);
+    private void appendMismatch(XSSFSheet xssfSheet, ComparisonResult.RowResult rowResult, ComparisonResult comparisonResult) throws Exception {
+        XSSFRow row = xssfSheet.createRow(rowid++);
         cellid = 0;
         Cell keyCell = row.createCell(cellid++);
         keyCell.setCellValue(rowResult.getMatchedKey().getValue());
-        List<ComparisonResult.ResultField> fields = rowResult.getFields();
-        int x = 0;
+        keyCell.setCellStyle(styles.get(BEFORE));
+
+        Map<String, ComparisonResult.ResultField> fields = rowResult.getFields();
         for (String header : comparisonResult.getUnitedHeaders()) {
             Cell cell = row.createCell(cellid++);
             Integer bheaderInd = comparisonResult.getBefore().getHeaderMapping().get(header);
+            Integer aheaderInd = comparisonResult.getAfter().getHeaderMapping().get(header);
             if (bheaderInd == null) {
-                cell.setCellValue("");
-                cell.setCellStyle(styles.get("nullbefore"));
+                cell.setCellValue("<BLANK>");
+                cell.setCellStyle(styles.get(NULLBEFORE));
+            } else if (aheaderInd == null) {
+                cell.setCellValue(rowResult.getFields().get(header).getBeforeField());
+                cell.setCellStyle(styles.get(BEFORE));
             } else {
-                ComparisonResult.ResultField rf = fields.get(x++);
+                ComparisonResult.ResultField rf = fields.get(header);
                 cell.setCellValue(rf.getBeforeField());
-                if (fields.get(bheaderInd).isMissmatched()) {
-                    cell.setCellStyle(styles.get("missmatchbefore"));
+                if (fields.get(header).isMissmatched()) {
+                    cell.setCellStyle(styles.get(MISMATCHBEFORE));
                 } else {
-                    cell.setCellStyle(styles.get("before"));
+                    cell.setCellStyle(styles.get(BEFORE));
                 }
             }
         }
-        row = mismatchshit.createRow(rowid++);
+        row = xssfSheet.createRow(rowid++);
         cellid = 0;
         keyCell = row.createCell(cellid++);
         keyCell.setCellValue("");
 
         for (String header : comparisonResult.getUnitedHeaders()) {
             Cell cell = row.createCell(cellid++);
+            Integer bheaderInd = comparisonResult.getBefore().getHeaderMapping().get(header);
             Integer aheaderInd = comparisonResult.getAfter().getHeaderMapping().get(header);
             if (aheaderInd == null) {
-                cell.setCellValue("");
-                cell.setCellStyle(styles.get("nullafter"));
+                cell.setCellValue("<BLANK>");
+                cell.setCellStyle(styles.get(NULLAFTER));
+            } else if (bheaderInd == null) {
+                ComparisonResult.ResultField s = rowResult.getFields().get(header);
+                cell.setCellValue(rowResult.getFields().get(header).getAfterField());
+                cell.setCellStyle(styles.get(AFTER));
             } else {
-                ComparisonResult.ResultField rf = fields.get(x++);
+                ComparisonResult.ResultField rf = fields.get(header);
                 cell.setCellValue(rf.getAfterField());
-                if (fields.get(aheaderInd).isMissmatched()) {
-                    cell.setCellStyle(styles.get("missmatchafter"));
+                if (fields.get(header).isMissmatched()) {
+                    cell.setCellStyle(styles.get(MISMATCHAFTER));
                 }
             }
         }
     }
 
-
+    /**
+     *
+     * @param xssfSheet
+     * @throws Exception
+     */
+    private void autoColumnWidth(XSSFSheet xssfSheet) throws Exception {
+        int maxColumns = xssfSheet.getRow(0).getLastCellNum();
+        for (int i = 0; i < maxColumns; i++) {
+            xssfSheet.autoSizeColumn(i);
+        }
+        xssfSheet.setAutoFilter(new CellRangeAddress(0, 0, 0, maxColumns==0?0:maxColumns-1));
+    }
 }
 

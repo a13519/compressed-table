@@ -74,7 +74,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
      * @param mismatch
      */
     public void addMarker(ComparisonResult.RowResult mismatch) {
-        for (ComparisonResult.ResultField arf : mismatch.getFields()) {
+        for (ComparisonResult.ResultField arf : mismatch.getFields().values()) {
             if (arf.isMissmatched()) {
                 Integer ai = markers.get(arf.getName());
                 if (ai == null) {
@@ -167,6 +167,7 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
 
         comparatorListener.handleMatchedList(ml);
         comparatorListener.handleMisMatchedList(mml);
+        comparatorListener.finished();
         return this;
     }
 

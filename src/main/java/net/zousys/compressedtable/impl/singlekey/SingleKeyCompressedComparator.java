@@ -71,7 +71,7 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
      * @param mismatch
      */
     public void addMarker(ComparisonResult.RowResult mismatch) {
-        for (ComparisonResult.ResultField arf : mismatch.getFields()) {
+        for (ComparisonResult.ResultField arf : mismatch.getFields().values()) {
             if (arf.isMissmatched()) {
                 Integer ai = markers.get(arf.getName());
                 if (ai == null) {
@@ -156,6 +156,7 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
         comparatorListener.handleMarkers(markers);
         comparatorListener.handleMatchedList(ml);
         comparatorListener.handleMisMatchedList(mml);
+        comparatorListener.finished();
         return this;
     }
 
@@ -166,32 +167,32 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
      * @throws IOException
      */
     private final ComparisonResult.RowResult compareRow(KeyValue key) throws DataFormatException, IOException {
-        Row a = before.seekByMainKey(key).orElseThrow();
-        Row b = after.seekByMainKey(key).orElseThrow();
-        List<String> fieldsA = a.getContent().form();
-        List<String> fieldsB = b.getContent().form();
+        Row bRow = before.seekByMainKey(key).orElseThrow();
+        Row aRow = after.seekByMainKey(key).orElseThrow();
+        List<String> fieldsB = bRow.getContent().form();
+        List<String> fieldsA = aRow.getContent().form();
 
         ComparisonResult.RowResult rowResult = new ComparisonResult.RowResult();
         rowResult.setMatchedKey(key);
 
-        for (String headerA : unitedHeaders) {
-            Integer beforeInd = before.getHeaderMapping().get(headerA);
-            Integer afterInd = after.getHeaderMapping().get(headerA);
-            String fvbefore = beforeInd == null ? null : fieldsA.get(beforeInd);
-            String fvafter = afterInd == null ? null : fieldsB.get(afterInd);
+        for (String header : unitedHeaders) {
+            Integer beforeInd = before.getHeaderMapping().get(header);
+            Integer afterInd = after.getHeaderMapping().get(header);
+            String fvbefore = beforeInd == null ? null : fieldsB.get(beforeInd);
+            String fvafter = afterInd == null ? null : fieldsA.get(afterInd);
 
             ComparisonResult.ResultField rf = ComparisonResult.ResultField.builder()
-                    .name(headerA)
+                    .name(header)
                     .beforeField(trim && fvbefore != null ? fvbefore.trim() : fvbefore)
                     .afterField(trim && fvafter != null ? fvafter.trim() : fvafter)
                     .build();
 
             if (!strictMissed &&
-                    (afterMissedHeaders.contains(headerA) || beforeMissedHeaders.contains(headerA))) {
+                    (afterMissedHeaders.contains(header) || beforeMissedHeaders.contains(header))) {
                 rf.setStrictMissed(false);
                 rf.setMissmatched(false);
                 rf.setIgnored(false);
-            } else if (ignoredFields != null && ignoredFields.contains(headerA)) {
+            } else if (ignoredFields != null && ignoredFields.contains(header)) {
                 rf.setIgnored(true);
                 rf.setMissmatched(false);
                 rf.setStrictMissed(false);

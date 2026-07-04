@@ -1,10 +1,11 @@
 package samples;
 
+import net.zousys.compressedtable.ComparisonResult;
 import net.zousys.compressedtable.CompressedComparatorFactory;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
 import net.zousys.compressedtable.impl.KeyHeadersList;
-import net.zousys.compressedtable.template.CompareListener;
+import net.zousys.compressedtable.template.CompareListenerInExcel;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -12,14 +13,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.zip.DataFormatException;
 
-public class CompareTwoTables {
+public class CompareTwoTables2Excel {
     /**
      * @throws IOException
      * @throws DataFormatException
      */
     @Test
-    public void compareMultipleKeys() throws IOException, DataFormatException {
-        CompareListener listener = new CompareListener();
+    public void compareCSVSingleKey() throws IOException, DataFormatException {
+        ComparisonResult comparisonResult = new ComparisonResult();
+        CompareListenerInExcel listener = new CompareListenerInExcel(comparisonResult, "CSVsingleKey.xlsx");
 
         CompressedTable beforetable = CompressedTableFactory
                 .build("csv")
@@ -61,34 +63,35 @@ public class CompareTwoTables {
     }
 
     @Test
-    public void compareSingleKey() throws IOException, DataFormatException {
-        CompareListener listener = new CompareListener();
+    public void compareEXCELSingleKey() throws IOException, DataFormatException {
+        ComparisonResult comparisonResult = new ComparisonResult();
+        CompareListenerInExcel listener = new CompareListenerInExcel(comparisonResult,"ExcelsingleKey.xlsx");
 
         CompressedTable beforetable = CompressedTableFactory
-                .build("csv")
+                .build("excel")
                 .keyHeaderList(new KeyHeadersList()
-                        .addHeaders(new String[]{"Customer Id"})
+                        .addHeaders(new String[]{"Customer Id", "First Name"})
                 )
                 .compressed(true)
                 .ignoredLines(0)
                 .headerPosition(0)
                 .delimeter(',')
                 .parse(Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("customers-1000b.csv"));
+                        .getResourceAsStream("customers-1000b.xlsx"));
         listener.handleBeforeLoaded(beforetable);
         System.out.println("Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
 
         CompressedTable aftertable = CompressedTableFactory
-                .build("csv")
+                .build("excel")
                 .keyHeaderList(new KeyHeadersList()
-                        .addHeaders(new String[]{"Customer Id"})
+                        .addHeaders(new String[]{"Customer Id", "First Name"})
                 )
                 .compressed(true)
                 .ignoredLines(0)
                 .headerPosition(0)
                 .delimeter(',')
                 .parse(Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("customers-1000a.csv"));
+                        .getResourceAsStream("customers-1000a.xlsx"));
         listener.handleAfterLoaded(aftertable);
         System.out.println("After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders() + " Mode: " + beforetable.getMode());
 
@@ -102,6 +105,5 @@ public class CompareTwoTables {
                 .compare();
 
     }
-
 
 }
