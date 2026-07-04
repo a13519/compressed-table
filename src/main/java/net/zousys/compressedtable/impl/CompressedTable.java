@@ -48,7 +48,9 @@ public class CompressedTable implements GeneralTable {
     @Getter
     @Setter
     private int physicalLineNumber = 0;
-
+    @Getter
+    @Setter
+    private String tabname;
     /**
      * @param mode
      */
