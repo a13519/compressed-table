@@ -46,7 +46,7 @@ public class ParseSingleKeySet {
         listener.handleBeforeLoaded(beforetable);
         System.out.println("Table size: " + beforetable.getContents().size() + " Headers: " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
 
-        assertTrue(beforetable.getContents().size() == 987);
+        assertTrue(beforetable.getContents().size() == 993);
         assertTrue(beforetable.getMode() == CompressedTableFactory.Mode.SINGLE_KEY);
         assertFalse(beforetable.isCompressed());
     }

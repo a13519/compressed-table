@@ -86,6 +86,7 @@ public class CompareListenerInExcel implements ComparatorListener {
 
     @Override
     public void handleMarkers(Map<String, Integer> markers) {
+        comparisonResult.setMarkers(markers);
     }
 
     @Override
@@ -127,6 +128,7 @@ public class CompareListenerInExcel implements ComparatorListener {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

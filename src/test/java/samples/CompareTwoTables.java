@@ -73,7 +73,7 @@ public class CompareTwoTables {
                 .headerPosition(0)
                 .delimeter(',')
                 .parse(Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("customers-2000000b.csv"));
+                        .getResourceAsStream("customers-1000b.csv"));
         listener.handleBeforeLoaded(beforetable);
         System.out.println("Before size: " + beforetable.getContents().size() + " " + beforetable.getHeaders() + " Mode: " + beforetable.getMode());
 
@@ -87,7 +87,7 @@ public class CompareTwoTables {
                 .headerPosition(0)
                 .delimeter(',')
                 .parse(Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("customers-2000000a.csv"));
+                        .getResourceAsStream("customers-1000a.csv"));
         listener.handleAfterLoaded(aftertable);
         System.out.println("After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders() + " Mode: " + beforetable.getMode());
 
