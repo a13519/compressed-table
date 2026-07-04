@@ -116,7 +116,7 @@ public class CompareListenerInExcel implements ComparatorListener {
     public void finished() {
 
         try {
-            ComparisonTemplate template = new ComparisonTemplate(comparisonResult);
+            ComparisonExcelTemplate template = new ComparisonExcelTemplate(comparisonResult);
             template.setOutputStream(new FileOutputStream(fileName));
             template.setStyles(Styles.styles);
             template.save();

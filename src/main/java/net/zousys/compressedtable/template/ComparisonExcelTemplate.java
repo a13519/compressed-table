@@ -21,7 +21,7 @@ import static net.zousys.compressedtable.template.Styles.*;
  *
  */
 @Data
-public class ComparisonTemplate {
+public class ComparisonExcelTemplate {
     private OutputStream outputStream;
 
     private XSSFWorkbook book;
@@ -56,16 +56,14 @@ public class ComparisonTemplate {
     private static int cellid = 0;
 
     /**
-     *
      * @param comparisonResult
      * @throws FileNotFoundException
      */
-    public ComparisonTemplate(ComparisonResult comparisonResult) throws Exception {
+    public ComparisonExcelTemplate(ComparisonResult comparisonResult) throws Exception {
         this.comparisonResult = comparisonResult;
     }
 
     /**
-     *
      * @throws Exception
      */
     public void save() throws Exception {
@@ -91,7 +89,6 @@ public class ComparisonTemplate {
     }
 
     /**
-     *
      * @param xssfSheet
      * @throws Exception
      */
@@ -120,7 +117,7 @@ public class ComparisonTemplate {
             keyCell.setCellValue("");
             keyCell.setCellStyle(styles.get(HEADERS));
         } else {
-            keyCell.setCellValue(""+cint);
+            keyCell.setCellValue("" + cint);
             keyCell.setCellStyle(styles.get(MARKER));
         }
 
@@ -143,7 +140,6 @@ public class ComparisonTemplate {
     }
 
     /**
-     *
      * @param xssfSheet
      * @throws Exception
      */
@@ -173,7 +169,7 @@ public class ComparisonTemplate {
             keyCell.setCellValue("");
             keyCell.setCellStyle(styles.get(HEADERS));
         } else {
-            keyCell.setCellValue(""+cint);
+            keyCell.setCellValue("" + cint);
             keyCell.setCellStyle(styles.get(MARKER));
         }
 
@@ -197,7 +193,6 @@ public class ComparisonTemplate {
 
 
     /**
-     *
      * @param xssfSheet
      * @throws Exception
      */
@@ -212,7 +207,6 @@ public class ComparisonTemplate {
     }
 
     /**
-     *
      * @param xssfSheet
      */
     private void populateHeaders(XSSFSheet xssfSheet) {
@@ -227,15 +221,20 @@ public class ComparisonTemplate {
             Cell cell = row.createCell(cellid++);
             Integer bheaderInd = comparisonResult.getBefore().getHeaderMapping().get(header);
             Integer aheaderInd = comparisonResult.getAfter().getHeaderMapping().get(header);
-            if (bheaderInd == null) {
+            if (comparisonResult.getIgnoredFields().contains(header)) {
                 cell.setCellValue(header);
-                cell.setCellStyle(styles.get(HEADERSAONLY));
-            } else if (aheaderInd == null) {
-                cell.setCellValue(header);
-                cell.setCellStyle(styles.get(HEADERSBONLY));
+                cell.setCellStyle(styles.get(IGNORE));
             } else {
-                cell.setCellValue(header);
-                cell.setCellStyle(styles.get(HEADERS));
+                if (bheaderInd == null) {
+                    cell.setCellValue(header);
+                    cell.setCellStyle(styles.get(HEADERSAONLY));
+                } else if (aheaderInd == null) {
+                    cell.setCellValue(header);
+                    cell.setCellStyle(styles.get(HEADERSBONLY));
+                } else {
+                    cell.setCellValue(header);
+                    cell.setCellStyle(styles.get(HEADERS));
+                }
             }
         }
 
@@ -244,17 +243,21 @@ public class ComparisonTemplate {
         cellid = 0;
         keyCell = row.createCell(cellid++);
         int tint = comparisonResult.getMismatches().size();
-        if ( tint == 0) {
+        if (tint == 0) {
             keyCell.setCellValue("");
 //            keyCell.setCellStyle(styles.get(HEADERS));
         } else {
-            keyCell.setCellValue(""+tint);
+            keyCell.setCellValue("" + tint);
             keyCell.setCellStyle(styles.get(MARKER));
         }
 
         for (String header : comparisonResult.getUnitedHeaders()) {
             Cell cell = row.createCell(cellid++);
             Integer cint = comparisonResult.getMarkers().get(header);
+            if (comparisonResult.getIgnoredFields().contains(header)) {
+                cell.setCellValue("");
+                cell.setCellStyle(styles.get(IGNORE));
+            }
             if (cint == null) {
                 cell.setCellValue("");
 //                cell.setCellStyle(styles.get(HEADERS));
@@ -262,6 +265,7 @@ public class ComparisonTemplate {
                 cell.setCellValue(cint.toString());
                 cell.setCellStyle(styles.get(MARKER));
             }
+
         }
     }
 
@@ -282,19 +286,28 @@ public class ComparisonTemplate {
             Cell cell = row.createCell(cellid++);
             Integer bheaderInd = comparisonResult.getBefore().getHeaderMapping().get(header);
             Integer aheaderInd = comparisonResult.getAfter().getHeaderMapping().get(header);
-            if (bheaderInd == null) {
-                cell.setCellValue("<BLANK>");
-                cell.setCellStyle(styles.get(NULLBEFORE));
-            } else if (aheaderInd == null) {
-                cell.setCellValue(rowResult.getFields().get(header).getBeforeField());
-                cell.setCellStyle(styles.get(BEFORE));
-            } else {
-                ComparisonResult.ResultField rf = fields.get(header);
+            ComparisonResult.ResultField rf = fields.get(header);
+            if (comparisonResult.getIgnoredFields().contains(header)) {
                 cell.setCellValue(rf.getBeforeField());
-                if (fields.get(header).isMissmatched()) {
+                if (rf.isMissmatched()) {
                     cell.setCellStyle(styles.get(MISMATCHBEFORE));
                 } else {
+                    cell.setCellStyle(styles.get(IGNORE));
+                }
+            } else {
+                if (bheaderInd == null) {
+                    cell.setCellValue("<BLANK>");
+                    cell.setCellStyle(styles.get(NULLBEFORE));
+                } else if (aheaderInd == null) {
+                    cell.setCellValue(rowResult.getFields().get(header).getBeforeField());
                     cell.setCellStyle(styles.get(BEFORE));
+                } else {
+                    cell.setCellValue(rf.getBeforeField());
+                    if (fields.get(header).isMissmatched()) {
+                        cell.setCellStyle(styles.get(MISMATCHBEFORE));
+                    } else {
+                        cell.setCellStyle(styles.get(BEFORE));
+                    }
                 }
             }
         }
@@ -307,25 +320,33 @@ public class ComparisonTemplate {
             Cell cell = row.createCell(cellid++);
             Integer bheaderInd = comparisonResult.getBefore().getHeaderMapping().get(header);
             Integer aheaderInd = comparisonResult.getAfter().getHeaderMapping().get(header);
-            if (aheaderInd == null) {
-                cell.setCellValue("<BLANK>");
-                cell.setCellStyle(styles.get(NULLAFTER));
-            } else if (bheaderInd == null) {
-                ComparisonResult.ResultField s = rowResult.getFields().get(header);
-                cell.setCellValue(rowResult.getFields().get(header).getAfterField());
-                cell.setCellStyle(styles.get(AFTER));
-            } else {
-                ComparisonResult.ResultField rf = fields.get(header);
+            ComparisonResult.ResultField rf = fields.get(header);
+            if (comparisonResult.getIgnoredFields().contains(header)) {
                 cell.setCellValue(rf.getAfterField());
-                if (fields.get(header).isMissmatched()) {
+                if (rf.isMissmatched()) {
                     cell.setCellStyle(styles.get(MISMATCHAFTER));
+                } else {
+                    cell.setCellStyle(styles.get(IGNORE));
+                }
+            } else {
+                if (aheaderInd == null) {
+                    cell.setCellValue("<BLANK>");
+                    cell.setCellStyle(styles.get(NULLAFTER));
+                } else if (bheaderInd == null) {
+                    ComparisonResult.ResultField s = rowResult.getFields().get(header);
+                    cell.setCellValue(rowResult.getFields().get(header).getAfterField());
+                    cell.setCellStyle(styles.get(AFTER));
+                } else {
+                    cell.setCellValue(rf.getAfterField());
+                    if (fields.get(header).isMissmatched()) {
+                        cell.setCellStyle(styles.get(MISMATCHAFTER));
+                    }
                 }
             }
         }
     }
 
     /**
-     *
      * @param xssfSheet
      * @throws Exception
      */
@@ -334,7 +355,7 @@ public class ComparisonTemplate {
         for (int i = 0; i < maxColumns; i++) {
             xssfSheet.autoSizeColumn(i);
         }
-        xssfSheet.setAutoFilter(new CellRangeAddress(0, 0, 0, maxColumns==0?0:maxColumns-1));
+        xssfSheet.setAutoFilter(new CellRangeAddress(0, 0, 0, maxColumns == 0 ? 0 : maxColumns - 1));
     }
 }
 

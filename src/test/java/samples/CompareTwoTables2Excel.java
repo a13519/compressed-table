@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.DataFormatException;
 
 public class CompareTwoTables2Excel {
@@ -20,7 +21,11 @@ public class CompareTwoTables2Excel {
      */
     @Test
     public void compareCSVSingleKey() throws IOException, DataFormatException {
+        Set<String> ignoredColumns = new HashSet(Arrays.asList(new String[]{"Country"}));
+
         ComparisonResult comparisonResult = new ComparisonResult();
+        comparisonResult.setIgnoredFields(ignoredColumns);
+
         CompareListenerInExcel listener = new CompareListenerInExcel(comparisonResult, "CSVsingleKey.xlsx");
 
         CompressedTable beforetable = CompressedTableFactory
@@ -64,7 +69,11 @@ public class CompareTwoTables2Excel {
 
     @Test
     public void compareEXCELSingleKey() throws IOException, DataFormatException {
+        Set<String> ignoredColumns = new HashSet(Arrays.asList(new String[]{"Last Name"}));
+
         ComparisonResult comparisonResult = new ComparisonResult();
+        comparisonResult.setIgnoredFields(ignoredColumns);
+
         CompareListenerInExcel listener = new CompareListenerInExcel(comparisonResult,"ExcelsingleKey.xlsx");
 
         CompressedTable beforetable = CompressedTableFactory
@@ -99,7 +108,7 @@ public class CompareTwoTables2Excel {
                 .before(beforetable)
                 .after(aftertable)
                 .comparatorListener(listener)
-                .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
+                .ignoredFields(ignoredColumns)
                 .strictMissed(true)
                 .build().create()
                 .compare();

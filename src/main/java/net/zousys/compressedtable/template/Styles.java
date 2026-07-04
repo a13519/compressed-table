@@ -21,6 +21,7 @@ public class Styles {
     public static final String MISMATCHBEFORE = "MISMATCHBEFORE";
     public static final String MISMATCHAFTER = "MISMATCHAFTER";
     public static final String MARKER = "MARKER";
+    public static final String IGNORE = "IGNORE";
 
     public static XSSFCellStyle bluegrayStyle;
     public static XSSFCellStyle lightOrangeStyle;
@@ -35,6 +36,7 @@ public class Styles {
     public static XSSFCellStyle nullOrangeStyle;
     public static XSSFCellStyle nullBlueStyle;
     public static XSSFCellStyle markerRedStyle;
+    public static XSSFCellStyle steelblueStyle;
 
     public static Map<String, XSSFCellStyle> styles = new HashMap<>();
 
@@ -44,6 +46,8 @@ public class Styles {
         XSSFColor customColor = new XSSFColor(pinkColor, new DefaultIndexedColorMap());
         Color skyblueColor = new Color(135,206,235);
         XSSFColor headerColor = new XSSFColor(skyblueColor, new DefaultIndexedColorMap());
+        Color steelblueColor = new Color(176,196,222);
+        XSSFColor ignoreColor = new XSSFColor(steelblueColor, new DefaultIndexedColorMap());
 
         bluegrayStyle = book.createCellStyle();
         bluegrayStyle.setFillForegroundColor(IndexedColors.BLUE_GREY.getIndex());
@@ -94,12 +98,19 @@ public class Styles {
         markerRedStyle.setFillForegroundColor(customColor);
         markerRedStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
+        XSSFFont fontignore = book.createFont();
+        fontignore.setColor(IndexedColors.WHITE.getIndex());
+        fontignore.setBold(false);
+        steelblueStyle = book.createCellStyle();
+        steelblueStyle.setFont(fontignore);
+        steelblueStyle.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        steelblueStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
         styles.put(HEADERS, yellowtouquiseStyle);
         styles.put(HEADERSAONLY, lightOrangeStyle);
         styles.put(HEADERSBONLY, blueStyle);
-
+        styles.put(IGNORE, steelblueStyle);
         styles.put(BEFORE, gray25Style);
-
         styles.put(NULLAFTER, nullBlueStyle);
         styles.put(NULLBEFORE, nullOrangeStyle);
         styles.put(MARKER, markerRedStyle);
