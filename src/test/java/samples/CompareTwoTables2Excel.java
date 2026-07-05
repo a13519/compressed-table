@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.DataFormatException;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CompareTwoTables2Excel {
     /**
@@ -113,6 +115,10 @@ public class CompareTwoTables2Excel {
                 .build().create()
                 .compare();
 
+        assertTrue(comparisonResult.getMismatches().size()==990);
+        assertTrue(comparisonResult.getBeforeMissed().size()==2);
+        assertTrue(comparisonResult.getAfterMissed().size()==3);
+        assertTrue(comparisonResult.getUnitedHeaders().size()==14);
     }
 
 }
