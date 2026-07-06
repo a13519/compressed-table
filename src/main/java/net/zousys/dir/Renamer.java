@@ -15,9 +15,9 @@ public class Renamer {
 
     public static void main(String[] args) {
         Path rootPath = Paths.get("/Users/songzou/Downloads/aysheila");   // Change this
-        String tag = "v1.1.08";                               // Tag to search for
+        String tag = "1.1.08";                               // Tag to search for
 
-        renameFilesContaining(rootPath, tag,"VERSION");
+        renameDirectoriesContaining(rootPath, tag,"VERSION");
     }
 
     /**
@@ -54,4 +54,32 @@ public class Renamer {
         }
     }
 
+    public static void renameDirectoriesContaining(Path root, String tag, String replacement) {
+        try (var walk = Files.walk(root)) {   // depth = 1 to only direct subdirs
+
+            walk.filter(Files::isDirectory)
+                    .filter(path -> !path.equals(root))   // skip root itself
+                    .filter(path -> path.getFileName().toString().contains(tag))
+                    .forEach(oldDir -> {
+                        String oldName = oldDir.getFileName().toString();
+                        String newName = oldName.replace(tag, replacement);
+                        Path newDir = oldDir.resolveSibling(newName);
+
+                        if (Files.exists(newDir)) {
+                            System.out.println("⚠️ Skipped (already exists): " + oldName);
+                            return;
+                        }
+
+                        try {
+                            Files.move(oldDir, newDir);
+                            System.out.println("✅ Renamed dir: " + oldName + " → " + newName);
+                        } catch (IOException e) {
+                            System.out.println("❌ Failed: " + oldName + " - " + e.getMessage());
+                        }
+                    });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

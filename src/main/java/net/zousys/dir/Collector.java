@@ -89,12 +89,6 @@ public class Collector {
 
         Collector cr = new Collector();
         cr.matchEntries(rootPath, fullPath);
-        String relativePath = getRelativePath(rootPath, fullPath);
-        String fileName     = getFileName(fullPath);
 
-        System.out.println("Root:     " + rootPath);
-        System.out.println("Full:     " + fullPath);
-        System.out.println("Relative: " + relativePath);
-        System.out.println("Filename: " + fileName);
     }
 }
