@@ -23,6 +23,7 @@ import java.util.zip.DataFormatException;
 public class MultiKeysCompressedComparator implements net.zousys.compressedtable.CompressedComparator {
     @Setter
     private ComparatorListener comparatorListener;
+    @Builder.Default
     private Set<String> ignoredFields = Collections.emptySet();
     @Setter
     private CompressedTable before;
