@@ -23,7 +23,7 @@ public class Renamer {
     /**
      * Renames all files whose name contains the given tag
      */
-    public static void renameFilesContaining(Path root, String tag, String newtag) {
+    public static void renameFilesContaining(Path root, String tag, String replacement) {
         try (Stream<Path> walk = Files.walk(root)) {
 
             List<Path> filesToRename = walk
@@ -33,19 +33,19 @@ public class Renamer {
 
             for (Path oldPath : filesToRename) {
                 String oldName = oldPath.getFileName().toString();
-                String newName = oldName.replace(tag, newtag);
+                String newName = oldName.replace(tag, replacement);
                 Path newPath = oldPath.resolveSibling(newName);
 
                 if (Files.exists(newPath)) {
-                    log.warn("⚠️  Skipped (already exists): " + oldName);
+                    log.warn("Skipped (already exists): " + oldName);
                     continue;
                 }
 
                 try {
                     Files.move(oldPath, newPath);
-                    log.info("✅ Renamed: " + oldName + " → " + newName);
+                    log.info("Renamed: " + oldName + " → " + newName);
                 } catch (IOException e) {
-                    log.error("❌ Failed to rename " + oldName + ": " + e.getMessage());
+                    log.error("Failed to rename " + oldName + ": " + e.getMessage());
                 }
             }
 
@@ -66,15 +66,15 @@ public class Renamer {
                         Path newDir = oldDir.resolveSibling(newName);
 
                         if (Files.exists(newDir)) {
-                            System.out.println("⚠️ Skipped (already exists): " + oldName);
+                            System.out.println("Skipped (already exists): " + oldName);
                             return;
                         }
 
                         try {
                             Files.move(oldDir, newDir);
-                            System.out.println("✅ Renamed dir: " + oldName + " → " + newName);
+                            System.out.println("Renamed dir: " + oldName + " → " + newName);
                         } catch (IOException e) {
-                            System.out.println("❌ Failed: " + oldName + " - " + e.getMessage());
+                            System.out.println("Failed: " + oldName + " - " + e.getMessage());
                         }
                     });
 
