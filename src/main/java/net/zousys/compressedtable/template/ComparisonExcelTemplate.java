@@ -80,8 +80,8 @@ public class ComparisonExcelTemplate {
         Styles.init(book);
 
         populateMisMatched(book.createSheet("Mismatched"));
-        populateAfterMissed(book.createSheet("After Missed"));
-        populateBeforeMissed(book.createSheet("Before Missed"));
+        populateAfterMissed(book.createSheet("Newly Missed"));
+        populateBeforeMissed(book.createSheet("Newly Added"));
         if (details == 3) {
 //            matchedshit = book.createSheet("Matched");
         }
@@ -114,26 +114,25 @@ public class ComparisonExcelTemplate {
         keyCell = row.createCell(cellid++);
         int cint = comparisonResult.getAfterMissed().size();
         if (cint == 0) {
-            keyCell.setCellValue("");
+            keyCell.setCellValue("EMPTY");
             keyCell.setCellStyle(styles.get(HEADERS));
         } else {
             keyCell.setCellValue("" + cint);
             keyCell.setCellStyle(styles.get(MARKER));
-        }
+            Map<String, Row> trows = comparisonResult.getBefore().getKeyedMappingMap().getMainKeyedMapping();
 
-        Map<String, Row> trows = comparisonResult.getBefore().getKeyedMappingMap().getMainKeyedMapping();
-
-        for (String akey : comparisonResult.getAfterMissed()) {
-            Row arow = trows.get(akey);
-            row = xssfSheet.createRow(rowid++);
-            cellid = 0;
-            Cell cell = row.createCell(cellid++);
-            cell.setCellValue(akey);
-            cell.setCellStyle(styles.get(BEFORE));
-            for (String header : comparisonResult.getBefore().getHeaders()) {
-                cell = row.createCell(cellid++);
-                cell.setCellValue(arow.getField(header));
-                cell.setCellStyle(styles.get(BEFORE));
+            for (String akey : comparisonResult.getAfterMissed()) {
+                Row arow = trows.get(akey);
+                row = xssfSheet.createRow(rowid++);
+                cellid = 0;
+                Cell cell = row.createCell(cellid++);
+                cell.setCellValue(akey);
+//                cell.setCellStyle(styles.get(BEFORE));
+                for (String header : comparisonResult.getBefore().getHeaders()) {
+                    cell = row.createCell(cellid++);
+                    cell.setCellValue(arow.getField(header));
+//                    cell.setCellStyle(styles.get(BEFORE));
+                }
             }
         }
         autoColumnWidth(xssfSheet);
@@ -166,28 +165,29 @@ public class ComparisonExcelTemplate {
         keyCell = row.createCell(cellid++);
         int cint = comparisonResult.getBeforeMissed().size();
         if (cint == 0) {
-            keyCell.setCellValue("");
+            keyCell.setCellValue("EMPTY");
             keyCell.setCellStyle(styles.get(HEADERS));
         } else {
             keyCell.setCellValue("" + cint);
             keyCell.setCellStyle(styles.get(MARKER));
-        }
 
-        Map<String, Row> trows = comparisonResult.getAfter().getKeyedMappingMap().getMainKeyedMapping();
+            Map<String, Row> trows = comparisonResult.getAfter().getKeyedMappingMap().getMainKeyedMapping();
 
-        for (String akey : comparisonResult.getBeforeMissed()) {
-            Row arow = trows.get(akey);
-            row = xssfSheet.createRow(rowid++);
-            cellid = 0;
-            Cell cell = row.createCell(cellid++);
-            cell.setCellValue(akey);
-            cell.setCellStyle(styles.get(AFTER));
-            for (String header : comparisonResult.getAfter().getHeaders()) {
-                cell = row.createCell(cellid++);
-                cell.setCellValue(arow.getField(header));
-                cell.setCellStyle(styles.get(AFTER));
+            for (String akey : comparisonResult.getBeforeMissed()) {
+                Row arow = trows.get(akey);
+                row = xssfSheet.createRow(rowid++);
+                cellid = 0;
+                Cell cell = row.createCell(cellid++);
+                cell.setCellValue(akey);
+//                cell.setCellStyle(styles.get(AFTER));
+                for (String header : comparisonResult.getAfter().getHeaders()) {
+                    cell = row.createCell(cellid++);
+                    cell.setCellValue(arow.getField(header));
+//                    cell.setCellStyle(styles.get(AFTER));
+                }
             }
         }
+
         autoColumnWidth(xssfSheet);
     }
 

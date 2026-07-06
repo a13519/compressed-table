@@ -23,7 +23,7 @@ public class ComparisonResult {
     private List<RowResult> mismatches = new ArrayList<>();
     private List<String> unitedHeaders;
     private Map<String, Integer> markers;
-    private Set<String> ignoredFields;
+    private Set<String> ignoredFields = new HashSet<>();
     /**
      * @param before
      * @param after

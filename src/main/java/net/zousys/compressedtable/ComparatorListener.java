@@ -40,4 +40,6 @@ public interface ComparatorListener {
     void appendInformation();
 
     void finished();
+
+    void setComparisonResult(ComparisonResult comparisonResult);
 }

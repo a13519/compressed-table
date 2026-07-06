@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class DummyListener implements ComparatorListener {
+
+    private ComparisonResult comparisonResult;
+
     @Override
     public void handleBeforeLoaded(CompressedTable before) {
 
@@ -86,5 +89,10 @@ public class DummyListener implements ComparatorListener {
     @Override
     public void finished() {
 
+    }
+
+    @Override
+    public void setComparisonResult(ComparisonResult comparisonResult) {
+        this.comparisonResult = comparisonResult;
     }
 }

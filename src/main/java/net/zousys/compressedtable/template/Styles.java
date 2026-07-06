@@ -114,7 +114,7 @@ public class Styles {
         styles.put(NULLAFTER, nullBlueStyle);
         styles.put(NULLBEFORE, nullOrangeStyle);
         styles.put(MARKER, markerRedStyle);
-        styles.put(MISMATCHBEFORE, yellowStyle);
+        styles.put(MISMATCHBEFORE, yellowlightStyle);
         styles.put(MISMATCHAFTER, yellowlightStyle);
     }
 }

@@ -1,6 +1,7 @@
 package samples;
 
 import net.zousys.compressedtable.ComparisonResult;
+import net.zousys.compressedtable.CompressedComparator;
 import net.zousys.compressedtable.CompressedComparatorFactory;
 import net.zousys.compressedtable.CompressedTableFactory;
 import net.zousys.compressedtable.impl.CompressedTable;
@@ -25,10 +26,7 @@ public class CompareTwoTables2Excel {
     public void compareCSVSingleKey() throws IOException, DataFormatException {
         Set<String> ignoredColumns = new HashSet(Arrays.asList(new String[]{"Country"}));
 
-        ComparisonResult comparisonResult = new ComparisonResult();
-        comparisonResult.setIgnoredFields(ignoredColumns);
-
-        CompareListenerInExcel listener = new CompareListenerInExcel(comparisonResult, "CSVsingleKey.xlsx");
+        CompareListenerInExcel listener = new CompareListenerInExcel("CSVsingleKey.xlsx");
 
         CompressedTable beforetable = CompressedTableFactory
                 .build("csv")
@@ -73,10 +71,7 @@ public class CompareTwoTables2Excel {
     public void compareEXCELSingleKey() throws IOException, DataFormatException {
         Set<String> ignoredColumns = new HashSet(Arrays.asList(new String[]{"Last Name"}));
 
-        ComparisonResult comparisonResult = new ComparisonResult();
-        comparisonResult.setIgnoredFields(ignoredColumns);
-
-        CompareListenerInExcel listener = new CompareListenerInExcel(comparisonResult,"ExcelsingleKey.xlsx");
+        CompareListenerInExcel listener = new CompareListenerInExcel("ExcelsingleKey.xlsx");
 
         CompressedTable beforetable = CompressedTableFactory
                 .build("excel")
@@ -106,7 +101,7 @@ public class CompareTwoTables2Excel {
         listener.handleAfterLoaded(aftertable);
         System.out.println("After size: " + aftertable.getContents().size() + " " + aftertable.getHeaders() + " Mode: " + beforetable.getMode());
 
-        CompressedComparatorFactory.builder()
+        CompressedComparator compressedComparator = CompressedComparatorFactory.builder()
                 .before(beforetable)
                 .after(aftertable)
                 .comparatorListener(listener)
@@ -115,10 +110,10 @@ public class CompareTwoTables2Excel {
                 .build().create()
                 .compare();
 
-        assertTrue(comparisonResult.getMismatches().size()==990);
-        assertTrue(comparisonResult.getBeforeMissed().size()==2);
-        assertTrue(comparisonResult.getAfterMissed().size()==3);
-        assertTrue(comparisonResult.getUnitedHeaders().size()==14);
+        assertTrue(compressedComparator.getComparisonResult().getMismatches().size()==990);
+        assertTrue(compressedComparator.getComparisonResult().getBeforeMissed().size()==2);
+        assertTrue(compressedComparator.getComparisonResult().getAfterMissed().size()==3);
+        assertTrue(compressedComparator.getComparisonResult().getUnitedHeaders().size()==14);
     }
 
 }

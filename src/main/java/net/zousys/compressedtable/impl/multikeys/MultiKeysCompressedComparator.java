@@ -56,6 +56,8 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
     @Builder.Default
     private Map<String, Integer> markers = new HashMap<>();
 
+    @Getter
+    private ComparisonResult  comparisonResult;
 
     /**
      * This is to set the ignored colume of table in comparison, those columns won't be compared
@@ -91,6 +93,8 @@ public class MultiKeysCompressedComparator implements net.zousys.compressedtable
      * This is to compare two tables
      */
     public MultiKeysCompressedComparator compare() {
+        comparisonResult = new ComparisonResult(before, after);
+        comparatorListener.setComparisonResult(comparisonResult);
         // missed in before
         contains(after, before, beforeMissed, null);
         comparatorListener.handleMissedInBefore(beforeMissed);

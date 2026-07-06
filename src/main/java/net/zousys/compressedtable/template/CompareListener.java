@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class CompareListener implements ComparatorListener {
+    private ComparisonResult comparisonResult;
+
     ArrayList<CompressedRow> beforemissed = new ArrayList<CompressedRow>();
     ArrayList<CompressedRow> aftermissed = new ArrayList<CompressedRow>();
 
@@ -95,5 +97,10 @@ public class CompareListener implements ComparatorListener {
     @Override
     public void finished() {
 
+    }
+
+    @Override
+    public void setComparisonResult(ComparisonResult comparisonResult) {
+        this.comparisonResult = comparisonResult;
     }
 }

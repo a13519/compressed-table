@@ -53,6 +53,8 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
     @Builder.Default
     private Map<String, Integer> markers = new HashMap<>();
 
+    @Getter
+    private ComparisonResult  comparisonResult;
 
     /**
      * This is to set the ignored colume of table in comparison, those columns won't be compared
@@ -88,6 +90,8 @@ public class SingleKeyCompressedComparator implements net.zousys.compressedtable
      * This is to compare two tables
      */
     public SingleKeyCompressedComparator compare() {
+        comparisonResult = new ComparisonResult(before, after);
+        comparatorListener.setComparisonResult(comparisonResult);
         // missed in before
         contains(after.getKeyedMappingMap().getMainKeyedMapping().keySet(),
                 before.getKeyedMappingMap().getMainKeyedMapping().keySet(), beforeMissed, null);

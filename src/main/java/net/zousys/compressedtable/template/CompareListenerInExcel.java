@@ -1,5 +1,6 @@
 package net.zousys.compressedtable.template;
 
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.zousys.compressedtable.ComparatorListener;
 import net.zousys.compressedtable.ComparisonResult;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Log4j2
+@Getter
 public class CompareListenerInExcel implements ComparatorListener {
 
     private ComparisonResult comparisonResult;
@@ -20,7 +22,7 @@ public class CompareListenerInExcel implements ComparatorListener {
     /**
      *
      */
-    public CompareListenerInExcel(ComparisonResult comparisonResult, String filename) {
+    public CompareListenerInExcel(String filename) {
         this.comparisonResult = comparisonResult;
         this.fileName = filename;
     }
@@ -28,13 +30,11 @@ public class CompareListenerInExcel implements ComparatorListener {
     @Override
     public void handleBeforeLoaded(CompressedTable before) {
         log.info("Load before rows: " + before.size());
-        comparisonResult.setBefore(before);
     }
 
     @Override
     public void handleAfterLoaded(CompressedTable after) {
         log.info("Load after rows: " + after.size());
-        comparisonResult.setAfter(after);
     }
 
     @Override
@@ -133,5 +133,10 @@ public class CompareListenerInExcel implements ComparatorListener {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setComparisonResult(ComparisonResult comparisonResult) {
+        this.comparisonResult = comparisonResult;
     }
 }
