@@ -114,12 +114,19 @@ public class CompareListenerInExcel implements ComparatorListener {
 
     @Override
     public void finished() {
-
         try {
-            ComparisonExcelTemplate template = new ComparisonExcelTemplate(comparisonResult);
-            template.setOutputStream(new FileOutputStream(fileName));
-            template.setStyles(Styles.styles);
-            template.save();
+            if (comparisonResult.getBeforeMissed().isEmpty()
+            && comparisonResult.getAfterMissed().isEmpty()
+            && comparisonResult.getMismatches().isEmpty()
+            && comparisonResult.getBeforeMissedHeaders().isEmpty()
+                && comparisonResult.getAfterMissedHeaders().isEmpty()) {
+                // not generate result since all match
+            } else {
+                ComparisonExcelTemplate template = new ComparisonExcelTemplate(comparisonResult);
+                template.setOutputStream(new FileOutputStream(fileName));
+                template.setStyles(Styles.styles);
+                template.save();
+            }
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {

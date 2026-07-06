@@ -24,7 +24,7 @@ import java.util.zip.DataFormatException;
 public class SingleKeyCompressedComparator implements net.zousys.compressedtable.CompressedComparator {
     @Setter
     private ComparatorListener comparatorListener;
-    private Set<String> ignoredFields;
+    private Set<String> ignoredFields = Collections.emptySet();
     @Setter
     private net.zousys.compressedtable.impl.CompressedTable before;
     @Setter

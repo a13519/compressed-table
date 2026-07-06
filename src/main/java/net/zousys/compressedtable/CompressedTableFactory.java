@@ -177,6 +177,7 @@ public class CompressedTableFactory {
                         .headerPosition(headerPosition)
                         .keyHeaderList(keyHeaderList)
                         .compressed(compressed)
+                        .tabname(tabname)
                         .ignoredTailLines(ignoredTailLines)
                         .build()
                         .parse(inputSteam);
