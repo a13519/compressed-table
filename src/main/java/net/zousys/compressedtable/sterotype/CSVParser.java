@@ -57,7 +57,7 @@ public class CSVParser {
                             CompressedTableFactory.Mode.MULTI_KEYS);
             compressedTable.setCompressed(compressed);
             compressedTable.setHeaderRowNumber(headerPosition);
-            if (keyHeaderList != null) {
+            if (keyHeaderList != null && keyHeaderList.getKeyHeadersList().size() > 0) {
                 compressedTable.setKeyHeaderList(keyHeaderList);
             }
             AtomicInteger n = new AtomicInteger();

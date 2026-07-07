@@ -50,7 +50,7 @@ public class ExcelParser {
                             CompressedTableFactory.Mode.SINGLE_KEY);
             compressedTable.setCompressed(compressed);
             compressedTable.setHeaderRowNumber(headerPosition);
-            if (keyHeaderList != null) {
+            if (keyHeaderList != null && keyHeaderList.getKeyHeadersList().size() > 0) {
                 compressedTable.setKeyHeaderList(keyHeaderList);
             }
 
