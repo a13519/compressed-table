@@ -41,7 +41,7 @@ public class ExcelParser {
             XSSFSheet sheet = tabname==null
                     ?workbook.getSheetAt(0):
                     workbook.getSheet(tabname);
-            int from = sheet.getFirstRowNum();
+            int from = Math.max(sheet.getFirstRowNum(), headerPosition);
             int to = sheet.getLastRowNum();
 
             CompressedTable compressedTable = new CompressedTable(
