@@ -73,7 +73,6 @@ public class PerformanceTest {
                 .before(beforetable)
                 .after(aftertable)
 //                .comparatorListener(listener)
-                .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
                 .strictMissed(true)
                 .build().create()
                 .compare();

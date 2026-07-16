@@ -60,7 +60,6 @@ public class CompareTwoTables2Excel {
                 .before(beforetable)
                 .after(aftertable)
                 .comparatorListener(listener)
-                .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
                 .strictMissed(true)
                 .build().create()
                 .compare();
@@ -69,7 +68,6 @@ public class CompareTwoTables2Excel {
 
     @Test
     public void compareEXCELSingleKey() throws IOException, DataFormatException {
-        Set<String> ignoredColumns = new HashSet(Arrays.asList(new String[]{"Last Name"}));
 
         CompareListenerInExcel listener = new CompareListenerInExcel("ExcelsingleKey.xlsx");
 
@@ -105,7 +103,7 @@ public class CompareTwoTables2Excel {
                 .before(beforetable)
                 .after(aftertable)
                 .comparatorListener(listener)
-                .ignoredFields(ignoredColumns)
+                .ignoredFields("Last Name")
                 .strictMissed(true)
                 .build().create()
                 .compare();
