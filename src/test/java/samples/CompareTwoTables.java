@@ -53,7 +53,6 @@ public class CompareTwoTables {
                 .before(beforetable)
                 .after(aftertable)
                 .comparatorListener(listener)
-                .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
                 .strictMissed(true)
                 .build().create()
                 .compare();
@@ -96,7 +95,6 @@ public class CompareTwoTables {
                 .before(beforetable)
                 .after(aftertable)
                 .comparatorListener(listener)
-                .ignoredFields(new HashSet(Arrays.asList(new String[]{})))
                 .strictMissed(true)
                 .build().create()
                 .compare();

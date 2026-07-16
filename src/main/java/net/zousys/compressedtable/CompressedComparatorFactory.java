@@ -8,10 +8,7 @@ import net.zousys.compressedtable.impl.DummyListener;
 import net.zousys.compressedtable.impl.multikeys.MultiKeysCompressedComparator;
 import net.zousys.compressedtable.impl.singlekey.SingleKeyCompressedComparator;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Log4j2
 /**
@@ -23,8 +20,7 @@ public class CompressedComparatorFactory {
     @Builder.Default
     private ComparatorListener comparatorListener = new DummyListener();
     @Setter
-    @Builder.Default
-    private Set<String> ignoredFields = new HashSet<>();
+    private String ignoredFields;
     @Setter
     private CompressedTable before;
     @Setter
@@ -42,15 +38,21 @@ public class CompressedComparatorFactory {
      */
     private boolean strictMissed;
 
+    @Builder.Default
+    private Set<String> ignoredFieldSet = new HashSet<>();
+
     /**
      * @return
      */
     public CompressedComparator create() {
+        if (ignoredFields != null) {
+            ignoredFieldSet.addAll(Arrays.asList(Arrays.stream(ignoredFields.split(",")).map(String::trim).toArray(String[]::new)));
+        }
         if (before.getMode() == CompressedTableFactory.Mode.MULTI_KEYS &&
                 after.getMode() == CompressedTableFactory.Mode.MULTI_KEYS) {
             return MultiKeysCompressedComparator.builder()
                     .comparatorListener(comparatorListener)
-                    .ignoredFields(ignoredFields)
+                    .ignoredFields(ignoredFieldSet)
                     .before(before)
                     .after(after)
                     .unitedHeaders(unitedHeaders)
@@ -62,7 +64,7 @@ public class CompressedComparatorFactory {
                 after.getMode() == CompressedTableFactory.Mode.SINGLE_KEY) {
             return SingleKeyCompressedComparator.builder()
                     .comparatorListener(comparatorListener)
-                    .ignoredFields(ignoredFields)
+                    .ignoredFields(ignoredFieldSet)
                     .before(before)
                     .after(after)
                     .unitedHeaders(unitedHeaders)
