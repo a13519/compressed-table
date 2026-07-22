@@ -1,0 +1,37 @@
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08">
+  <BkToCstmrDbtCdtNtfctn>
+
+    <GrpHdr>
+      <MsgId>CAMT20260721001</MsgId>
+      <CreDtTm>2026-07-21T10:05:00</CreDtTm>
+    </GrpHdr>
+
+    <Ntfctn>
+      <Id>NOTIF001</Id>
+
+      <Ntry>
+        <Amt Ccy="USD">100000.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+
+        <NtryDtls>
+          <TxDtls>
+
+            <Refs>
+              <TxId>TX123456789</TxId>
+              <EndToEndId>INV-2026-001</EndToEndId>
+            </Refs>
+
+            <RltdPties>
+              <Dbtr>
+                <Nm>ABC Manufacturing Ltd</Nm>
+              </Dbtr>
+            </RltdPties>
+
+          </TxDtls>
+        </NtryDtls>
+
+      </Ntry>
+    </Ntfctn>
+
+  </BkToCstmrDbtCdtNtfctn>
+</Document>
