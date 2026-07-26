@@ -1,0 +1,24 @@
+rules:
+
+  - id: OBS_DISTINCT
+    nature: OBSERVATION
+    type: DISTINCT
+    table: *
+    column: abc
+    store: v1
+
+
+  - id: TYPE001
+    nature: DATA_TYPE
+    table: Account
+    column: balance
+    dataType: DECIMAL
+
+  - id: FK001
+    nature: MANY_TO_ONE
+    sourceTable: Account
+    sourceColumn: customerId
+    targetTable: Customer
+    targetColumn: customerId
+
+  - id:
