@@ -26,7 +26,8 @@ public class CSVParser {
     private int headerPosition;
     @Builder.Default
     private boolean compressed = true;
-
+    @Builder.Default
+    private boolean ignoreEmptyLines = true;
 
     /**
      * @param headers
@@ -47,7 +48,7 @@ public class CSVParser {
             Reader in = new BufferedReader(new InputStreamReader(inputStream));
             CSVFormat format = CSVFormat.RFC4180.builder()
                     .setDelimiter(delimeter)
-                    .setIgnoreEmptyLines(true)
+                    .setIgnoreEmptyLines(ignoreEmptyLines)
                     .setIgnoreSurroundingSpaces(true)
                     .setTrim(true)
                     .build();

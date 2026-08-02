@@ -36,6 +36,7 @@ public class CompressedTableFactory {
      */
     private int headerPosition = -1;
     private boolean compressed = true;
+    private boolean ignoreEmptyLines = true;
     private String tabname;
     
     /**
@@ -78,6 +79,15 @@ public class CompressedTableFactory {
      */
     public CompressedTableFactory compressed(boolean compressed) {
         this.compressed = compressed;
+        return this;
+    }
+
+    /**
+     * @param ignoreEmptyLines
+     * @return
+     */
+    public CompressedTableFactory ignoreEmptyLines(boolean ignoreEmptyLines) {
+        this.ignoreEmptyLines = ignoreEmptyLines;
         return this;
     }
 
@@ -167,6 +177,7 @@ public class CompressedTableFactory {
                         .headerPosition(headerPosition)
                         .keyHeaderList(keyHeaderList)
                         .compressed(compressed)
+                        .ignoreEmptyLines(ignoreEmptyLines)
                         .build()
                         .parse(inputSteam);
             }
@@ -176,6 +187,7 @@ public class CompressedTableFactory {
                         .headerPosition(headerPosition)
                         .keyHeaderList(keyHeaderList)
                         .compressed(compressed)
+                        .ignoreEmptyLines(ignoreEmptyLines)
                         .tabname(tabname)
                         .build()
                         .parse(inputSteam);
