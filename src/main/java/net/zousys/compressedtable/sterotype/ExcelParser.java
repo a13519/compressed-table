@@ -28,6 +28,8 @@ public class ExcelParser {
     private KeyHeadersList keyHeaderList = new KeyHeadersList();
     @Builder.Default
     private boolean compressed = true;
+    @Builder.Default
+    private boolean ignoreEmptyLines = true;
     private String tabname;
 
     /**
@@ -57,20 +59,26 @@ public class ExcelParser {
             int columnNo = -1;
 
             for (int i = from; i <= to; i++) {
+                int emptyFieldsNo = 0;
                 ArrayList<String> arowarray = new ArrayList<>();
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 if (row != null) {
                     int cn = row.getPhysicalNumberOfCells();
 
                     for (int j = 0; j < (columnNo == -1 ? cn : columnNo); j++) {
-                        arowarray.add(stringvalue(row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)).trim());
+                        String cellValue = stringvalue(row.getCell(j, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)).trim();
+                        arowarray.add(cellValue);
+                        if (cellValue.length() == 0) {
+                            emptyFieldsNo++;
+                        }
                     }
-
-                    if (headerPosition == i) {
-                        columnNo = cn;
-                        compressedTable.setHeaders(arowarray);
-                    } else {
-                        compressedTable.appendRow(arowarray);
+                    if (!ignoreEmptyLines || emptyFieldsNo != arowarray.size()) {
+                        if (headerPosition == i) {
+                            columnNo = cn;
+                            compressedTable.setHeaders(arowarray);
+                        } else {
+                            compressedTable.appendRow(arowarray);
+                        }
                     }
                 } else {
                     // empty row
